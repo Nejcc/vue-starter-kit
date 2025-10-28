@@ -41,6 +41,7 @@ defineProps<{
                 :href="logout()"
                 as="button"
                 class="mx-auto block text-sm"
+                prefetch
             >
                 Log out
             </TextLink>

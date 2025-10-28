@@ -4,6 +4,7 @@ import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
@@ -82,10 +83,38 @@ import { LoaderCircle } from 'lucide-vue-next';
                     <InputError :message="errors.password_confirmation" />
                 </div>
 
+                <!-- GDPR Data Processing Consent -->
+                <div class="grid gap-2">
+                    <div class="flex items-start space-x-2">
+                        <Checkbox
+                            id="data_processing_consent"
+                            name="data_processing_consent"
+                            :tabindex="5"
+                            required
+                        />
+                        <div class="grid gap-1.5 leading-none">
+                            <Label
+                                for="data_processing_consent"
+                                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                                I agree to the processing of my personal data
+                            </Label>
+                            <p class="text-xs text-muted-foreground">
+                                By creating an account, you agree to our 
+                                <a href="/privacy-policy" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+                                    Privacy Policy
+                                </a>
+                                and the processing of your personal data in accordance with GDPR regulations.
+                            </p>
+                        </div>
+                    </div>
+                    <InputError :message="errors.data_processing_consent" />
+                </div>
+
                 <Button
                     type="submit"
                     class="mt-2 w-full"
-                    tabindex="5"
+                    tabindex="6"
                     :disabled="processing"
                     data-test="register-user-button"
                 >
@@ -102,7 +131,8 @@ import { LoaderCircle } from 'lucide-vue-next';
                 <TextLink
                     :href="login()"
                     class="underline underline-offset-4"
-                    :tabindex="6"
+                    :tabindex="7"
+                    prefetch
                     >Log in</TextLink
                 >
             </div>

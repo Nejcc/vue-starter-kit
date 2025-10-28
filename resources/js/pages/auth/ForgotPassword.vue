@@ -61,7 +61,7 @@ defineProps<{
 
             <div class="space-x-1 text-center text-sm text-muted-foreground">
                 <span>Or, return to</span>
-                <TextLink :href="login()">log in</TextLink>
+                <TextLink :href="login()" prefetch>log in</TextLink>
             </div>
         </div>
     </AuthLayout>

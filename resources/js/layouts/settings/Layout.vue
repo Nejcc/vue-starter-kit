@@ -7,8 +7,10 @@ import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
+import { edit as editCookiePreferences } from '@/routes/cookie-preferences';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
+import { Cookie } from 'lucide-vue-next';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -26,6 +28,11 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Appearance',
         href: editAppearance(),
+    },
+    {
+        title: 'Cookie Preferences',
+        href: editCookiePreferences(),
+        icon: Cookie,
     },
 ];
 

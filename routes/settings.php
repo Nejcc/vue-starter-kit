@@ -25,4 +25,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])
         ->name('two-factor.show');
+
+    Route::get('settings/cookie-preferences', function () {
+        return Inertia::render('settings/CookiePreferences');
+    })->name('cookie-preferences.edit');
 });

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import CookieConsentBanner from '@/components/CookieConsentBanner.vue';
 import { home } from '@/routes';
 import { Link } from '@inertiajs/vue3';
 
 defineProps<{
     title?: string;
     description?: string;
+    cookieConsent?: any;
 }>();
 </script>
 
@@ -39,5 +41,8 @@ defineProps<{
                 <slot />
             </div>
         </div>
+        
+        <!-- Cookie Consent Banner -->
+        <CookieConsentBanner :cookie-consent="cookieConsent" />
     </div>
 </template>
