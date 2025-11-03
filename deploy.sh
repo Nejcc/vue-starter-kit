@@ -124,10 +124,16 @@ command -v php >/dev/null || { error "php not found"; exit 1; }
 command -v composer >/dev/null || { error "composer not found"; exit 1; }
 command -v npm >/dev/null || { error "npm not found"; exit 1; }
 
-# Check if .env exists
+# Check if .env exists, copy from .env.example if not
 if [ ! -f .env ]; then
-  error ".env file not found. Please create it from .env.example first."
-  exit 1
+  if [ -f .env.example ]; then
+    info ".env file not found. Copying from .env.example"
+    cp .env.example .env
+    success ".env file created from .env.example"
+  else
+    error ".env file not found and .env.example is missing. Please create .env manually."
+    exit 1
+  fi
 fi
 
 # Get current branch
@@ -172,13 +178,51 @@ else
   info "Deployment mode: ${BOLD}Development${RESET}"
 fi
 
-# ALWAYS disable maintenance mode at the start to ensure clean state for tests
-# This MUST happen before any tests run
-info "Disabling maintenance mode (if enabled) to ensure tests run against live application"
-php artisan up || true
-sleep 1  # Give Laravel a moment to fully disable maintenance mode
-
 if [ "$MIGRATE_ONLY" -eq 0 ]; then
+  # Initial setup steps - must be done before git pull to ensure dependencies are available
+  info "Installing PHP dependencies"
+  composer update --no-interaction --prefer-dist --ansi || {
+    error "Failed to install PHP dependencies"
+    exit 1
+  }
+
+  info "Installing Node dependencies"
+  if [ -f package-lock.json ]; then
+    npm ci --prefer-offline --no-audit || {
+      error "Failed to install Node dependencies"
+      exit 1
+    }
+  else
+    npm install --prefer-offline --no-audit || {
+      error "Failed to install Node dependencies"
+      exit 1
+    }
+  fi
+
+  info "Building frontend assets"
+  npm run build || {
+    error "Failed to build frontend assets"
+    exit 1
+  }
+
+  # Generate app key if not set
+  info "Ensuring application key is set"
+  php artisan key:generate --force || true
+
+  # Create database.sqlite if it doesn't exist
+  if [ ! -f database/database.sqlite ]; then
+    info "Creating database.sqlite file"
+    touch database/database.sqlite || {
+      warn "Could not create database.sqlite, continuing anyway"
+    }
+  fi
+
+  # ALWAYS disable maintenance mode at the start to ensure clean state for tests
+  # This MUST happen before any tests run
+  info "Disabling maintenance mode (if enabled) to ensure tests run against live application"
+  php artisan up || true
+  sleep 1  # Give Laravel a moment to fully disable maintenance mode
+
   if [ "$DO_PULL" -eq 1 ]; then
     info "Fetching latest changes from ${REMOTE}/${BRANCH}"
     git fetch "${REMOTE}" "${BRANCH}" || {
@@ -212,17 +256,21 @@ if [ "$MIGRATE_ONLY" -eq 0 ]; then
     info "Skipping git pull (--no-pull flag set)"
   fi
 
-  # Run tests if requested (before enabling maintenance mode)
+  # Run tests after setup is complete
   if [ "$RUN_TESTS" -eq 1 ]; then
-    info "Installing dev dependencies for testing"
-    composer install --no-interaction --prefer-dist --ansi || {
-      error "Failed to install dependencies for testing"
+    info "Running database migrations fresh with seeding"
+    php artisan migrate:fresh --seed --force || {
+      error "Failed to run migrations"
       exit 1
     }
     
     info "Running tests"
-    # Try composer test first, fallback to phpunit/pest directly
-    if command -v vendor/bin/pest >/dev/null 2>&1; then
+    # Try composer test first, then php artisan test, then fallback to phpunit/pest directly
+    if composer run test 2>/dev/null; then
+      success "All tests passed"
+    elif php artisan test --stop-on-failure 2>/dev/null; then
+      success "All tests passed"
+    elif [ -f vendor/bin/pest ]; then
       if vendor/bin/pest --stop-on-failure; then
         success "All tests passed"
       else
@@ -237,7 +285,7 @@ if [ "$MIGRATE_ONLY" -eq 0 ]; then
         exit 1
       fi
     else
-      error "No test runner found (pest or phpunit)"
+      error "No test runner found (composer test, artisan test, pest, or phpunit)"
       exit 1
     fi
   fi
@@ -248,26 +296,10 @@ if [ "$MIGRATE_ONLY" -eq 0 ]; then
     php artisan down || true
   fi
 
-  info "Installing PHP dependencies"
+  # Reinstall dependencies based on mode (production vs development)
   if [ "$IS_PROD" -eq 1 ]; then
+    info "Reinstalling PHP dependencies for production"
     composer install --no-dev --optimize-autoloader --classmap-authoritative --no-interaction --prefer-dist --ansi
-  else
-    composer install --no-interaction --prefer-dist --ansi
-  fi
-
-  info "Installing Node dependencies"
-  # We need dev dependencies for building (vite, typescript, etc.)
-  if [ -f package-lock.json ]; then
-    npm ci --prefer-offline --no-audit
-  else
-    npm install --prefer-offline --no-audit
-  fi
-
-  info "Building frontend assets"
-  if [ "$IS_PROD" -eq 1 ]; then
-    npm run build
-  else
-    info "Development mode: skipping build (run 'npm run dev' manually)"
   fi
 
   if [ "$IS_PROD" -eq 1 ]; then
