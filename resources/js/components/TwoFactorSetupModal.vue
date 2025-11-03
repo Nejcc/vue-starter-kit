@@ -2,6 +2,7 @@
 import AlertError from '@/components/AlertError.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import {
     Dialog,
     DialogContent,
@@ -18,8 +19,8 @@ import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/vue3';
 import { useClipboard } from '@vueuse/core';
-import { Check, Copy, Loader2, ScanLine } from 'lucide-vue-next';
-import { computed, nextTick, ref, watch } from 'vue';
+import { Check, Copy, ScanLine } from 'lucide-vue-next';
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 
 interface Props {
     requiresConfirmation: boolean;
@@ -37,7 +38,7 @@ const showVerificationStep = ref(false);
 const code = ref<number[]>([]);
 const codeValue = computed<string>(() => code.value.join(''));
 
-const pinInputContainerRef = ref<HTMLElement | null>(null);
+const pinInputContainerRef = useTemplateRef('pinInputContainerRef');
 
 const modalConfig = computed<{
     title: string;
@@ -163,7 +164,7 @@ watch(
                                     v-if="!qrCodeSvg"
                                     class="absolute inset-0 z-10 flex aspect-square h-auto w-full animate-pulse items-center justify-center bg-background"
                                 >
-                                    <Loader2 class="size-6 animate-spin" />
+                                    <Spinner class="size-6" />
                                 </div>
                                 <div
                                     v-else
@@ -204,7 +205,7 @@ watch(
                                     v-if="!manualSetupKey"
                                     class="flex h-full w-full items-center justify-center bg-muted p-3"
                                 >
-                                    <Loader2 class="size-4 animate-spin" />
+                                    <Spinner />
                                 </div>
                                 <template v-else>
                                     <input
