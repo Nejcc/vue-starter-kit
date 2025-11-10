@@ -93,4 +93,50 @@ class UserRepositoryTest extends TestCase
             'id' => $user->id,
         ]);
     }
+
+    public function test_find_by_email_returns_null_for_non_existent_email(): void
+    {
+        $found = $this->repository->findByEmail('nonexistent@example.com');
+
+        $this->assertNull($found);
+    }
+
+    public function test_find_by_id_returns_null_for_non_existent_id(): void
+    {
+        $found = $this->repository->findById(99999);
+
+        $this->assertNull($found);
+    }
+
+    public function test_update_user_returns_false_for_non_existent_id(): void
+    {
+        $result = $this->repository->updateUser(99999, ['name' => 'Test']);
+
+        $this->assertFalse($result);
+    }
+
+    public function test_delete_user_returns_false_for_non_existent_id(): void
+    {
+        $result = $this->repository->deleteUser(99999);
+
+        $this->assertFalse($result);
+    }
+
+    public function test_update_password_returns_false_for_non_existent_id(): void
+    {
+        $result = $this->repository->updatePassword(99999, 'new_password');
+
+        $this->assertFalse($result);
+    }
+
+    public function test_find_by_email_matches_exact_case(): void
+    {
+        $user = User::factory()->create(['email' => 'Test@Example.com']);
+
+        // Find with exact case
+        $found = $this->repository->findByEmail('Test@Example.com');
+
+        $this->assertNotNull($found);
+        $this->assertEquals($user->id, $found->id);
+    }
 }

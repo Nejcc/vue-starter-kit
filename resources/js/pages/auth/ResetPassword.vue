@@ -9,10 +9,9 @@ import { update } from '@/routes/password';
 import { Form, Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-const props = defineProps<{
-    token: string;
-    email: string;
-}>();
+import type { ResetPasswordPageProps } from '@/types';
+
+const props = defineProps<ResetPasswordPageProps>();
 
 const inputEmail = ref(props.email);
 </script>

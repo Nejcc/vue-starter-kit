@@ -13,12 +13,9 @@ import { Form, Head } from '@inertiajs/vue3';
 import { ShieldBan, ShieldCheck } from 'lucide-vue-next';
 import { onUnmounted, ref } from 'vue';
 
-interface Props {
-    requiresConfirmation?: boolean;
-    twoFactorEnabled?: boolean;
-}
+import type { TwoFactorPageProps } from '@/types';
 
-withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<TwoFactorPageProps>(), {
     requiresConfirmation: false,
     twoFactorEnabled: false,
 });

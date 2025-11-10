@@ -4,19 +4,12 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { useCookieConsent, type CookieCategory } from '@/composables/useCookieConsent'
-import { Settings, Cookie, Shield, BarChart3, Target, Calendar, MapPin } from 'lucide-vue-next'
+import { useCookieConsent } from '@/composables/useCookieConsent'
+import { Settings, Cookie, Shield, BarChart3, Target, Calendar } from 'lucide-vue-next'
 
-interface Props {
-  cookieConsent?: {
-    hasConsent: boolean
-    preferences: Record<string, boolean>
-    categories: Record<string, CookieCategory>
-    config: any
-  }
-}
+import type { CookiePreferencesPageProps } from '@/types';
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<CookiePreferencesPageProps>(), {
   cookieConsent: () => ({
     hasConsent: false,
     preferences: {},
@@ -29,7 +22,6 @@ const {
   hasConsent,
   preferences,
   categories,
-  config,
   updatePreferences,
   initializeFromServer,
 } = useCookieConsent()
@@ -91,11 +83,6 @@ const getCategoryIcon = (categoryKey: string) => {
     default:
       return Cookie
   }
-}
-
-// Check if category is required
-const isCategoryRequired = (categoryKey: string) => {
-  return categories.value[categoryKey]?.required || false
 }
 
 // Update local preference

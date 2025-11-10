@@ -113,11 +113,6 @@ const getCategoryIcon = (categoryKey: string) => {
   }
 }
 
-// Check if category is required
-const isCategoryRequired = (categoryKey: string) => {
-  return categories.value[categoryKey]?.required || false
-}
-
 // Update local preference
 const updateLocalPreference = (categoryKey: string, value: boolean) => {
   localPreferences.value[categoryKey] = value

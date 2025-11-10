@@ -24,4 +24,18 @@ export default defineConfig({
             },
         }),
     ],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['vue', '@inertiajs/vue3'],
+                    ui: ['reka-ui', 'lucide-vue-next'],
+                },
+            },
+        },
+        chunkSizeWarningLimit: 1000,
+    },
+    optimizeDeps: {
+        include: ['vue', '@inertiajs/vue3', 'reka-ui'],
+    },
 });

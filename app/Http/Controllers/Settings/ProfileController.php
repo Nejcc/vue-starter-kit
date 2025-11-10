@@ -12,10 +12,19 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * Profile controller for user profile management.
+ *
+ * Handles displaying and updating user profile information, as well as
+ * account deletion. Uses actions to encapsulate business logic.
+ */
 class ProfileController extends Controller
 {
     /**
      * Create a new profile controller instance.
+     *
+     * @param  UpdateUserProfileAction  $updateUserProfileAction  Action for updating user profile
+     * @param  DeleteUserAction  $deleteUserAction  Action for deleting user account
      */
     public function __construct(
         private readonly UpdateUserProfileAction $updateUserProfileAction,
@@ -24,6 +33,9 @@ class ProfileController extends Controller
 
     /**
      * Show the user's profile settings page.
+     *
+     * @param  Request  $request  The incoming request
+     * @return Response The Inertia response with profile page data
      */
     public function edit(Request $request): Response
     {
@@ -35,6 +47,12 @@ class ProfileController extends Controller
 
     /**
      * Update the user's profile information.
+     *
+     * Validates and updates the authenticated user's profile information
+     * using the UpdateUserProfileAction.
+     *
+     * @param  ProfileUpdateRequest  $request  The validated request
+     * @return RedirectResponse Redirect to profile edit page
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -48,6 +66,12 @@ class ProfileController extends Controller
 
     /**
      * Delete the user's profile.
+     *
+     * Validates the password and deletes the authenticated user's account
+     * using the DeleteUserAction. Invalidates the session after deletion.
+     *
+     * @param  Request  $request  The incoming request
+     * @return RedirectResponse Redirect to home page
      */
     public function destroy(Request $request): RedirectResponse
     {

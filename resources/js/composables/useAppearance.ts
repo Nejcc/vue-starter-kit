@@ -1,6 +1,16 @@
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, type Ref } from 'vue';
 
 type Appearance = 'light' | 'dark' | 'system';
+
+/**
+ * Return type for useAppearance composable.
+ */
+export interface UseAppearanceReturn {
+    /** Current appearance value (reactive) */
+    appearance: Ref<Appearance>;
+    /** Function to update the appearance */
+    updateAppearance: (value: Appearance) => void;
+}
 
 export function updateTheme(value: Appearance) {
     if (typeof window === 'undefined') {
@@ -69,7 +79,12 @@ export function initializeTheme() {
 
 const appearance = ref<Appearance>('system');
 
-export function useAppearance() {
+/**
+ * Composable for managing application appearance (light/dark/system theme).
+ *
+ * @returns UseAppearanceReturn Object containing appearance state and update function
+ */
+export function useAppearance(): UseAppearanceReturn {
     onMounted(() => {
         const savedAppearance = localStorage.getItem(
             'appearance',
@@ -80,7 +95,7 @@ export function useAppearance() {
         }
     });
 
-    function updateAppearance(value: Appearance) {
+    function updateAppearance(value: Appearance): void {
         appearance.value = value;
 
         // Store in localStorage for client-side persistence...

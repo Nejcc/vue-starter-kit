@@ -6,10 +6,9 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 import { Form, Head } from '@inertiajs/vue3';
+import type { VerifyEmailPageProps } from '@/types';
 
-defineProps<{
-    status?: string;
-}>();
+defineProps<VerifyEmailPageProps>();
 </script>
 
 <template>

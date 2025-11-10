@@ -232,7 +232,44 @@ watch(hasConsent, (newValue) => {
   }
 })
 
-export function useCookieConsent() {
+/**
+ * Return type for useCookieConsent composable.
+ */
+export interface UseCookieConsentReturn {
+    /** Whether the user has given consent */
+    hasConsent: ReturnType<typeof computed<boolean>>;
+    /** Current cookie preferences */
+    preferences: ReturnType<typeof computed<Record<string, boolean>>>;
+    /** Available cookie categories */
+    categories: ReturnType<typeof computed<Record<string, CookieCategory>>>;
+    /** Cookie consent configuration */
+    config: ReturnType<typeof computed<CookieConsentConfig>>;
+    /** Whether cookie consent is enabled */
+    isEnabled: ReturnType<typeof computed<boolean>>;
+    /** Accept all cookies */
+    acceptAll: () => Promise<void>;
+    /** Reject all non-essential cookies */
+    rejectAll: () => Promise<void>;
+    /** Update specific cookie preferences */
+    updatePreferences: (preferences: Record<string, boolean>) => Promise<void>;
+    /** Check if a category is allowed */
+    isCategoryAllowed: (category: string) => boolean;
+    /** Initialize from server data */
+    initializeFromServer: (serverData: CookieConsentState) => void;
+    /** Load preferences from localStorage */
+    loadPreferences: () => void;
+    /** Save preferences to localStorage */
+    savePreferences: (preferences: Record<string, boolean>) => void;
+    /** Raw state for advanced usage */
+    cookieConsentState: typeof cookieConsentState;
+}
+
+/**
+ * Composable for managing cookie consent preferences.
+ *
+ * @returns UseCookieConsentReturn Object containing consent state and methods
+ */
+export function useCookieConsent(): UseCookieConsentReturn {
   return {
     // State
     hasConsent,

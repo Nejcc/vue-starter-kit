@@ -9,10 +9,9 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
 import { Form, Head } from '@inertiajs/vue3';
+import type { ForgotPasswordPageProps } from '@/types';
 
-defineProps<{
-    status?: string;
-}>();
+defineProps<ForgotPasswordPageProps>();
 </script>
 
 <template>

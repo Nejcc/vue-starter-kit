@@ -7,6 +7,9 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { store } from '@/routes/password/confirm';
 import { Form, Head } from '@inertiajs/vue3';
+import type { ConfirmPasswordPageProps } from '@/types';
+
+defineProps<ConfirmPasswordPageProps>();
 </script>
 
 <template>

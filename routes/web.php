@@ -23,4 +23,13 @@ Route::prefix('cookie-consent')->group(function () {
     Route::post('/reject-all', [CookieConsentController::class, 'rejectAll'])->name('cookie-consent.reject-all');
 });
 
+// Privacy and Cookie Policy Pages
+Route::get('/privacy-policy', function () {
+    return Inertia::render('PrivacyPolicy');
+})->name('privacy-policy');
+
+Route::get('/cookie-policy', function () {
+    return Inertia::render('CookiePolicy');
+})->name('cookie-policy');
+
 require __DIR__.'/settings.php';

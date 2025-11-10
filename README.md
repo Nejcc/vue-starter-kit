@@ -56,8 +56,10 @@ This starter kit extends the base Laravel installation with the following additi
 - `app/Repositories/` - Data access layer
 - `app/Services/` - Business logic layer
 - `resources/js/pages/` - Inertia page components
-- `resources/js/components/` - Reusable Vue components
+- `resources/js/components/` - Reusable Vue components (PublicHeader, PublicFooter, etc.)
 - `resources/js/composables/` - Vue composition functions
+- `resources/js/layouts/` - Layout components (PublicLayout, AuthLayout, etc.)
+- `resources/js/types/` - TypeScript type definitions (pages, models, forms)
 
 ### 🛠️ Development Tools
 - **Laravel Pint** - PHP code style fixer
@@ -74,6 +76,9 @@ This starter kit extends the base Laravel installation with the following additi
 - **SSR Support** - Server-side rendering for improved performance
 - **Hot Module Replacement** - Instant frontend updates during development
 - **TypeScript Support** - Full type checking and IntelliSense
+- **Link Prefetching** - Automatic prefetching for faster navigation
+- **Mobile-First Design** - Responsive design starting from mobile screens
+- **Code Splitting** - Optimized bundle sizes with manual chunks
 
 ### 🧪 Testing
 - **PHPUnit** - Comprehensive test suite
@@ -93,21 +98,31 @@ This starter kit extends the base Laravel installation with the following additi
 - **Authentication Pages** - Login, register, password reset, email verification
 - **Cookie Preferences** - User-configurable cookie consent
 - **Appearance Settings** - Theme switching (light/dark mode)
+- **Privacy Policy** - GDPR-compliant privacy policy page
+- **Cookie Policy** - Comprehensive cookie policy page
+- **Public Layout Components** - Reusable header and footer components
 
 ### 🔧 Configuration
 - **Fortify Configuration** - Pre-configured authentication features
 - **Inertia Configuration** - SSR and shared data setup
-- **Tailwind v4 Configuration** - Modern CSS setup
+- **Tailwind v4 Configuration** - Modern CSS setup with custom breakpoints
+  - **xs**: < 768px (phones)
+  - **sm**: >= 768px (tablets)
+  - **md**: >= 992px (small laptops)
+  - **lg**: >= 1200px (laptops and desktops)
 - **TypeScript Configuration** - Strict type checking
 - **ESLint Configuration** - Vue 3 + TypeScript rules
 - **Prettier Configuration** - Consistent code formatting
+- **Vite Build Optimization** - Code splitting and chunk optimization
 
 ### 📝 Code Quality
 - **Strict TypeScript** - Type safety across frontend
 - **PHP Type Hints** - Full type declarations in PHP 8.4
-- **PHPDoc Blocks** - Comprehensive documentation
+- **PHPDoc Blocks** - Comprehensive documentation for all classes and methods
 - **Code Formatting** - Automated with Pint and Prettier
 - **Linting** - ESLint for frontend, Pint for backend
+- **Reusable Components** - DRY principle with shared components (PublicHeader, PublicFooter)
+- **Type Definitions** - Complete TypeScript types for pages, models, and forms
 
 ## 📋 Prerequisites
 

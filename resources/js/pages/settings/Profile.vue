@@ -14,12 +14,9 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem } from '@/types';
 
-interface Props {
-    mustVerifyEmail: boolean;
-    status?: string;
-}
+import type { ProfilePageProps } from '@/types';
 
-defineProps<Props>();
+defineProps<ProfilePageProps>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {

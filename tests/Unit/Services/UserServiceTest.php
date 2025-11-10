@@ -91,4 +91,96 @@ class UserServiceTest extends TestCase
         $this->assertInstanceOf(User::class, $found);
         $this->assertEquals($user->id, $found->id);
     }
+
+    public function test_update_profile_with_invalid_data_throws_exception(): void
+    {
+        $user = User::factory()->create();
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $this->service->updateProfile($user->id, [
+            'name' => '',
+            'email' => 'invalid-email',
+        ]);
+    }
+
+    public function test_update_profile_with_duplicate_email_throws_exception(): void
+    {
+        $user1 = User::factory()->create(['email' => 'existing@example.com']);
+        $user2 = User::factory()->create(['email' => 'other@example.com']);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $this->service->updateProfile($user2->id, [
+            'name' => 'Test Name',
+            'email' => 'existing@example.com',
+        ]);
+    }
+
+    public function test_delete_with_wrong_password_throws_exception(): void
+    {
+        $user = User::factory()->create(['password' => Hash::make('correct_password')]);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $this->service->delete($user->id, 'wrong_password');
+    }
+
+    public function test_delete_with_non_existent_user_throws_exception(): void
+    {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
+        $this->service->delete(99999, 'password');
+    }
+
+    public function test_update_password_with_validation_failure_throws_exception(): void
+    {
+        $user = User::factory()->create(['password' => Hash::make('old_password')]);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        // Password too short
+        $this->service->updatePassword($user->id, 'old_password', 'short');
+    }
+
+    public function test_update_password_with_non_existent_user_throws_exception(): void
+    {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
+        $this->service->updatePassword(99999, 'old_password', 'new_password123');
+    }
+
+    public function test_update_profile_with_non_existent_user_throws_exception(): void
+    {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
+        $this->service->updateProfile(99999, [
+            'name' => 'Test Name',
+            'email' => 'test@example.com',
+        ]);
+    }
+
+    public function test_create_user_with_duplicate_email_throws_exception(): void
+    {
+        User::factory()->create(['email' => 'existing@example.com']);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $this->service->create([
+            'name' => 'Test User',
+            'email' => 'existing@example.com',
+            'password' => 'password123',
+        ]);
+    }
+
+    public function test_create_user_with_weak_password_throws_exception(): void
+    {
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $this->service->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => '123', // Too short
+        ]);
+    }
 }

@@ -10,7 +10,9 @@ import HeadingSmall from '@/components/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type PasswordPageProps } from '@/types';
+
+defineProps<PasswordPageProps>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
