@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Container width inconsistencies across different screen sizes
 - Missing prefetch attributes on navigation links
 
-## [1.0.0] - 2025-01-XX
+## [1.0.0] - 2025-01-XX (Initial Release)
 
 ### Added
 - Laravel 12 with PHP 8.4+ support
