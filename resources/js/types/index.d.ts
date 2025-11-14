@@ -22,12 +22,8 @@ export interface NavItem {
  *
  * These props are automatically provided by the HandleInertiaRequests middleware
  * and are available on all pages that use AppLayout.
- *
- * @template T Additional page-specific props
  */
-export type AppPageProps<
-    T extends Record<string, unknown> = Record<string, unknown>,
-> = T & {
+export interface AppPageProps {
     /** The current page name */
     name: string;
     /** Daily quote for inspiration */
@@ -36,7 +32,7 @@ export type AppPageProps<
     auth: Auth;
     /** Whether the sidebar is open */
     sidebarOpen: boolean;
-};
+}
 
 /**
  * User model interface matching Laravel User model.
