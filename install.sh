@@ -249,6 +249,9 @@ else
   php artisan migrate --seed --force
 fi
 
+info "Updating bootstrap files"
+php artisan bootstrap:update --force || true
+
 if [ "$IS_PROD" -eq 1 ]; then
   info "Optimizing application for production"
   php artisan optimize --force || true
