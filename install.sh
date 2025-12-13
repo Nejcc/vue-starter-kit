@@ -81,7 +81,17 @@ banner() {
   echo -e "${CYAN}${BOLD}────────────────────────────────────────────────────────────${RESET}"
 }
 
-trap 'error "Installation failed."' ERR
+# Enhanced error handling
+cleanup_on_error() {
+  local exit_code=$?
+  if [ $exit_code -ne 0 ]; then
+    echo
+    error "Installation failed at line $1 with exit code $exit_code"
+    error "Please check the error messages above and try again."
+  fi
+}
+
+trap 'cleanup_on_error $LINENO' ERR
 
 ask_yes_no() {
   local prompt="$1"; shift
@@ -107,9 +117,48 @@ cd "$SCRIPT_DIR"
 banner
 
 info "Checking required tools"
-command -v php >/dev/null || { echo "php not found" >&2; exit 1; }
-command -v composer >/dev/null || { echo "composer not found" >&2; exit 1; }
-command -v npm >/dev/null || { echo "npm not found" >&2; exit 1; }
+command -v php >/dev/null || { error "PHP is not installed. Please install PHP 8.4 or higher."; exit 1; }
+command -v composer >/dev/null || { error "Composer is not installed. Please install Composer from https://getcomposer.org"; exit 1; }
+command -v npm >/dev/null || { error "npm is not installed. Please install Node.js 18+ from https://nodejs.org"; exit 1; }
+
+info "Validating tool versions"
+# Check PHP version (8.4+)
+PHP_VERSION=$(php -r 'echo PHP_VERSION;')
+PHP_MAJOR=$(echo "$PHP_VERSION" | cut -d. -f1)
+PHP_MINOR=$(echo "$PHP_VERSION" | cut -d. -f2)
+if [ "$PHP_MAJOR" -lt 8 ] || { [ "$PHP_MAJOR" -eq 8 ] && [ "$PHP_MINOR" -lt 4 ]; }; then
+  error "PHP 8.4+ is required. Found: $PHP_VERSION"
+  exit 1
+fi
+echo "  ${DIM}PHP: $PHP_VERSION${RESET}"
+
+# Check Node.js version (18+)
+NODE_VERSION=$(node -v 2>/dev/null | sed 's/v//' || echo "0.0.0")
+NODE_MAJOR=$(echo "$NODE_VERSION" | cut -d. -f1)
+if [ "$NODE_MAJOR" -lt 18 ]; then
+  error "Node.js 18+ is required. Found: $NODE_VERSION"
+  exit 1
+fi
+echo "  ${DIM}Node.js: $NODE_VERSION${RESET}"
+
+# Check Composer version
+COMPOSER_VERSION=$(composer --version 2>/dev/null | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 || echo "0.0.0")
+echo "  ${DIM}Composer: $COMPOSER_VERSION${RESET}"
+
+info "Checking required PHP extensions"
+REQUIRED_EXTENSIONS=("pdo" "mbstring" "openssl" "tokenizer" "xml" "ctype" "json" "fileinfo" "curl")
+MISSING_EXTENSIONS=()
+for ext in "${REQUIRED_EXTENSIONS[@]}"; do
+  if ! php -m | grep -qi "^${ext}$"; then
+    MISSING_EXTENSIONS+=("$ext")
+  fi
+done
+if [ ${#MISSING_EXTENSIONS[@]} -gt 0 ]; then
+  error "Missing required PHP extensions: ${MISSING_EXTENSIONS[*]}"
+  error "Please install them using your system's package manager."
+  exit 1
+fi
+echo "  ${DIM}All required PHP extensions are installed${RESET}"
 
 echo
 if [ -n "$MODE_FLAG" ]; then
@@ -165,20 +214,28 @@ else
   fi
 fi
 
+info "Clearing Laravel caches"
+php artisan config:clear 2>/dev/null || true
+php artisan cache:clear 2>/dev/null || true
+php artisan route:clear 2>/dev/null || true
+php artisan view:clear 2>/dev/null || true
+
 info "Preparing environment file"
 if [ ! -f .env ]; then
   if [ -f .env.example ]; then
     cp .env.example .env
+    success "Created .env file from .env.example"
   else
-    echo ".env and .env.example not found. Aborting." >&2
+    error ".env and .env.example not found. Aborting."
     exit 1
   fi
+else
+  echo "  ${DIM}.env file already exists${RESET}"
 fi
 
-info "Ensuring SQLite database file exists at database/database.sqlite"
-mkdir -p database
-if [ ! -f database/database.sqlite ]; then
-  : > database/database.sqlite
+info "Generating application key"
+if ! php artisan key:generate --force 2>/dev/null; then
+  warn "Application key generation failed. This may be normal if key already exists."
 fi
 
 info "Setting permissions"
@@ -196,6 +253,12 @@ if [ -f .env ]; then
   chmod 600 .env || true
 fi
 
+info "Ensuring SQLite database file exists at database/database.sqlite"
+mkdir -p database
+if [ ! -f database/database.sqlite ]; then
+  : > database/database.sqlite
+fi
+
 # SQLite DB should be writable by user and group
 if [ -f database/database.sqlite ]; then
   chmod 664 database/database.sqlite || true
@@ -207,9 +270,17 @@ if [ "$CLEAN_DEPS" -eq 1 ] && [ -d vendor ]; then
   rm -rf vendor
 fi
 if [ "$IS_PROD" -eq 1 ]; then
+  echo "  ${DIM}Production mode: Installing without dev dependencies${RESET}"
   composer install --no-dev --classmap-authoritative --no-interaction --prefer-dist --ansi
 else
+  echo "  ${DIM}Development mode: Installing all dependencies${RESET}"
   composer install --no-interaction --prefer-dist --ansi
+fi
+if [ $? -eq 0 ]; then
+  success "PHP dependencies installed successfully"
+else
+  error "Failed to install PHP dependencies"
+  exit 1
 fi
 
 info "Installing Node dependencies (npm)"
@@ -218,54 +289,41 @@ if [ "$CLEAN_DEPS" -eq 1 ] && [ -d node_modules ]; then
   rm -rf node_modules
 fi
 if [ "$IS_PROD" -eq 1 ]; then
+  echo "  ${DIM}Production mode: Installing without dev dependencies${RESET}"
   if [ -f package-lock.json ]; then
     npm ci --omit=dev
   else
     npm i --omit=dev
   fi
 else
+  echo "  ${DIM}Development mode: Installing all dependencies${RESET}"
   npm i
+fi
+if [ $? -eq 0 ]; then
+  success "Node dependencies installed successfully"
+else
+  error "Failed to install Node dependencies"
+  exit 1
+fi
+
+info "Updating Node dependencies (npm update)"
+if [ "$IS_PROD" -eq 1 ]; then
+  npm update --omit=dev || true
+else
+  npm update || true
 fi
 
 info "Auditing and fixing npm vulnerabilities"
 if [ "$IS_PROD" -eq 1 ]; then
-  npm audit fix --omit=dev || true
+  npm audit fix --force --omit=dev || true
 else
-  npm audit fix || true
-fi
-
-info "Building frontend (npm run build)"
-npm run build
-
-info "Generating application key"
-php artisan key:generate --force
-
-info "Running migrations with seeders"
-if [ "$DO_FRESH" -eq 1 ]; then
-  echo "  ${DIM}Using: php artisan migrate:fresh --seed --force${RESET}"
-  php artisan migrate:fresh --seed --force
-else
-  echo "  ${DIM}Using: php artisan migrate --seed --force${RESET}"
-  php artisan migrate --seed --force
-fi
-
-if [ "$IS_PROD" -eq 1 ]; then
-  info "Optimizing application for production"
-  php artisan optimize --force || true
-else
-  info "Development mode selected"
-  if grep -q '"dev"\s*:' composer.json 2>/dev/null; then
-    echo "  ${DIM}Running: composer dev${RESET}"
-    composer run dev || composer dev || true
-  else
-    echo "  ${DIM}No composer 'dev' script found in composer.json. Skipping.${RESET}"
-  fi
+  npm audit fix --force || true
 fi
 
 echo
 info "Optional developer tooling"
 
-# Telescope prompt (default: install in dev mode, skip in prod)
+# Telescope prompt (default: skip in both dev and prod)
 INSTALL_TELESCOPE=0
 if [ -n "$TELESCOPE_FLAG" ]; then
   [ "$TELESCOPE_FLAG" = "yes" ] && INSTALL_TELESCOPE=1 || INSTALL_TELESCOPE=0
@@ -273,16 +331,21 @@ else
   if [ "$IS_PROD" -eq 1 ]; then
     if ask_yes_no "Install Laravel Telescope? [y/N]" "n"; then INSTALL_TELESCOPE=1; fi
   else
-    if ask_yes_no "Install Laravel Telescope? [Y/n]" "y"; then INSTALL_TELESCOPE=1; fi
+    if ask_yes_no "Install Laravel Telescope? [y/N]" "n"; then INSTALL_TELESCOPE=1; fi
   fi
 fi
 
 if [ "$INSTALL_TELESCOPE" -eq 1 ]; then
   info "Installing Laravel Telescope (dev dependency)"
-  composer require laravel/telescope --dev --no-interaction --ansi || true
-  php artisan telescope:install || true
-  php artisan migrate --force || true
-  warn "Remember to restrict Telescope in production (gate or env)."
+  if composer require laravel/telescope --dev --no-interaction --ansi; then
+    php artisan telescope:install || true
+    success "Laravel Telescope installed"
+    if [ "$IS_PROD" -eq 1 ]; then
+      warn "Remember to restrict Telescope in production (gate or env)."
+    fi
+  else
+    warn "Failed to install Laravel Telescope. Continuing..."
+  fi
 fi
 
 # Nightwatch prompt (default: install in dev mode, skip in prod)
@@ -299,11 +362,116 @@ fi
 
 if [ "$INSTALL_NIGHTWATCH" -eq 1 ]; then
   info "Installing Nightwatch (dev)"
-  npm i -D nightwatch chromedriver || true
-  npx nightwatch --init || npx nightwatch --generate-config || true
-  success "Nightwatch installed. Review generated config before running tests."
+  if npm i -D nightwatch chromedriver; then
+    if npx nightwatch --init 2>/dev/null || npx nightwatch --generate-config 2>/dev/null; then
+      success "Nightwatch installed and configured"
+      echo "  ${DIM}Review generated config before running tests${RESET}"
+    else
+      success "Nightwatch installed (config generation skipped)"
+    fi
+  else
+    warn "Failed to install Nightwatch. Continuing..."
+  fi
 fi
 
-success "Install complete. You can now run the application."
+info "Validating database connection"
+# For SQLite, check if file exists and is writable
+if grep -q "DB_CONNECTION=sqlite" .env 2>/dev/null || [ -f "database/database.sqlite" ]; then
+  if [ -f "database/database.sqlite" ] && [ -w "database/database.sqlite" ]; then
+    echo "  ${DIM}SQLite database file is accessible${RESET}"
+  else
+    warn "SQLite database file may not be writable. Continuing..."
+  fi
+elif php artisan db:show --quiet 2>/dev/null; then
+  echo "  ${DIM}Database connection successful${RESET}"
+else
+  warn "Database connection validation skipped (may require manual configuration)"
+fi
+
+info "Running migrations with seeders"
+if [ "$DO_FRESH" -eq 1 ]; then
+  echo "  ${DIM}Using: php artisan migrate:fresh --seed --force${RESET}"
+  php artisan migrate:fresh --seed --force
+else
+  echo "  ${DIM}Using: php artisan migrate --seed --force${RESET}"
+  php artisan migrate --seed --force
+fi
+
+info "Updating boost files"
+php artisan boost:update || true
+
+info "Building frontend (npm run build)"
+if npm run build; then
+  success "Frontend build completed successfully"
+else
+  error "Frontend build failed"
+  exit 1
+fi
+
+if [ "$IS_PROD" -eq 1 ]; then
+  info "Optimizing application for production"
+  php artisan config:cache --force || true
+  php artisan route:cache --force || true
+  php artisan view:cache --force || true
+  php artisan event:cache --force || true
+  php artisan optimize --force || true
+  success "Production optimizations complete"
+else
+  info "Development mode selected"
+  if grep -q '"dev"\s*:' composer.json 2>/dev/null; then
+    echo "  ${DIM}Note: Run 'composer run dev' to start the development server${RESET}"
+  else
+    echo "  ${DIM}No composer 'dev' script found in composer.json. Skipping.${RESET}"
+  fi
+fi
+
+echo
+info "Verifying installation"
+VERIFY_FAILED=0
+
+# Check if key exists
+if ! grep -q "^APP_KEY=base64:" .env 2>/dev/null; then
+  warn "Application key may not be set correctly"
+  VERIFY_FAILED=1
+fi
+
+# Check if vendor exists
+if [ ! -d "vendor" ]; then
+  error "Vendor directory not found"
+  VERIFY_FAILED=1
+fi
+
+# Check if node_modules exists
+if [ ! -d "node_modules" ]; then
+  error "node_modules directory not found"
+  VERIFY_FAILED=1
+fi
+
+# Check if build assets exist
+if [ ! -d "public/build" ] && [ ! -f "public/hot" ]; then
+  warn "Frontend assets not built. Run 'npm run build' if needed."
+fi
+
+# Test basic Laravel command
+if php artisan --version >/dev/null 2>&1; then
+  echo "  ${DIM}Laravel is working correctly${RESET}"
+else
+  error "Laravel artisan command failed"
+  VERIFY_FAILED=1
+fi
+
+if [ "$VERIFY_FAILED" -eq 0 ]; then
+  success "Installation verification passed"
+else
+  warn "Some verification checks failed. Please review the installation."
+fi
+
+echo
+success "Installation complete!"
+if [ "$IS_PROD" -eq 1 ]; then
+  echo "  ${DIM}Production mode: Application is optimized and ready to deploy${RESET}"
+else
+  echo "  ${DIM}Development mode: Run 'composer run dev' to start the development server${RESET}"
+fi
 
 
