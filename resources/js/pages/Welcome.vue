@@ -57,8 +57,8 @@ withDefaults(defineProps<WelcomePageProps>(), {
                                 >
                                     <span>Documentation</span>
                                     <svg
-                                        width="{10}"
-                                        height="{11}"
+                                        width="10"
+                                        height="11"
                                         viewBox="0 0 10 11"
                                         fill="none"
                                         xmlns="http://www.w3.org/2000/svg"
@@ -96,8 +96,8 @@ withDefaults(defineProps<WelcomePageProps>(), {
                                 >
                                     <span>Laracasts</span>
                                     <svg
-                                        width="{10}"
-                                        height="{11}"
+                                        width="10"
+                                        height="11"
                                         viewBox="0 0 10 11"
                                         fill="none"
                                         xmlns="http://www.w3.org/2000/svg"
