@@ -1,21 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Actions\User;
 
 use App\Actions\User\CreateUserAction;
+use App\Contracts\Services\UserServiceInterface;
 use App\Models\User;
-use App\Services\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 use Tests\TestCase;
 
-class CreateUserActionTest extends TestCase
+final class CreateUserActionTest extends TestCase
 {
     use RefreshDatabase;
 
     public function test_can_create_user_action(): void
     {
-        $userService = Mockery::mock(UserService::class);
+        $userService = app(UserServiceInterface::class);
         $action = new CreateUserAction($userService);
 
         $data = [
@@ -24,23 +25,13 @@ class CreateUserActionTest extends TestCase
             'password' => 'password123',
         ];
 
-        $expectedUser = User::factory()->make($data);
-
-        $userService->shouldReceive('create')
-            ->once()
-            ->with($data)
-            ->andReturn($expectedUser);
-
         $result = $action->handle($data);
 
         $this->assertInstanceOf(User::class, $result);
         $this->assertEquals('John Doe', $result->name);
         $this->assertEquals('john@example.com', $result->email);
-    }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
+        $this->assertDatabaseHas('users', [
+            'email' => 'john@example.com',
+        ]);
     }
 }

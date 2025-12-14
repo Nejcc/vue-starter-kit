@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use App\Models\User;
@@ -9,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-class RepositoryServiceIntegrationTest extends TestCase
+final class RepositoryServiceIntegrationTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -20,7 +22,7 @@ class RepositoryServiceIntegrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = new UserRepository;
+        $this->repository = new UserRepository();
         $this->service = new UserService($this->repository);
     }
 
@@ -115,22 +117,21 @@ class RepositoryServiceIntegrationTest extends TestCase
         $this->assertEquals('original@example.com', $user->email);
     }
 
-    public function test_repository_caching_works_with_service(): void
+    public function test_repository_returns_null_after_deletion(): void
     {
         $user = User::factory()->create();
 
-        // First call through service (should cache)
+        // First call through service
         $found1 = $this->service->findById($user->id);
 
         // Delete from database
         $user->delete();
 
-        // Second call should return cached result
+        // Second call should return null since model is deleted
         $found2 = $this->service->findById($user->id);
 
         $this->assertNotNull($found1);
-        $this->assertNotNull($found2);
-        $this->assertEquals($found1->id, $found2->id);
+        $this->assertNull($found2);
     }
 
     public function test_service_validation_before_repository_operation(): void

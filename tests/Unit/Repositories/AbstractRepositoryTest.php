@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Repositories;
 
 use App\Models\User;
-use App\Repositories\AbstractRepository;
+use App\Repositories\BaseRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 /**
- * Test repository implementation for testing AbstractRepository.
+ * Test repository implementation for testing BaseRepository.
  */
-class TestRepository extends AbstractRepository
+final class TestRepository extends BaseRepository
 {
     public function __construct()
     {
@@ -19,7 +20,7 @@ class TestRepository extends AbstractRepository
     }
 }
 
-class AbstractRepositoryTest extends TestCase
+final class AbstractRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -28,8 +29,7 @@ class AbstractRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = new TestRepository;
-        Cache::flush();
+        $this->repository = new TestRepository();
     }
 
     public function test_can_find_model_by_id(): void
@@ -50,22 +50,21 @@ class AbstractRepositoryTest extends TestCase
         $this->assertNull($found);
     }
 
-    public function test_find_caches_result(): void
+    public function test_find_returns_null_after_deletion(): void
     {
         $user = User::factory()->create();
 
-        // First call should hit database
+        // First call should return user
         $first = $this->repository->find($user->id);
 
         // Delete from database
         $user->delete();
 
-        // Second call should return cached result
-        $cached = $this->repository->find($user->id);
+        // Second call should return null since model is deleted
+        $found = $this->repository->find($user->id);
 
         $this->assertNotNull($first);
-        $this->assertNotNull($cached);
-        $this->assertEquals($first->id, $cached->id);
+        $this->assertNull($found);
     }
 
     public function test_find_with_specific_columns(): void
@@ -159,7 +158,7 @@ class AbstractRepositoryTest extends TestCase
         $this->assertCount(3, $all);
     }
 
-    public function test_all_caches_result(): void
+    public function test_all_includes_newly_created_models(): void
     {
         $user1 = User::factory()->create();
 
@@ -169,11 +168,11 @@ class AbstractRepositoryTest extends TestCase
         // Create another user
         $user2 = User::factory()->create();
 
-        // Second call should return cached result (without new user)
-        $cached = $this->repository->all();
+        // Second call should include new user
+        $all = $this->repository->all();
 
         $this->assertCount(1, $first);
-        $this->assertCount(1, $cached);
+        $this->assertCount(2, $all);
     }
 
     public function test_can_create_model(): void
@@ -194,19 +193,16 @@ class AbstractRepositoryTest extends TestCase
         ]);
     }
 
-    public function test_create_clears_cache(): void
+    public function test_create_adds_new_model(): void
     {
-        // Populate cache with all()
+        // Get initial count
         $before = $this->repository->all();
         $countBefore = $before->count();
 
-        // Create new model (should clear cache)
+        // Create new model
         $user = User::factory()->create();
 
-        // Clear cache manually to simulate cache clearing behavior
-        Cache::flush();
-
-        // After cache clear, all() should include new user
+        // After creation, all() should include new user
         $after = $this->repository->all();
 
         $this->assertGreaterThan($countBefore, $after->count());
@@ -233,21 +229,18 @@ class AbstractRepositoryTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_update_clears_cache(): void
+    public function test_update_modifies_model(): void
     {
         $user = User::factory()->create(['name' => 'Original Name']);
 
-        // Populate cache
-        $cached = $this->repository->find($user->id);
-        $this->assertEquals('Original Name', $cached->name);
+        // Get original
+        $original = $this->repository->find($user->id);
+        $this->assertEquals('Original Name', $original->name);
 
-        // Update model (should clear cache)
+        // Update model
         $this->repository->update($user->id, ['name' => 'Updated Name']);
 
-        // Clear cache manually to simulate cache clearing behavior
-        Cache::flush();
-
-        // Find should return updated data (cache cleared)
+        // Find should return updated data
         $found = $this->repository->find($user->id);
         $this->assertEquals('Updated Name', $found->name);
     }
@@ -269,21 +262,18 @@ class AbstractRepositoryTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_delete_clears_cache(): void
+    public function test_delete_removes_model(): void
     {
         $user = User::factory()->create();
 
-        // Populate cache
+        // Verify model exists
         $cached = $this->repository->find($user->id);
         $this->assertNotNull($cached);
 
-        // Delete model (should clear cache)
+        // Delete model
         $this->repository->delete($user->id);
 
-        // Clear cache manually to simulate cache clearing behavior
-        Cache::flush();
-
-        // Find should return null (cache cleared, model deleted)
+        // Find should return null (model deleted)
         $found = $this->repository->find($user->id);
         $this->assertNull($found);
     }
@@ -318,31 +308,5 @@ class AbstractRepositoryTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertEquals('John', $result->first()->name);
-    }
-
-    public function test_cache_key_generation(): void
-    {
-        $reflection = new \ReflectionClass($this->repository);
-        $method = $reflection->getMethod('getCacheKey');
-        $method->setAccessible(true);
-
-        $key1 = $method->invoke($this->repository, 'find', 1, ['*']);
-        $key2 = $method->invoke($this->repository, 'find', 1, ['*']);
-        $key3 = $method->invoke($this->repository, 'find', 2, ['*']);
-
-        $this->assertEquals($key1, $key2);
-        $this->assertNotEquals($key1, $key3);
-    }
-
-    public function test_cache_key_prefix(): void
-    {
-        $reflection = new \ReflectionClass($this->repository);
-        $method = $reflection->getMethod('getCacheKeyPrefix');
-        $method->setAccessible(true);
-
-        $prefix = $method->invoke($this->repository);
-
-        $this->assertStringStartsWith('repository:', $prefix);
-        $this->assertStringContainsString('User', $prefix);
     }
 }

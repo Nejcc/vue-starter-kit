@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Settings;
 
 use App\Actions\User\DeleteUserAction;
@@ -18,7 +20,7 @@ use Inertia\Response;
  * Handles displaying and updating user profile information, as well as
  * account deletion. Uses actions to encapsulate business logic.
  */
-class ProfileController extends Controller
+final class ProfileController extends Controller
 {
     /**
      * Create a new profile controller instance.
@@ -29,7 +31,9 @@ class ProfileController extends Controller
     public function __construct(
         private readonly UpdateUserProfileAction $updateUserProfileAction,
         private readonly DeleteUserAction $deleteUserAction
-    ) {}
+    ) {
+        $this->middleware('auth');
+    }
 
     /**
      * Show the user's profile settings page.

@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import PublicFooter from '@/components/PublicFooter.vue';
 import PublicHeader from '@/components/PublicHeader.vue';
+import CookieConsentBanner from '@/components/CookieConsentBanner.vue';
 
-defineProps<{
+interface Props {
     centered?: boolean;
-}>();
+    cookieConsent?: any;
+}
+
+withDefaults(defineProps<Props>(), {
+    centered: false,
+    cookieConsent: () => ({}),
+});
 </script>
 
 <template>
@@ -15,6 +22,9 @@ defineProps<{
         <PublicHeader />
         <slot />
         <PublicFooter />
+        
+        <!-- Cookie Consent Banner -->
+        <CookieConsentBanner :cookie-consent="cookieConsent" />
     </div>
 </template>
 

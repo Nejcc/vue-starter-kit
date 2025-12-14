@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
@@ -15,7 +17,7 @@ use Illuminate\Validation\Rules\Password;
  * Provides business logic for user operations including creation, profile updates,
  * password changes, and account deletion. All operations use transactions and validation.
  */
-class UserService extends AbstractService implements UserServiceInterface
+final class UserService extends AbstractService implements UserServiceInterface
 {
     /**
      * Create a new user service instance.
@@ -53,13 +55,11 @@ class UserService extends AbstractService implements UserServiceInterface
             'password' => ['required', Password::defaults()],
         ]);
 
-        return $this->transaction(function () use ($validated) {
-            return $this->getRepository()->createUser([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-            ]);
-        });
+        return $this->transaction(fn () => $this->getRepository()->createUser([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]));
     }
 
     /**
@@ -91,18 +91,20 @@ class UserService extends AbstractService implements UserServiceInterface
 
         $user = $this->getRepository()->findById($userId);
 
-        if (! $user) {
+        if (!$user) {
             throw new \Illuminate\Database\Eloquent\ModelNotFoundException('User not found.');
         }
 
-        return $this->transaction(function () use ($user, $validated) {
+        $originalEmail = $user->email;
+
+        return $this->transaction(function () use ($user, $validated, $originalEmail) {
+            // Update the user
             $this->getRepository()->updateUser($user->id, $validated);
 
             // Reset email verification if email changed
-            if ($user->email !== $validated['email']) {
-                $this->getRepository()->updateUser($user->id, [
-                    'email_verified_at' => null,
-                ]);
+            if ($originalEmail !== $validated['email']) {
+                $user->email_verified_at = null;
+                $user->save();
             }
 
             // Refresh the user to get updated data
@@ -134,11 +136,11 @@ class UserService extends AbstractService implements UserServiceInterface
     {
         $user = $this->getRepository()->findById($userId);
 
-        if (! $user) {
+        if (!$user) {
             throw new \Illuminate\Database\Eloquent\ModelNotFoundException('User not found.');
         }
 
-        if (! Hash::check($currentPassword, $user->password)) {
+        if (!Hash::check($currentPassword, $user->password)) {
             $validator = validator([], []);
             $validator->errors()->add('current_password', 'The current password is incorrect.');
             throw new \Illuminate\Validation\ValidationException($validator);
@@ -151,9 +153,7 @@ class UserService extends AbstractService implements UserServiceInterface
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
-        return $this->transaction(function () use ($user, $validated) {
-            return $this->getRepository()->updatePassword($user->id, Hash::make($validated['password']));
-        });
+        return $this->transaction(fn () => $this->getRepository()->updatePassword($user->id, Hash::make($validated['password'])));
     }
 
     /**
@@ -176,11 +176,11 @@ class UserService extends AbstractService implements UserServiceInterface
     {
         $user = $this->getRepository()->findById($userId);
 
-        if (! $user) {
+        if (!$user) {
             throw new \Illuminate\Database\Eloquent\ModelNotFoundException('User not found.');
         }
 
-        if (! Hash::check($password, $user->password)) {
+        if (!Hash::check($password, $user->password)) {
             $validator = validator([], []);
             $validator->errors()->add('password', 'The password is incorrect.');
             throw new \Illuminate\Validation\ValidationException($validator);
@@ -222,5 +222,34 @@ class UserService extends AbstractService implements UserServiceInterface
     public function findByEmail(string $email): ?User
     {
         return $this->getRepository()->findByEmail($email);
+    }
+
+    /**
+     * Search users by name or email.
+     *
+     * @param  string  $search  The search query
+     * @param  int  $limit  Maximum number of results
+     * @return \Illuminate\Database\Eloquent\Collection<int, User> Collection of matching users
+     *
+     * @example
+     * $users = $service->search('john');
+     */
+    public function search(string $search, int $limit = 50): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->getRepository()->search($search, $limit);
+    }
+
+    /**
+     * Get all users for impersonation (excluding current user).
+     *
+     * @param  int  $excludeUserId  The user ID to exclude
+     * @return \Illuminate\Database\Eloquent\Collection<int, User> Collection of users
+     *
+     * @example
+     * $users = $service->getAllForImpersonation(1);
+     */
+    public function getAllForImpersonation(int $excludeUserId): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->getRepository()->getAllForImpersonation($excludeUserId);
     }
 }

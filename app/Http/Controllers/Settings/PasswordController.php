@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Settings;
 
 use App\Actions\User\UpdateUserPasswordAction;
@@ -9,14 +11,16 @@ use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class PasswordController extends Controller
+final class PasswordController extends Controller
 {
     /**
      * Create a new password controller instance.
      */
     public function __construct(
         private readonly UpdateUserPasswordAction $updateUserPasswordAction
-    ) {}
+    ) {
+        $this->middleware('auth');
+    }
 
     /**
      * Show the user's password settings page.

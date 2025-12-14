@@ -10,11 +10,15 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, router } from '@inertiajs/vue3';
 
 import type { LoginPageProps } from '@/types';
 
 defineProps<LoginPageProps>();
+
+const quickLogin = (): void => {
+    router.post('/quick-login');
+};
 </script>
 
 <template>
@@ -94,6 +98,17 @@ defineProps<LoginPageProps>();
                 >
                     <Spinner v-if="processing" />
                     Log in
+                </Button>
+
+                <Button
+                    type="button"
+                    variant="outline"
+                    class="w-full"
+                    :tabindex="6"
+                    @click="quickLogin"
+                    data-test="quick-login-button"
+                >
+                    Quick Login (User 1)
                 </Button>
             </div>
 

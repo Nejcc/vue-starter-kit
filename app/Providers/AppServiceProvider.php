@@ -1,23 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
-use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Contracts\Services\UserServiceInterface;
-use App\Repositories\UserRepository;
+use App\Listeners\UpdateLastLoginAt;
 use App\Services\UserService;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
+final class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
     public function register(): void
     {
-        // Repository bindings
-        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
-
         // Service bindings
         $this->app->bind(UserServiceInterface::class, UserService::class);
     }
@@ -27,6 +27,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen(Login::class, UpdateLastLoginAt::class);
     }
 }

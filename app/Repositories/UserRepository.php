@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
@@ -8,10 +10,10 @@ use App\Models\User;
 /**
  * User repository implementation.
  *
- * Provides data access methods for User models with caching support.
- * Extends AbstractRepository to inherit base CRUD operations.
+ * Provides data access methods for User models.
+ * Extends BaseRepository to inherit base CRUD operations.
  */
-class UserRepository extends AbstractRepository implements UserRepositoryInterface
+final class UserRepository extends BaseRepository implements UserRepositoryInterface
 {
     /**
      * Create a new user repository instance.
@@ -115,5 +117,45 @@ class UserRepository extends AbstractRepository implements UserRepositoryInterfa
         return $this->update($id, [
             'password' => $password,
         ]);
+    }
+
+    /**
+     * Search users by name or email.
+     *
+     * @param  string  $search  The search query
+     * @param  int  $limit  Maximum number of results
+     * @param  array<string>  $columns  The columns to retrieve
+     * @return \Illuminate\Database\Eloquent\Collection<int, User> Collection of matching users
+     *
+     * @example
+     * $users = $repository->search('john');
+     */
+    public function search(string $search, int $limit = 50, array $columns = ['*']): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->query()
+            ->where(function ($query) use ($search): void {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->limit($limit)
+            ->get($columns);
+    }
+
+    /**
+     * Get all users for impersonation (excluding current user).
+     *
+     * @param  int  $excludeUserId  The user ID to exclude
+     * @param  array<string>  $columns  The columns to retrieve
+     * @return \Illuminate\Database\Eloquent\Collection<int, User> Collection of users
+     *
+     * @example
+     * $users = $repository->getAllForImpersonation(1);
+     */
+    public function getAllForImpersonation(int $excludeUserId, array $columns = ['*']): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->query()
+            ->where('id', '!=', $excludeUserId)
+            ->orderBy('name')
+            ->get($columns);
     }
 }

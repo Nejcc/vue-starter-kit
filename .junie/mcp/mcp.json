@@ -1,9 +1,9 @@
 {
     "mcpServers": {
         "laravel-boost": {
-            "command": "/usr/bin/php",
+            "command": "/home/neo/.config/herd-lite/bin/php",
             "args": [
-                "/home/neo/projects/personal/vue-starter-kit/artisan",
+                "/home/neo/projects/privat/vue-starter-kit/artisan",
                 "boost:mcp"
             ]
         }

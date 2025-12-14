@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import PublicFooter from '@/components/PublicFooter.vue';
 import PublicHeader from '@/components/PublicHeader.vue';
+import CookieConsentBanner from '@/components/CookieConsentBanner.vue';
 import { Head } from '@inertiajs/vue3';
 
 import type { WelcomePageProps } from '@/types';
 
-withDefaults(defineProps<WelcomePageProps>(), {
+interface Props extends WelcomePageProps {
+    cookieConsent?: any;
+}
+
+withDefaults(defineProps<Props>(), {
     canRegister: true,
+    cookieConsent: () => ({}),
 });
 </script>
 
@@ -809,5 +815,8 @@ withDefaults(defineProps<WelcomePageProps>(), {
             </main>
         </div>
         <PublicFooter />
+        
+        <!-- Cookie Consent Banner -->
+        <CookieConsentBanner :cookie-consent="cookieConsent" />
     </div>
 </template>

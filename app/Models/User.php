@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\TracksLastLogin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+final class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, HasRoles, Notifiable, TracksLastLogin, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -27,6 +31,7 @@ class User extends Authenticatable
         'data_processing_consent',
         'data_processing_consent_given_at',
         'gdpr_ip_address',
+        'last_login_at',
     ];
 
     /**
@@ -56,6 +61,7 @@ class User extends Authenticatable
             'cookie_consent_given_at' => 'datetime',
             'data_processing_consent' => 'boolean',
             'data_processing_consent_given_at' => 'datetime',
+            'last_login_at' => 'datetime',
         ];
     }
 
@@ -76,8 +82,8 @@ class User extends Authenticatable
         $initials = '';
 
         foreach ($names as $name) {
-            if (! empty($name)) {
-                $initials .= strtoupper(substr($name, 0, 1));
+            if (!empty($name)) {
+                $initials .= mb_strtoupper(mb_substr($name, 0, 1));
             }
         }
 
@@ -89,7 +95,7 @@ class User extends Authenticatable
      */
     public function getHasVerifiedEmailAttribute(): bool
     {
-        return ! is_null($this->email_verified_at);
+        return null !== $this->email_verified_at;
     }
 
     /**
@@ -105,7 +111,7 @@ class User extends Authenticatable
      */
     public function hasCookieConsent(): bool
     {
-        return ! is_null($this->cookie_consent_given_at);
+        return null !== $this->cookie_consent_given_at;
     }
 
     /**
@@ -113,7 +119,7 @@ class User extends Authenticatable
      */
     public function hasDataProcessingConsent(): bool
     {
-        return $this->data_processing_consent && ! is_null($this->data_processing_consent_given_at);
+        return $this->data_processing_consent && null !== $this->data_processing_consent_given_at;
     }
 
     /**
@@ -121,7 +127,7 @@ class User extends Authenticatable
      */
     public function hasCookieConsentForCategory(string $category): bool
     {
-        if (! $this->hasCookieConsent()) {
+        if (!$this->hasCookieConsent()) {
             return false;
         }
 

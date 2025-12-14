@@ -4,11 +4,13 @@
         "codex",
         "copilot",
         "cursor",
+        "opencode",
         "phpstorm"
     ],
     "editors": [
         "claude_code",
         "cursor",
+        "opencode",
         "phpstorm",
         "vscode"
     ],
