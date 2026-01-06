@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
-class HandleInertiaRequests extends Middleware
+final class HandleInertiaRequests extends Middleware
 {
     /**
      * The root template that's loaded on the first page visit.
@@ -38,14 +40,19 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)],
+            'quote' => ['message' => mb_trim($message), 'author' => mb_trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user ? [
+                    ...$user->toArray(),
+                    'roles' => $user->roles->pluck('name')->toArray(),
+                ] : null,
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
 }

@@ -51,6 +51,7 @@ export interface User {
     data_processing_consent?: boolean;
     data_processing_consent_given_at?: string | null;
     gdpr_ip_address?: string | null;
+    roles?: string[];
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

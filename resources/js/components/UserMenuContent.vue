@@ -8,19 +8,26 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
+import { index as adminIndex } from '@/routes/admin';
 import type { User } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings } from 'lucide-vue-next';
+import { LogOut, Settings, Shield } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 interface Props {
     user: User;
 }
 
+const props = defineProps<Props>();
+
+const isAdmin = computed(() => {
+    const roles = props.user.roles ?? [];
+    return roles.includes('admin') || roles.includes('super-admin');
+});
+
 const handleLogout = () => {
     router.flushAll();
 };
-
-defineProps<Props>();
 </script>
 
 <template>
@@ -35,6 +42,20 @@ defineProps<Props>();
             <Link class="block w-full" :href="edit()" prefetch as="button">
                 <Settings class="mr-2 h-4 w-4" />
                 Settings
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+            v-if="isAdmin"
+            :as-child="true"
+        >
+            <Link
+                class="block w-full"
+                :href="adminIndex().url"
+                prefetch
+                as="button"
+            >
+                <Shield class="mr-2 h-4 w-4" />
+                Administration
             </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>
