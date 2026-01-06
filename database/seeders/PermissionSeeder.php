@@ -15,14 +15,17 @@ final class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
+            ['name' => 'view users', 'group_name' => 'users'],
+            ['name' => 'create users', 'group_name' => 'users'],
+            ['name' => 'edit users', 'group_name' => 'users'],
+            ['name' => 'delete users', 'group_name' => 'users'],
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate(
+                ['name' => $permission['name']],
+                ['group_name' => $permission['group_name']]
+            );
         }
     }
 }

@@ -35,6 +35,13 @@ const quickLogin = (): void => {
             {{ status }}
         </div>
 
+        <div
+            v-if="error"
+            class="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-400"
+        >
+            {{ error }}
+        </div>
+
         <Form
             v-bind="store.form()"
             :reset-on-success="['password']"

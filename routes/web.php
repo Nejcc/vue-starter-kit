@@ -2,14 +2,23 @@
 
 declare(strict_types=1);
 
+use App\Contracts\Repositories\SettingsRepositoryInterface;
 use App\Http\Controllers\CookieConsentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
-Route::get('/', fn () => Inertia::render('Welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-]))->name('home');
+Route::get('/', function () {
+    try {
+        $settingsRepository = app(SettingsRepositoryInterface::class);
+        $canRegister = (bool) $settingsRepository->get('registration_enabled', false);
+    } catch (Exception $e) {
+        $canRegister = false;
+    }
+
+    return Inertia::render('Welcome', [
+        'canRegister' => $canRegister,
+    ]);
+})->name('home');
 
 Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
@@ -55,3 +64,29 @@ Route::middleware(['auth'])->prefix('impersonate')->name('impersonate.')->group(
 });
 
 require __DIR__.'/settings.php';
+
+// Admin routes - only accessible to super-admin role (and admin if it exists)
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function (): void {
+    Route::get('/', [App\Http\Controllers\Admin\AdminController::class, 'index'])->name('index');
+    Route::resource('settings', App\Http\Controllers\Admin\SettingsController::class)->except(['show']);
+    Route::patch('settings/bulk', [App\Http\Controllers\Admin\SettingsController::class, 'bulkUpdate'])->name('settings.bulk-update');
+    Route::get('users', [App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
+    Route::get('users/create', [App\Http\Controllers\Admin\UsersController::class, 'create'])->name('users.create');
+    Route::post('users', [App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');
+    Route::get('roles', [App\Http\Controllers\Admin\RolesController::class, 'index'])->name('roles.index');
+    Route::get('roles/create', [App\Http\Controllers\Admin\RolesController::class, 'create'])->name('roles.create');
+    Route::post('roles', [App\Http\Controllers\Admin\RolesController::class, 'store'])->name('roles.store');
+    Route::get('roles/{role}/edit', [App\Http\Controllers\Admin\RolesController::class, 'edit'])->name('roles.edit');
+    Route::patch('roles/{role}', [App\Http\Controllers\Admin\RolesController::class, 'update'])->name('roles.update');
+    Route::delete('roles/{role}', [App\Http\Controllers\Admin\RolesController::class, 'destroy'])->name('roles.destroy');
+    Route::get('permissions', [App\Http\Controllers\Admin\PermissionsController::class, 'index'])->name('permissions.index');
+    Route::get('permissions/create', [App\Http\Controllers\Admin\PermissionsController::class, 'create'])->name('permissions.create');
+    Route::post('permissions', [App\Http\Controllers\Admin\PermissionsController::class, 'store'])->name('permissions.store');
+    Route::get('permissions/{permission}/edit', [App\Http\Controllers\Admin\PermissionsController::class, 'edit'])->name('permissions.edit');
+    Route::patch('permissions/{permission}', [App\Http\Controllers\Admin\PermissionsController::class, 'update'])->name('permissions.update');
+    Route::get('database', [App\Http\Controllers\Admin\DatabaseController::class, 'index'])->name('database.index');
+    Route::get('database/{connection}', [App\Http\Controllers\Admin\DatabaseController::class, 'index'])->name('database.connection.index');
+    Route::get('database/{connection}/{table}', [App\Http\Controllers\Admin\DatabaseController::class, 'show'])->name('database.connection.show');
+    Route::get('database/{connection}/{table}/{view}', [App\Http\Controllers\Admin\DatabaseController::class, 'show'])->name('database.connection.show.view');
+    Route::get('databases', [App\Http\Controllers\Admin\DatabaseController::class, 'listConnections'])->name('databases.index');
+});

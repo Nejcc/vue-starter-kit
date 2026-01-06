@@ -112,3 +112,10 @@ export interface CookiePreferencesPageProps extends AppPageProps {
  */
 export type AppearancePageProps = AppPageProps;
 
+/**
+ * Registration settings page props.
+ */
+export interface RegistrationPageProps extends AppPageProps {
+    registrationEnabled: boolean;
+    status?: string;
+}

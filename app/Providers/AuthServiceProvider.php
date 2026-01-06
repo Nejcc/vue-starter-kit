@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Constants\RoleNames;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -25,6 +26,7 @@ final class AuthServiceProvider extends ServiceProvider
     {
         // Implicitly grant "Super Admin" role all permissions
         // This works in the app by using gate-related functions like auth()->user->can() and @can()
-        Gate::before(fn ($user, $ability) => $user->hasRole('super-admin') ? true : null);
+        // The super-admin role is special and should not be deleted or have its name changed
+        Gate::before(fn ($user, $ability) => $user->hasRole(RoleNames::SUPER_ADMIN) ? true : null);
     }
 }

@@ -71,6 +71,7 @@ export type {
     TwoFactorPageProps,
     CookiePreferencesPageProps,
     AppearancePageProps,
+    RegistrationPageProps,
 } from './pages';
 
 // Re-export model types
