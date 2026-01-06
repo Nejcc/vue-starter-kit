@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { connection } from '@/routes/admin/database';
+import connection from '@/routes/admin/database/connection';
 import type { Index, ForeignKey } from './types';
 
 interface Props {

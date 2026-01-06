@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { index, connection } from '@/routes/admin/database';
+import { index } from '@/routes/admin/database';
+import connection from '@/routes/admin/database/connection';
 import { view } from '@/routes/admin/database/connection/show';
 import { Head, Link } from '@inertiajs/vue3';
 

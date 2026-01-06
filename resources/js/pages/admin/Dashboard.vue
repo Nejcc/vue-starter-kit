@@ -10,7 +10,6 @@ import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as settingsIndex } from '@/routes/admin/settings';
 import { index as databasesIndex } from '@/routes/admin/databases';
-import { connection } from '@/routes/admin/database';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {

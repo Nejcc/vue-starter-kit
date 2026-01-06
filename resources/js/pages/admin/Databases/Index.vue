@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { index as databasesIndex } from '@/routes/admin/databases';
-import { connection } from '@/routes/admin/database';
+import connection from '@/routes/admin/database/connection';
 import { Head, Link } from '@inertiajs/vue3';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
