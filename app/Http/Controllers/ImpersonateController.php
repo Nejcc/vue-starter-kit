@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Constants\RoleNames;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,6 +27,8 @@ final class ImpersonateController extends Controller
      */
     public function index(Request $request): Response|\Illuminate\Http\JsonResponse
     {
+        $this->authorizeImpersonate();
+
         $search = $request->input('search', '');
 
         $users = $search
@@ -57,8 +60,10 @@ final class ImpersonateController extends Controller
     /**
      * Impersonate a user.
      */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request): \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
     {
+        $this->authorizeImpersonate();
+
         $request->validate([
             'user_id' => ['required', 'integer', 'exists:users,id'],
         ]);
@@ -81,13 +86,14 @@ final class ImpersonateController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')->with('success', "Now impersonating {$user->name}");
+        // Use Inertia location for full page reload to update all shared props
+        return Inertia::location(route('dashboard'));
     }
 
     /**
      * Stop impersonating and return to original user.
      */
-    public function destroy(Request $request): \Illuminate\Http\RedirectResponse
+    public function destroy(Request $request): \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
     {
         $impersonatorId = session()->pull('impersonator_id');
 
@@ -108,6 +114,24 @@ final class ImpersonateController extends Controller
         Auth::login($impersonator);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')->with('success', 'Stopped impersonating');
+        // Use Inertia location for full page reload to update all shared props
+        return Inertia::location(route('dashboard'));
+    }
+
+    /**
+     * Authorize impersonation access.
+     */
+    private function authorizeImpersonate(): void
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            abort(403, 'Unauthorized.');
+        }
+
+        // Check if user is super-admin or has impersonate permission
+        if (!$user->hasRole(RoleNames::SUPER_ADMIN) && !$user->can('impersonate')) {
+            abort(403, 'Unauthorized. Impersonation requires super-admin role or impersonate permission.');
+        }
     }
 }

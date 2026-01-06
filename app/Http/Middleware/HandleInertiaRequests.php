@@ -41,6 +41,13 @@ final class HandleInertiaRequests extends Middleware
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         $user = $request->user();
+        $isImpersonating = session()->has('impersonator_id');
+        $impersonator = null;
+
+        if ($isImpersonating) {
+            $impersonatorId = session()->get('impersonator_id');
+            $impersonator = \App\Models\User::find($impersonatorId);
+        }
 
         return [
             ...parent::share($request),
@@ -50,6 +57,13 @@ final class HandleInertiaRequests extends Middleware
                 'user' => $user ? [
                     ...$user->toArray(),
                     'roles' => $user->roles->pluck('name')->toArray(),
+                    'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+                ] : null,
+                'isImpersonating' => $isImpersonating,
+                'impersonator' => $impersonator ? [
+                    'id' => $impersonator->id,
+                    'name' => $impersonator->name,
+                    'email' => $impersonator->email,
                 ] : null,
             ],
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

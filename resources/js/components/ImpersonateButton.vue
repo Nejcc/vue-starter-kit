@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="canImpersonate">
     <SidebarMenu>
       <SidebarMenuItem>
         <SidebarMenuButton
@@ -20,8 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { UserRound } from 'lucide-vue-next'
+import { usePage } from '@inertiajs/vue3'
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -35,6 +36,27 @@ interface User {
   email: string
   initials: string
 }
+
+const page = usePage()
+const auth = computed(() => page.props.auth as {
+  user?: {
+    roles?: string[]
+    permissions?: string[]
+  } | null
+})
+
+const canImpersonate = computed(() => {
+  const user = auth.value?.user
+  if (!user) {
+    return false
+  }
+  
+  const roles = user.roles ?? []
+  const permissions = user.permissions ?? []
+  
+  // Check if user is super-admin or has impersonate permission
+  return roles.includes('super-admin') || permissions.includes('impersonate')
+})
 
 const isModalOpen = ref(false)
 const users = ref<User[]>([])

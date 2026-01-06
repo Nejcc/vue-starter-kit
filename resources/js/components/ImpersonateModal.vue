@@ -27,7 +27,7 @@
           <div class="text-muted-foreground">No users found</div>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
+        <div v-else class="grid grid-cols-1 gap-3 max-h-[400px] overflow-y-auto">
           <UserCard
             v-for="user in filteredUsers"
             :key="user.id"
@@ -98,54 +98,48 @@ const filteredUsers = computed(() => {
   )
 })
 
+const loadUsers = async (search: string = '') => {
+  isLoading.value = true
+  try {
+    const url = search
+      ? `/impersonate?partial=1&search=${encodeURIComponent(search)}`
+      : '/impersonate?partial=1'
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      credentials: 'same-origin',
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      if (data.users) {
+        localUsers.value = data.users
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load users:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
 const debouncedSearch = useDebounceFn(async (query: string) => {
   if (!query.trim()) {
-    isLoading.value = false
+    await loadUsers()
     return
   }
 
-  isLoading.value = true
-  router.get(
-    '/impersonate',
-    { search: query },
-    {
-      preserveState: true,
-      preserveScroll: true,
-      only: ['users'],
-      onSuccess: (page) => {
-        if (page.props.users) {
-          localUsers.value = page.props.users as User[]
-        }
-        isLoading.value = false
-      },
-      onError: () => {
-        isLoading.value = false
-      },
-    }
-  )
+  await loadUsers(query)
 }, 300)
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
-    isLoading.value = true
     debouncedSearch(searchQuery.value)
   } else {
-    isLoading.value = false
-    // Reload all users when search is cleared
-    router.get(
-      '/impersonate',
-      {},
-      {
-        preserveState: true,
-        preserveScroll: true,
-        only: ['users'],
-        onSuccess: (page) => {
-          if (page.props.users) {
-            localUsers.value = page.props.users as User[]
-          }
-        },
-      }
-    )
+    loadUsers()
   }
 }
 

@@ -2,7 +2,6 @@
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
-import ImpersonateButton from '@/components/ImpersonateButton.vue';
 import {
     Sidebar,
     SidebarContent,
@@ -11,8 +10,6 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarGroup,
-    SidebarGroupContent,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
@@ -61,11 +58,6 @@ const footerNavItems: NavItem[] = [
         </SidebarContent>
 
         <SidebarFooter>
-            <SidebarGroup class="group-data-[collapsible=icon]:p-0">
-                <SidebarGroupContent>
-                    <ImpersonateButton />
-                </SidebarGroupContent>
-            </SidebarGroup>
             <NavFooter :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>

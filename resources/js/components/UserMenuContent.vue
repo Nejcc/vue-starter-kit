@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, computed, nextTick } from 'vue';
 import UserInfo from '@/components/UserInfo.vue';
 import {
     DropdownMenuGroup,
@@ -11,8 +12,8 @@ import { edit } from '@/routes/profile';
 import { index as adminIndex } from '@/routes/admin';
 import type { User } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings, Shield } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { LogOut, Settings, Shield, UserRound } from 'lucide-vue-next';
+import ImpersonateModal from './ImpersonateModal.vue';
 
 interface Props {
     user: User;
@@ -24,6 +25,48 @@ const isAdmin = computed(() => {
     const roles = props.user.roles ?? [];
     return roles.includes('admin') || roles.includes('super-admin');
 });
+
+const canImpersonate = computed(() => {
+    const roles = props.user.roles ?? [];
+    const permissions = props.user.permissions ?? [];
+    
+    // Check if user is super-admin or has impersonate permission
+    return roles.includes('super-admin') || permissions.includes('impersonate');
+});
+
+const isModalOpen = ref(false);
+const users = ref<Array<{ id: number; name: string; email: string; initials: string }>>([]);
+
+const openModal = async () => {
+    // Load users when modal opens
+    await loadUsers();
+    
+    // Use nextTick to ensure modal opens after any dropdown state changes
+    await nextTick();
+    isModalOpen.value = true;
+};
+
+const loadUsers = async () => {
+    try {
+        const response = await fetch('/impersonate?partial=1', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin',
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.users) {
+                users.value = data.users;
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load users:', error);
+    }
+};
 
 const handleLogout = () => {
     router.flushAll();
@@ -58,9 +101,23 @@ const handleLogout = () => {
                 Administration
             </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem
+            v-if="canImpersonate"
+            @select.prevent="openModal"
+            @click.stop="openModal"
+        >
+            <UserRound class="mr-2 h-4 w-4" />
+            Impersonate
+        </DropdownMenuItem>
     </DropdownMenuGroup>
+    <ImpersonateModal
+        v-if="canImpersonate"
+        v-model:open="isModalOpen"
+        :users="users"
+    />
     <DropdownMenuSeparator />
-    <DropdownMenuItem :as-child="true">
+    <DropdownMenuGroup>
+        <DropdownMenuItem :as-child="true">
         <Link
             class="block w-full"
             :href="logout()"
@@ -71,5 +128,6 @@ const handleLogout = () => {
             <LogOut class="mr-2 h-4 w-4" />
             Log out
         </Link>
-    </DropdownMenuItem>
+        </DropdownMenuItem>
+    </DropdownMenuGroup>
 </template>
