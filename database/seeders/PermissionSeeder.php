@@ -19,6 +19,7 @@ final class PermissionSeeder extends Seeder
             ['name' => 'create users', 'group_name' => 'users'],
             ['name' => 'edit users', 'group_name' => 'users'],
             ['name' => 'delete users', 'group_name' => 'users'],
+            ['name' => 'impersonate', 'group_name' => 'users'],
         ];
 
         foreach ($permissions as $permission) {
