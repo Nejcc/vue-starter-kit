@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\User;
 
 use App\Contracts\Actions\ActionInterface;
@@ -11,7 +13,7 @@ use App\Contracts\Services\UserServiceInterface;
  * Handles user account deletion with password verification. Optionally
  * invalidates the session if a request object is provided.
  */
-class DeleteUserAction implements ActionInterface
+final class DeleteUserAction implements ActionInterface
 {
     /**
      * Create a new delete user action instance.

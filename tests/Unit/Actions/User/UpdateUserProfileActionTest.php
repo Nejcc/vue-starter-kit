@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Actions\User;
 
 use App\Actions\User\UpdateUserProfileAction;
@@ -8,7 +10,7 @@ use App\Services\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class UpdateUserProfileActionTest extends TestCase
+final class UpdateUserProfileActionTest extends TestCase
 {
     use RefreshDatabase;
 

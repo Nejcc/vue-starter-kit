@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\User;
 
 use App\Contracts\Actions\ActionInterface;
@@ -11,7 +13,7 @@ use App\Contracts\Services\UserServiceInterface;
  * Handles password updates with current password verification and
  * new password validation.
  */
-class UpdateUserPasswordAction implements ActionInterface
+final class UpdateUserPasswordAction implements ActionInterface
 {
     /**
      * Create a new update user password action instance.

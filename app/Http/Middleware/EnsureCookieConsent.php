@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -8,17 +10,17 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureCookieConsent
+final class EnsureCookieConsent
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         // Skip middleware if cookie consent is disabled
-        if (! config('cookie.enabled', true)) {
+        if (!config('cookie.enabled', true)) {
             return $next($request);
         }
 
@@ -36,7 +38,7 @@ class EnsureCookieConsent
                 config('cookie.storage.session_key'),
                 []
             );
-            $hasConsent = ! empty($preferences);
+            $hasConsent = !empty($preferences);
         }
 
         // Share cookie consent state with Inertia pages
@@ -55,7 +57,7 @@ class EnsureCookieConsent
         ]);
 
         // Block non-essential cookies if no consent given
-        if (! $hasConsent) {
+        if (!$hasConsent) {
             $this->blockNonEssentialCookies($request);
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Actions\User;
 
 use App\Actions\User\DeleteUserAction;
@@ -10,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Mockery;
 use Tests\TestCase;
 
-class DeleteUserActionTest extends TestCase
+final class DeleteUserActionTest extends TestCase
 {
     use RefreshDatabase;
 

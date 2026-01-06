@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Settings;
 
 use App\Http\Requests\AbstractFormRequest;
 use Illuminate\Validation\Rules\Password;
 
-class PasswordUpdateRequest extends AbstractFormRequest
+final class PasswordUpdateRequest extends AbstractFormRequest
 {
     /**
      * Get the validation rules that apply to the request.

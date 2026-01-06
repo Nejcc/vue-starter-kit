@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\User;
 
 use App\Contracts\Actions\ActionInterface;
 use App\Contracts\Services\UserServiceInterface;
 use App\Models\User;
 
-class CreateUserAction implements ActionInterface
+final class CreateUserAction implements ActionInterface
 {
     /**
      * Create a new create user action instance.

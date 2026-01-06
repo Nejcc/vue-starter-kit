@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Repositories;
 
 use App\Models\User;
@@ -7,7 +9,7 @@ use App\Repositories\UserRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class UserRepositoryTest extends TestCase
+final class UserRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -16,7 +18,7 @@ class UserRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = new UserRepository;
+        $this->repository = new UserRepository();
     }
 
     public function test_can_find_user_by_email(): void

@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/usr/bin/php",
+            "args": [
+                "/home/neo/projects/b2b.spaycloud.com/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}

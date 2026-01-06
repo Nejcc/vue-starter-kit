@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Contracts\RepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * Abstract service implementation providing business logic layer.
@@ -53,7 +56,7 @@ abstract class AbstractService
      * @param  callable  $callback  The callback to execute within the transaction
      * @return mixed The return value of the callback
      *
-     * @throws \Throwable Any exception thrown by the callback
+     * @throws Throwable Any exception thrown by the callback
      *
      * @example
      * $result = $this->transaction(function () {

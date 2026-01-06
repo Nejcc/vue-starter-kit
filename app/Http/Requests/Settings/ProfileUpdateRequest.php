@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Settings;
 
 use App\Http\Requests\AbstractFormRequest;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 
-class ProfileUpdateRequest extends AbstractFormRequest
+final class ProfileUpdateRequest extends AbstractFormRequest
 {
     /**
      * Get the validation rules that apply to the request.

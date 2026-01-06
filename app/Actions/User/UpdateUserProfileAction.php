@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\User;
 
 use App\Contracts\Actions\ActionInterface;
@@ -12,7 +14,7 @@ use App\Models\User;
  * Handles profile updates including name and email changes. Automatically
  * resets email verification if the email address changes.
  */
-class UpdateUserProfileAction implements ActionInterface
+final class UpdateUserProfileAction implements ActionInterface
 {
     /**
      * Create a new update user profile action instance.

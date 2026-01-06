@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Services;
 
 use App\Models\User;
@@ -9,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-class UserServiceTest extends TestCase
+final class UserServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -18,7 +20,7 @@ class UserServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new UserService(new UserRepository);
+        $this->service = new UserService(new UserRepository());
     }
 
     public function test_can_create_user(): void

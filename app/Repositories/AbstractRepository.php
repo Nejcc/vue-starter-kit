@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Contracts\RepositoryInterface;
@@ -71,9 +73,7 @@ abstract class AbstractRepository implements RepositoryInterface
     {
         $cacheKey = $this->getCacheKey('find', $id, $columns);
 
-        return Cache::remember($cacheKey, $this->cacheTtl, function () use ($id, $columns) {
-            return $this->query()->find($id, $columns);
-        });
+        return Cache::remember($cacheKey, $this->cacheTtl, fn () => $this->query()->find($id, $columns));
     }
 
     /**
@@ -163,9 +163,7 @@ abstract class AbstractRepository implements RepositoryInterface
     {
         $cacheKey = $this->getCacheKey('all', $columns);
 
-        return Cache::remember($cacheKey, $this->cacheTtl, function () use ($columns) {
-            return $this->query()->get($columns);
-        });
+        return Cache::remember($cacheKey, $this->cacheTtl, fn () => $this->query()->get($columns));
     }
 
     /**

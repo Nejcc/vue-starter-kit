@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Actions\User;
 
 use App\Actions\User\UpdateUserPasswordAction;
@@ -9,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-class UpdateUserPasswordActionTest extends TestCase
+final class UpdateUserPasswordActionTest extends TestCase
 {
     use RefreshDatabase;
 

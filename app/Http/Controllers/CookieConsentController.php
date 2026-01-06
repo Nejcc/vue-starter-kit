@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateCookieConsentRequest;
@@ -8,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class CookieConsentController extends Controller
+final class CookieConsentController extends Controller
 {
     /**
      * Get the current cookie consent preferences.
@@ -28,7 +30,7 @@ class CookieConsentController extends Controller
                 config('cookie.storage.session_key'),
                 []
             );
-            $hasConsent = ! empty($preferences);
+            $hasConsent = !empty($preferences);
         }
 
         return response()->json([

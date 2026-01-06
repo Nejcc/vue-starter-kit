@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Services;
 
 use App\Contracts\RepositoryInterface;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Services\AbstractService;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
@@ -13,7 +16,7 @@ use Tests\TestCase;
 /**
  * Test service implementation for testing AbstractService.
  */
-class TestService extends AbstractService
+final class TestService extends AbstractService
 {
     public function __construct(RepositoryInterface $repository)
     {
@@ -49,7 +52,7 @@ class TestService extends AbstractService
     }
 }
 
-class AbstractServiceTest extends TestCase
+final class AbstractServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -58,7 +61,7 @@ class AbstractServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new TestService(new UserRepository);
+        $this->service = new TestService(new UserRepository());
     }
 
     public function test_can_access_repository(): void
@@ -70,12 +73,10 @@ class AbstractServiceTest extends TestCase
 
     public function test_transaction_commits_on_success(): void
     {
-        $user = $this->service->testTransaction(function () {
-            return User::factory()->create([
-                'name' => 'Transaction User',
-                'email' => 'transaction@example.com',
-            ]);
-        });
+        $user = $this->service->testTransaction(fn () => User::factory()->create([
+            'name' => 'Transaction User',
+            'email' => 'transaction@example.com',
+        ]));
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertDatabaseHas('users', [
@@ -85,7 +86,7 @@ class AbstractServiceTest extends TestCase
 
     public function test_transaction_rolls_back_on_exception(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         try {
             $this->service->testTransaction(function () {
@@ -94,11 +95,11 @@ class AbstractServiceTest extends TestCase
                     'email' => 'rollback@example.com',
                 ]);
 
-                throw new \Exception('Test exception');
+                throw new Exception('Test exception');
 
                 return $user;
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Verify the user was not created (transaction rolled back)
             $this->assertDatabaseMissing('users', [
                 'email' => 'rollback@example.com',
@@ -110,9 +111,7 @@ class AbstractServiceTest extends TestCase
 
     public function test_transaction_returns_value(): void
     {
-        $result = $this->service->testTransaction(function () {
-            return 'test value';
-        });
+        $result = $this->service->testTransaction(fn () => 'test value');
 
         $this->assertEquals('test value', $result);
     }
