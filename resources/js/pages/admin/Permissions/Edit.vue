@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PermissionsController from '@/actions/App/Http/Controllers/Admin/PermissionsController';
-import { destroy, index, update } from '@/routes/admin/permissions';
+import { index, update } from '@/routes/admin/permissions';
 import { Form, Head, Link, router } from '@inertiajs/vue3';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -44,9 +44,8 @@ const formData = ref({
 });
 
 const deletePermission = (): void => {
-    if (confirm(`Are you sure you want to delete the permission "${props.permission.name}"?`)) {
-        router.delete(destroy(props.permission.id).url);
-    }
+    // TODO: Implement destroy route and method in PermissionsController
+    alert('Delete functionality is not yet implemented.');
 };
 </script>
 
