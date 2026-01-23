@@ -16,6 +16,8 @@ import type { LoginPageProps } from '@/types';
 
 defineProps<LoginPageProps>();
 
+const isDevelopment = import.meta.env.DEV;
+
 const quickLogin = (userId: number): void => {
     router.post(`/quick-login/${userId}`);
 };
@@ -107,7 +109,7 @@ const quickLogin = (userId: number): void => {
                     Log in
                 </Button>
 
-                <div class="flex flex-col gap-2">
+                <div v-if="isDevelopment" class="flex flex-col gap-2">
                     <p class="text-center text-xs text-muted-foreground">
                         Development Quick Login
                     </p>
