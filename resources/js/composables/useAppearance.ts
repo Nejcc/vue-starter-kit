@@ -1,18 +1,22 @@
-import { onMounted, ref, type Ref } from 'vue';
+import type { Appearance, ResolvedAppearance } from '@/types';
+import type { ComputedRef, Ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
-type Appearance = 'light' | 'dark' | 'system';
+export type { Appearance, ResolvedAppearance };
 
 /**
  * Return type for useAppearance composable.
  */
-export interface UseAppearanceReturn {
+export type UseAppearanceReturn = {
     /** Current appearance value (reactive) */
     appearance: Ref<Appearance>;
+    /** Resolved appearance value (computed, system -> light/dark) */
+    resolvedAppearance: ComputedRef<ResolvedAppearance>;
     /** Function to update the appearance */
     updateAppearance: (value: Appearance) => void;
-}
+};
 
-export function updateTheme(value: Appearance) {
+export function updateTheme(value: Appearance): void {
     if (typeof window === 'undefined') {
         return;
     }
@@ -58,13 +62,21 @@ const getStoredAppearance = () => {
     return localStorage.getItem('appearance') as Appearance | null;
 };
 
+const prefersDark = (): boolean => {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+};
+
 const handleSystemThemeChange = () => {
     const currentAppearance = getStoredAppearance();
 
     updateTheme(currentAppearance || 'system');
 };
 
-export function initializeTheme() {
+export function initializeTheme(): void {
     if (typeof window === 'undefined') {
         return;
     }
@@ -95,6 +107,14 @@ export function useAppearance(): UseAppearanceReturn {
         }
     });
 
+    const resolvedAppearance = computed<ResolvedAppearance>(() => {
+        if (appearance.value === 'system') {
+            return prefersDark() ? 'dark' : 'light';
+        }
+
+        return appearance.value;
+    });
+
     function updateAppearance(value: Appearance): void {
         appearance.value = value;
 
@@ -109,6 +129,7 @@ export function useAppearance(): UseAppearanceReturn {
 
     return {
         appearance,
+        resolvedAppearance,
         updateAppearance,
     };
 }

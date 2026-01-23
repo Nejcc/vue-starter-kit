@@ -2,7 +2,8 @@
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { toUrl, urlIsActive } from '@/lib/utils';
+import { useCurrentUrl } from '@/composables/useCurrentUrl';
+import { toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editCookiePreferences } from '@/routes/cookie-preferences';
 import { edit as editProfile } from '@/routes/profile';
@@ -36,7 +37,7 @@ const sidebarNavItems: NavItem[] = [
     },
 ];
 
-const currentPath = typeof window !== undefined ? window.location.pathname : '';
+const { isCurrentUrl } = useCurrentUrl();
 </script>
 
 <template>
@@ -48,14 +49,17 @@ const currentPath = typeof window !== undefined ? window.location.pathname : '';
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
-                <nav class="flex flex-col space-y-1 space-x-0">
+                <nav
+                    class="flex flex-col space-y-1 space-x-0"
+                    aria-label="Settings"
+                >
                     <Button
                         v-for="item in sidebarNavItems"
                         :key="toUrl(item.href)"
                         variant="ghost"
                         :class="[
                             'w-full justify-start',
-                            { 'bg-muted': urlIsActive(item.href, currentPath) },
+                            { 'bg-muted': isCurrentUrl(item.href) },
                         ]"
                         as-child
                     >

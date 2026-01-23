@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Settings;
 
+use App\Concerns\ProfileValidationRules;
 use App\Http\Requests\AbstractFormRequest;
-use App\Models\User;
-use Illuminate\Validation\Rule;
 
 final class ProfileUpdateRequest extends AbstractFormRequest
 {
+    use ProfileValidationRules;
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -17,16 +18,6 @@ final class ProfileUpdateRequest extends AbstractFormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
-        ];
+        return $this->profileRules($this->user()->id);
     }
 }

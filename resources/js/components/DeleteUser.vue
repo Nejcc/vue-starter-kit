@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import { Form } from '@inertiajs/vue3';
-import { useTemplateRef } from 'vue';
-
-// Components
-import HeadingSmall from '@/components/HeadingSmall.vue';
+import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,13 +15,16 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Form } from '@inertiajs/vue3';
+import { useTemplateRef } from 'vue';
 
 const passwordInput = useTemplateRef('passwordInput');
 </script>
 
 <template>
     <div class="space-y-6">
-        <HeadingSmall
+        <Heading
+            variant="small"
             title="Delete account"
             description="Delete your account and all of its resources"
         />

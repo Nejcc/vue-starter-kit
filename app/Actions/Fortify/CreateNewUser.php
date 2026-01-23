@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Actions\Fortify;
 
+use App\Concerns\PasswordValidationRules;
+use App\Concerns\ProfileValidationRules;
 use App\Contracts\Repositories\SettingsRepositoryInterface;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 final class CreateNewUser implements CreatesNewUsers
 {
-    use PasswordValidationRules;
+    use PasswordValidationRules, ProfileValidationRules;
 
     /**
      * Validate and create a newly registered user.
@@ -40,15 +41,9 @@ final class CreateNewUser implements CreatesNewUsers
                 'email' => ['Registration is currently disabled. Please contact an administrator.'],
             ]);
         }
+
         $rules = [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique(User::class),
-            ],
+            ...$this->profileRules(),
             'password' => $this->passwordRules(),
         ];
 

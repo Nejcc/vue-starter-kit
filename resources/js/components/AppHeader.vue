@@ -29,17 +29,18 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import UserMenuContent from '@/components/UserMenuContent.vue';
+import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
-import { toUrl, urlIsActive } from '@/lib/utils';
+import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
-import { InertiaLinkProps, Link, usePage } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-vue-next';
 import { computed } from 'vue';
 
-interface Props {
+type Props = {
     breadcrumbs?: BreadcrumbItem[];
-}
+};
 
 const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
@@ -47,18 +48,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const page = usePage();
 const auth = computed(() => page.props.auth);
+const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
 
-const isCurrentRoute = computed(
-    () => (url: NonNullable<InertiaLinkProps['href']>) =>
-        urlIsActive(url, page.url),
-);
-
-const activeItemStyles = computed(
-    () => (url: NonNullable<InertiaLinkProps['href']>) =>
-        isCurrentRoute.value(toUrl(url))
-            ? 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
-            : '',
-);
+const activeItemStyles =
+    'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
 const mainNavItems: NavItem[] = [
     {
@@ -116,7 +109,12 @@ const rightNavItems: NavItem[] = [
                                         :key="item.title"
                                         :href="item.href"
                                         class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
-                                        :class="activeItemStyles(item.href)"
+                                        :class="
+                                            whenCurrentUrl(
+                                                item.href,
+                                                activeItemStyles,
+                                            )
+                                        "
                                     >
                                         <component
                                             v-if="item.icon"
@@ -166,7 +164,10 @@ const rightNavItems: NavItem[] = [
                                 <Link
                                     :class="[
                                         navigationMenuTriggerStyle(),
-                                        activeItemStyles(item.href),
+                                        whenCurrentUrl(
+                                            item.href,
+                                            activeItemStyles,
+                                        ),
                                         'h-9 cursor-pointer px-3',
                                     ]"
                                     :href="item.href"
@@ -179,7 +180,7 @@ const rightNavItems: NavItem[] = [
                                     {{ item.title }}
                                 </Link>
                                 <div
-                                    v-if="isCurrentRoute(item.href)"
+                                    v-if="isCurrentUrl(item.href)"
                                     class="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"
                                 ></div>
                             </NavigationMenuItem>

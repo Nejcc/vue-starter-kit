@@ -21,7 +21,7 @@ final class EmailVerificationTest extends TestCase
 
         $response = $this->actingAs($user)->get(route('verification.notice'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
     }
 
     public function test_email_can_be_verified(): void

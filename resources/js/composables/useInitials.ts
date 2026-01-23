@@ -1,10 +1,10 @@
 /**
  * Return type for useInitials composable.
  */
-export interface UseInitialsReturn {
+export type UseInitialsReturn = {
     /** Function to get initials from a full name */
     getInitials: (fullName?: string) => string;
-}
+};
 
 /**
  * Get initials from a full name.

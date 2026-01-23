@@ -18,12 +18,12 @@ final class AuthenticationTest extends TestCase
     {
         $response = $this->get(route('login'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
     }
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $user = User::factory()->withoutTwoFactor()->create();
+        $user = User::factory()->create();
 
         $response = $this->post(route('login.store'), [
             'email' => $user->email,

@@ -4,10 +4,10 @@ import { useInitials } from '@/composables/useInitials';
 import type { User } from '@/types';
 import { computed } from 'vue';
 
-interface Props {
+type Props = {
     user: User;
     showEmail?: boolean;
-}
+};
 
 const props = withDefaults(defineProps<Props>(), {
     showEmail: false,

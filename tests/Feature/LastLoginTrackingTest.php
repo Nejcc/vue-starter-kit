@@ -37,7 +37,7 @@ final class LastLoginTrackingTest extends TestCase
         // The event listener should have updated last_login_at
         $this->assertNotNull($user->last_login_at, 'last_login_at should be set when Login event is dispatched');
         $this->assertTrue($user->hasLoggedIn());
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $user->last_login_at);
+        $this->assertInstanceOf(\Carbon\CarbonImmutable::class, $user->last_login_at);
     }
 
     /**

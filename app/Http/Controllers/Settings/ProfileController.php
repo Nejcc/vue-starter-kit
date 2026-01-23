@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Settings;
 use App\Actions\User\DeleteUserAction;
 use App\Actions\User\UpdateUserProfileAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -74,15 +75,11 @@ final class ProfileController extends Controller
      * Validates the password and deletes the authenticated user's account
      * using the DeleteUserAction. Invalidates the session after deletion.
      *
-     * @param  Request  $request  The incoming request
+     * @param  ProfileDeleteRequest  $request  The validated request
      * @return RedirectResponse Redirect to home page
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(ProfileDeleteRequest $request): RedirectResponse
     {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
-
         $this->deleteUserAction->handle(
             $request->user()->id,
             $request->input('password'),

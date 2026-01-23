@@ -4,11 +4,11 @@ import AppShell from '@/components/AppShell.vue';
 import AppSidebar from '@/components/AppSidebar.vue';
 import AppSidebarHeader from '@/components/AppSidebarHeader.vue';
 import ImpersonationBanner from '@/components/ImpersonationBanner.vue';
-import type { BreadcrumbItemType } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 
-interface Props {
-    breadcrumbs?: BreadcrumbItemType[];
-}
+type Props = {
+    breadcrumbs?: BreadcrumbItem[];
+};
 
 withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],

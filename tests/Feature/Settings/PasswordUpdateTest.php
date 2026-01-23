@@ -21,7 +21,7 @@ final class PasswordUpdateTest extends TestCase
             ->actingAs($user)
             ->get(route('user-password.edit'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
     }
 
     public function test_password_can_be_updated(): void

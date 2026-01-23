@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import UserInfo from '@/components/UserInfo.vue';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import UserInfo from '@/components/UserInfo.vue';
 import { logout } from '@/routes';
 import { index as adminIndex } from '@/routes/admin';
 import { edit } from '@/routes/profile';
@@ -15,9 +15,9 @@ import { LogOut, Settings, Shield, UserRound } from 'lucide-vue-next';
 import { computed, nextTick, ref } from 'vue';
 import ImpersonateModal from './ImpersonateModal.vue';
 
-interface Props {
+type Props = {
     user: User;
-}
+};
 
 const props = defineProps<Props>();
 
@@ -84,14 +84,14 @@ const handleLogout = () => {
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
-            <Link class="block w-full" :href="edit()" prefetch as="button">
+            <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
                 <Settings class="mr-2 h-4 w-4" />
                 Settings
             </Link>
         </DropdownMenuItem>
         <DropdownMenuItem v-if="isAdmin" :as-child="true">
             <Link
-                class="block w-full"
+                class="block w-full cursor-pointer"
                 :href="adminIndex().url"
                 prefetch
                 as="button"
@@ -118,7 +118,7 @@ const handleLogout = () => {
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
             <Link
-                class="block w-full"
+                class="block w-full cursor-pointer"
                 :href="logout()"
                 @click="handleLogout"
                 as="button"

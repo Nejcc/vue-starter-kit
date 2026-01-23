@@ -1,10 +1,11 @@
 import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
-import { computed, ref, type ComputedRef, type Ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
+import { computed, ref } from 'vue';
 
 /**
  * Return type for useTwoFactorAuth composable.
  */
-export interface UseTwoFactorAuthReturn {
+export type UseTwoFactorAuthReturn = {
     /** QR code SVG for 2FA setup */
     qrCodeSvg: Ref<string | null>;
     /** Manual setup key for 2FA */
@@ -29,7 +30,7 @@ export interface UseTwoFactorAuthReturn {
     fetchSetupData: () => Promise<void>;
     /** Fetch recovery codes */
     fetchRecoveryCodes: () => Promise<void>;
-}
+};
 
 const fetchJson = async <T>(url: string): Promise<T> => {
     const response = await fetch(url, {

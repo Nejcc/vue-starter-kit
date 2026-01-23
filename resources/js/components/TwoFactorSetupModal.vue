@@ -15,17 +15,21 @@ import {
     InputOTPSlot,
 } from '@/components/ui/input-otp';
 import { Spinner } from '@/components/ui/spinner';
+import { useAppearance } from '@/composables/useAppearance';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { confirm } from '@/routes/two-factor';
+import type { TwoFactorConfigContent } from '@/types';
 import { Form } from '@inertiajs/vue3';
 import { useClipboard } from '@vueuse/core';
 import { Check, Copy, ScanLine } from 'lucide-vue-next';
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 
-interface Props {
+type Props = {
     requiresConfirmation: boolean;
     twoFactorEnabled: boolean;
-}
+};
+
+const { resolvedAppearance } = useAppearance();
 
 const props = defineProps<Props>();
 const isOpen = defineModel<boolean>('isOpen');
@@ -39,11 +43,7 @@ const code = ref<string>('');
 
 const pinInputContainerRef = useTemplateRef('pinInputContainerRef');
 
-const modalConfig = computed<{
-    title: string;
-    description: string;
-    buttonText: string;
-}>(() => {
+const modalConfig = computed<TwoFactorConfigContent>(() => {
     if (props.twoFactorEnabled) {
         return {
             title: 'Two-Factor Authentication Enabled',
@@ -171,7 +171,13 @@ watch(
                                 >
                                     <div
                                         v-html="qrCodeSvg"
-                                        class="aspect-square w-full justify-center rounded-lg bg-white p-2 [&_svg]:size-full"
+                                        class="flex aspect-square size-full items-center justify-center"
+                                        :style="{
+                                            filter:
+                                                resolvedAppearance === 'dark'
+                                                    ? 'invert(1) brightness(1.5)'
+                                                    : undefined,
+                                        }"
                                     />
                                 </div>
                             </div>

@@ -15,6 +15,6 @@ final class ExampleTest extends TestCase
     {
         $response = $this->get(route('home'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
     }
 }
