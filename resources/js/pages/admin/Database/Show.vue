@@ -4,7 +4,7 @@ import { view } from '@/routes/admin/database/connection/show';
 import { index as databasesIndex } from '@/routes/admin/databases';
 import { Head, Link } from '@inertiajs/vue3';
 
-import HeadingSmall from '@/components/HeadingSmall.vue';
+import Heading from '@/components/Heading.vue';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { ArrowLeft, Database } from 'lucide-vue-next';
@@ -70,7 +70,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         >
                             <ArrowLeft class="h-5 w-5" />
                         </Link>
-                        <HeadingSmall
+                        <Heading variant="small"
                             :title="table.name"
                             :description="`Table details and structure`"
                         />

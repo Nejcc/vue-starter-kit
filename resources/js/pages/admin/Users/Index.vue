@@ -6,7 +6,7 @@ import { Users } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 import EmptyState from '@/components/EmptyState.vue';
-import HeadingSmall from '@/components/HeadingSmall.vue';
+import Heading from '@/components/Heading.vue';
 import SearchEmptyState from '@/components/SearchEmptyState.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -76,7 +76,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <HeadingSmall
+                    <Heading variant="small"
                         title="Users"
                         description="Manage application users"
                     />

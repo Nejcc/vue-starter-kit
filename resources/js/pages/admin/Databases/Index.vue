@@ -3,7 +3,7 @@ import connection from '@/routes/admin/database/connection';
 import { index as databasesIndex } from '@/routes/admin/databases';
 import { Head, Link } from '@inertiajs/vue3';
 
-import HeadingSmall from '@/components/HeadingSmall.vue';
+import Heading from '@/components/Heading.vue';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Database } from 'lucide-vue-next';
@@ -57,7 +57,7 @@ const getDriverColor = (driver: string): string => {
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
-                <HeadingSmall
+                <Heading variant="small"
                     title="Database Connections"
                     description="View and manage all database connections"
                 />

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 
-import HeadingSmall from '@/components/HeadingSmall.vue';
+import Heading from '@/components/Heading.vue';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { index as databasesIndex } from '@/routes/admin/databases';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
@@ -67,9 +67,10 @@ const quickLinks = [
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
-                <HeadingSmall
+                <Heading
                     title="Admin Dashboard"
                     description="Manage your application"
+                    variant="small"
                 />
 
                 <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

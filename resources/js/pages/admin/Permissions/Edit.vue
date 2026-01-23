@@ -3,7 +3,7 @@ import { index, update } from '@/routes/admin/permissions';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-import HeadingSmall from '@/components/HeadingSmall.vue';
+import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,7 +64,7 @@ const deletePermission = (): void => {
                     Back to Permissions
                 </button>
                 <div class="flex items-center justify-between">
-                    <HeadingSmall
+                    <Heading variant="small"
                         title="Edit Permission"
                         description="Update permission details"
                     />

@@ -3,7 +3,7 @@ import { index, store } from '@/routes/admin/roles';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-import HeadingSmall from '@/components/HeadingSmall.vue';
+import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,7 +41,7 @@ const selectedPermissions = ref<string[]>([]);
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
-                <HeadingSmall
+                <Heading variant="small"
                     title="Create New Role"
                     description="Add a new role to the system"
                 />

@@ -3,7 +3,7 @@ import { destroy, index, update } from '@/routes/admin/roles';
 import { Form, Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-import HeadingSmall from '@/components/HeadingSmall.vue';
+import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -79,7 +79,7 @@ const deleteRole = (): void => {
                 </button>
                 <div class="flex items-center justify-between">
                     <div>
-                        <HeadingSmall
+                        <Heading variant="small"
                             title="Edit Role"
                             description="Update role details"
                         />
