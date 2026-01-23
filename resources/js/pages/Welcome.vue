@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import CookieConsentBanner from '@/components/CookieConsentBanner.vue';
 import PublicFooter from '@/components/PublicFooter.vue';
 import PublicHeader from '@/components/PublicHeader.vue';
-import CookieConsentBanner from '@/components/CookieConsentBanner.vue';
 import { Head } from '@inertiajs/vue3';
 
 import type { WelcomePageProps } from '@/types';
@@ -815,7 +815,7 @@ withDefaults(defineProps<Props>(), {
             </main>
         </div>
         <PublicFooter />
-        
+
         <!-- Cookie Consent Banner -->
         <CookieConsentBanner :cookie-consent="cookieConsent" />
     </div>

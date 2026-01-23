@@ -16,8 +16,8 @@ import type { LoginPageProps } from '@/types';
 
 defineProps<LoginPageProps>();
 
-const quickLogin = (): void => {
-    router.post('/quick-login');
+const quickLogin = (userId: number): void => {
+    router.post(`/quick-login/${userId}`);
 };
 </script>
 
@@ -30,7 +30,7 @@ const quickLogin = (): void => {
 
         <div
             v-if="status"
-            class="mb-4 text-center text-sm font-medium text-green-600"
+            class="mb-4 text-center text-sm font-medium text-green-600 dark:text-green-500"
         >
             {{ status }}
         </div>
@@ -107,16 +107,43 @@ const quickLogin = (): void => {
                     Log in
                 </Button>
 
-                <Button
-                    type="button"
-                    variant="outline"
-                    class="w-full"
-                    :tabindex="6"
-                    @click="quickLogin"
-                    data-test="quick-login-button"
-                >
-                    Quick Login (User 1)
-                </Button>
+                <div class="flex flex-col gap-2">
+                    <p class="text-center text-xs text-muted-foreground">
+                        Development Quick Login
+                    </p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            :tabindex="6"
+                            @click="quickLogin(1)"
+                            data-test="quick-login-super-admin"
+                        >
+                            Super Admin
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            :tabindex="7"
+                            @click="quickLogin(2)"
+                            data-test="quick-login-admin"
+                        >
+                            Admin
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            :tabindex="8"
+                            @click="quickLogin(3)"
+                            data-test="quick-login-user"
+                        >
+                            User
+                        </Button>
+                    </div>
+                </div>
             </div>
 
             <div
@@ -124,7 +151,9 @@ const quickLogin = (): void => {
                 v-if="canRegister"
             >
                 Don't have an account?
-                <TextLink :href="register()" :tabindex="5" prefetch>Sign up</TextLink>
+                <TextLink :href="register()" :tabindex="5" prefetch
+                    >Sign up</TextLink
+                >
             </div>
         </Form>
     </AuthBase>

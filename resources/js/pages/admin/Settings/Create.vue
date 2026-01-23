@@ -57,7 +57,8 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
                         />
                         <InputError :message="errors.key" />
                         <p class="text-sm text-muted-foreground">
-                            Unique identifier for this setting (lowercase, underscores)
+                            Unique identifier for this setting (lowercase,
+                            underscores)
                         </p>
                     </div>
 
@@ -81,7 +82,7 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
                             id="description"
                             name="description"
                             rows="3"
-                            class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             placeholder="Describe what this setting controls"
                         />
                         <InputError :message="errors.description" />
@@ -94,11 +95,13 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
                             v-model="fieldType"
                             name="field_type"
                             required
-                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <option value="input">Input (Text)</option>
                             <option value="checkbox">Checkbox</option>
-                            <option value="multioptions">Multi-options (Select)</option>
+                            <option value="multioptions">
+                                Multi-options (Select)
+                            </option>
                         </select>
                         <InputError :message="errors.field_type" />
                     </div>
@@ -108,7 +111,7 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
                         <select
                             id="role"
                             name="role"
-                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <option value="user">User</option>
                             <option value="plugin">Plugin</option>
@@ -119,10 +122,7 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
                         </p>
                     </div>
 
-                    <div
-                        v-if="fieldType === 'multioptions'"
-                        class="grid gap-2"
-                    >
+                    <div v-if="fieldType === 'multioptions'" class="grid gap-2">
                         <Label for="options">Options (comma-separated)</Label>
                         <Input
                             id="options"
@@ -139,7 +139,10 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
                     <div class="grid gap-2">
                         <Label for="value">Default Value</Label>
                         <Input
-                            v-if="fieldType === 'input' || fieldType === 'multioptions'"
+                            v-if="
+                                fieldType === 'input' ||
+                                fieldType === 'multioptions'
+                            "
                             id="value"
                             name="value"
                             type="text"
@@ -173,10 +176,7 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button
-                            :disabled="processing"
-                            type="submit"
-                        >
+                        <Button :disabled="processing" type="submit">
                             Create Setting
                         </Button>
                         <Link
@@ -193,7 +193,7 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-neutral-600 dark:text-neutral-400"
                             >
                                 Created.
                             </p>

@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Constants\RoleNames;
-use App\Contracts\Repositories\SettingsRepositoryInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SettingStoreRequest;
 use App\Http\Requests\Admin\SettingsUpdateRequest;
+use App\Http\Requests\Admin\SettingUpdateRequest;
 use App\Models\Setting;
+use App\Services\SettingsService;
 use App\SettingRole;
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -26,8 +28,9 @@ final class SettingsController extends Controller
     /**
      * Create a new admin settings controller instance.
      */
-    public function __construct()
-    {
+    public function __construct(
+        protected SettingsService $settingsService
+    ) {
         $this->middleware('auth');
     }
 
@@ -53,8 +56,7 @@ final class SettingsController extends Controller
     {
         $this->authorizeAdmin();
 
-        $settingsRepository = app(SettingsRepositoryInterface::class);
-        $settings = $settingsRepository->all();
+        $settings = $this->settingsService->all();
 
         // Search functionality
         if ($request->has('search') && $request->filled('search')) {
@@ -105,7 +107,6 @@ final class SettingsController extends Controller
     {
         $this->authorizeAdmin();
 
-        $settingsRepository = app(SettingsRepositoryInterface::class);
         $data = $request->validated();
 
         // Handle checkbox values
@@ -118,7 +119,7 @@ final class SettingsController extends Controller
             $data['role'] = SettingRole::User->value;
         }
 
-        $settingsRepository->create($data);
+        $this->settingsService->create($data);
 
         return redirect()->route('admin.settings.index')->with('status', 'Setting created successfully.');
     }
@@ -150,23 +151,15 @@ final class SettingsController extends Controller
     /**
      * Update a specific setting.
      *
-     * @param  Request  $request  The incoming request
+     * @param  SettingUpdateRequest  $request  The validated request
      * @param  Setting  $setting  The setting to update
      * @return RedirectResponse Redirect to admin settings page
      */
-    public function update(Request $request, Setting $setting): RedirectResponse
+    public function update(SettingUpdateRequest $request, Setting $setting): RedirectResponse
     {
         $this->authorizeAdmin();
 
-        $validated = $request->validate([
-            'key' => ['required', 'string', 'max:255', 'unique:settings,key,'.$setting->id],
-            'value' => ['nullable'],
-            'field_type' => ['required', 'string', 'in:input,checkbox,multioptions'],
-            'options' => ['nullable', 'string'],
-            'label' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'role' => ['nullable', 'string', 'in:system,user,plugin'],
-        ]);
+        $validated = $request->validated();
 
         // Prevent changing role of system settings
         if ($setting->role === SettingRole::System && isset($validated['role']) && $validated['role'] !== SettingRole::System->value) {
@@ -178,7 +171,7 @@ final class SettingsController extends Controller
             $validated['value'] = filter_var($validated['value'], FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
         }
 
-        $setting->update($validated);
+        $this->settingsService->update($setting->id, $validated);
 
         return redirect()->route('admin.settings.index')->with('status', 'Setting updated successfully.');
     }
@@ -193,7 +186,6 @@ final class SettingsController extends Controller
     {
         $this->authorizeAdmin();
 
-        $settingsRepository = app(SettingsRepositoryInterface::class);
         $settings = $request->validated()['settings'];
 
         foreach ($settings as $key => $value) {
@@ -201,7 +193,7 @@ final class SettingsController extends Controller
             if (is_bool($value) || $value === '1' || $value === '0' || $value === 'true' || $value === 'false') {
                 $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
             }
-            $settingsRepository->set($key, $value);
+            $this->settingsService->set($key, $value);
         }
 
         return redirect()->route('admin.settings.index')->with('status', 'Settings updated successfully.');
@@ -217,14 +209,13 @@ final class SettingsController extends Controller
     {
         $this->authorizeAdmin();
 
-        // Prevent deletion of system settings
-        if ($setting->role === SettingRole::System) {
+        try {
+            $this->settingsService->delete($setting->id);
+
+            return redirect()->route('admin.settings.index')->with('status', 'Setting deleted successfully.');
+        } catch (Exception $e) {
             return redirect()->route('admin.settings.index')
-                ->with('error', 'System settings cannot be deleted.');
+                ->with('error', $e->getMessage());
         }
-
-        $setting->delete();
-
-        return redirect()->route('admin.settings.index')->with('status', 'Setting deleted successfully.');
     }
 }

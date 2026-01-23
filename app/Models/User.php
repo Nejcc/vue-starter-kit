@@ -18,6 +18,25 @@ final class User extends Authenticatable
     use HasFactory, HasRoles, Notifiable, TracksLastLogin, TwoFactorAuthenticatable;
 
     /**
+     * Boot the model.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        // Clean up related data when user is being deleted
+        self::deleting(function (User $user): void {
+            // Remove all role assignments
+            $user->roles()->detach();
+
+            // Remove all permission assignments
+            $user->permissions()->detach();
+
+            // Note: audit_logs.user_id will be set to null automatically via nullOnDelete()
+        });
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -56,6 +75,8 @@ final class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted',
             'two_factor_confirmed_at' => 'datetime',
             'cookie_consent_preferences' => 'array',
             'cookie_consent_given_at' => 'datetime',

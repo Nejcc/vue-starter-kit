@@ -65,36 +65,33 @@ export type BreadcrumbItemType = BreadcrumbItem;
 
 // Re-export page types for convenience
 export type {
-    DashboardPageProps,
-    WelcomePageProps,
-    LoginPageProps,
-    RegisterPageProps,
-    ForgotPasswordPageProps,
-    ResetPasswordPageProps,
-    VerifyEmailPageProps,
-    ConfirmPasswordPageProps,
-    TwoFactorChallengePageProps,
-    ProfilePageProps,
-    PasswordPageProps,
-    TwoFactorPageProps,
-    CookiePreferencesPageProps,
     AppearancePageProps,
+    ConfirmPasswordPageProps,
+    CookiePreferencesPageProps,
+    DashboardPageProps,
+    ForgotPasswordPageProps,
+    LoginPageProps,
+    PasswordPageProps,
+    ProfilePageProps,
+    RegisterPageProps,
     RegistrationPageProps,
+    ResetPasswordPageProps,
+    TwoFactorChallengePageProps,
+    TwoFactorPageProps,
+    VerifyEmailPageProps,
+    WelcomePageProps,
 } from './pages';
 
 // Re-export model types
-export type {
-    PaginatedResponse,
-    Paginator,
-} from './models';
+export type { PaginatedResponse, Paginator } from './models';
 
 // Re-export form types
 export type {
-    ValidationErrors,
+    CookieConsentFormData,
+    FormData,
     FormErrors,
     FormState,
-    FormData,
-    ProfileUpdateFormData,
     PasswordUpdateFormData,
-    CookieConsentFormData,
+    ProfileUpdateFormData,
+    ValidationErrors,
 } from './forms';

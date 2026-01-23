@@ -8,8 +8,8 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
-import { Form, Head } from '@inertiajs/vue3';
 import type { ForgotPasswordPageProps } from '@/types';
+import { Form, Head } from '@inertiajs/vue3';
 
 defineProps<ForgotPasswordPageProps>();
 </script>
@@ -23,7 +23,7 @@ defineProps<ForgotPasswordPageProps>();
 
         <div
             v-if="status"
-            class="mb-4 text-center text-sm font-medium text-green-600"
+            class="mb-4 text-center text-sm font-medium text-green-600 dark:text-green-500"
         >
             {{ status }}
         </div>

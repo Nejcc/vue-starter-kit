@@ -50,4 +50,3 @@ const canRegister = computed(() => page.props.canRegister ?? true);
         </nav>
     </header>
 </template>
-

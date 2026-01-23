@@ -18,13 +18,19 @@ final class UserSeeder extends Seeder
         $users = [
             [
                 'email' => 'admin@laravelplus.com',
-                'name' => 'Admin',
+                'name' => 'Super Admin',
                 'password' => 'password',
                 'role' => 'super-admin',
             ],
             [
-                'email' => 'user@example.com',
-                'name' => 'User',
+                'email' => 'manager@laravelplus.com',
+                'name' => 'Admin User',
+                'password' => 'password',
+                'role' => 'admin',
+            ],
+            [
+                'email' => 'user@laravelplus.com',
+                'name' => 'Regular User',
                 'password' => 'password',
                 'role' => 'user',
             ],

@@ -11,15 +11,15 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { dashboard } from '@/routes';
+import { index as databaseIndex } from '@/routes/admin/database';
+import { index as permissionsIndex } from '@/routes/admin/permissions';
+import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as settingsIndex } from '@/routes/admin/settings';
 import { index as usersIndex } from '@/routes/admin/users';
-import { index as rolesIndex } from '@/routes/admin/roles';
-import { index as permissionsIndex } from '@/routes/admin/permissions';
-import { index as databaseIndex } from '@/routes/admin/database';
-import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { Settings, Users, Shield, Key, Database, Home} from 'lucide-vue-next';
+import { Database, Home, Key, Settings, Shield, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [

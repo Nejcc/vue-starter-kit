@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Constants\RoleNames;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 final class ImpersonateTest extends TestCase
@@ -13,11 +15,23 @@ final class ImpersonateTest extends TestCase
     use RefreshDatabase;
 
     /**
+     * Create a user with admin role for testing.
+     */
+    private function createAdminUser(): User
+    {
+        $user = User::factory()->create();
+        $adminRole = Role::firstOrCreate(['name' => RoleNames::ADMIN]);
+        $user->assignRole($adminRole);
+
+        return $user;
+    }
+
+    /**
      * Test that users can be listed for impersonation.
      */
     public function test_can_list_users_for_impersonation(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAdminUser();
         $otherUser = User::factory()->create();
 
         $response = $this->actingAs($user)
@@ -36,7 +50,7 @@ final class ImpersonateTest extends TestCase
      */
     public function test_current_user_is_excluded_from_list(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAdminUser();
 
         $response = $this->actingAs($user)
             ->get('/impersonate');
@@ -53,7 +67,7 @@ final class ImpersonateTest extends TestCase
      */
     public function test_can_search_users(): void
     {
-        $user = User::factory()->create(['name' => 'John Doe', 'email' => 'john@example.com']);
+        $user = $this->createAdminUser();
         $otherUser = User::factory()->create(['name' => 'Jane Smith', 'email' => 'jane@example.com']);
 
         $response = $this->actingAs($user)
@@ -72,7 +86,7 @@ final class ImpersonateTest extends TestCase
      */
     public function test_can_impersonate_user(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAdminUser();
         $targetUser = User::factory()->create();
 
         $response = $this->actingAs($user)
@@ -90,7 +104,7 @@ final class ImpersonateTest extends TestCase
      */
     public function test_cannot_impersonate_self(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAdminUser();
 
         $response = $this->actingAs($user)
             ->post('/impersonate', [
@@ -120,7 +134,7 @@ final class ImpersonateTest extends TestCase
      */
     public function test_can_stop_impersonating(): void
     {
-        $originalUser = User::factory()->create();
+        $originalUser = $this->createAdminUser();
         $impersonatedUser = User::factory()->create();
 
         // Start impersonation
@@ -137,5 +151,22 @@ final class ImpersonateTest extends TestCase
         $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($originalUser);
         $this->assertNull(session('impersonator_id'));
+    }
+
+    /**
+     * Test that non-admin users cannot access impersonate functionality.
+     */
+    public function test_non_admin_users_cannot_access_impersonate(): void
+    {
+        $user = User::factory()->create();
+        $targetUser = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/impersonate');
+        $response->assertStatus(403);
+
+        $response = $this->actingAs($user)->post('/impersonate', [
+            'user_id' => $targetUser->id,
+        ]);
+        $response->assertStatus(403);
     }
 }

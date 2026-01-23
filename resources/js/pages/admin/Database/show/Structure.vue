@@ -9,10 +9,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <div
-        id="structure"
-        class="rounded-lg border scroll-mt-4"
-    >
+    <div id="structure" class="scroll-mt-4 rounded-lg border">
         <div class="border-b p-4">
             <h2 class="text-lg font-semibold">Columns</h2>
         </div>
@@ -22,9 +19,15 @@ defineProps<Props>();
                     <tr class="border-b">
                         <th class="px-4 py-2 text-left font-semibold">Name</th>
                         <th class="px-4 py-2 text-left font-semibold">Type</th>
-                        <th class="px-4 py-2 text-left font-semibold">Nullable</th>
-                        <th class="px-4 py-2 text-left font-semibold">Default</th>
-                        <th class="px-4 py-2 text-left font-semibold">Primary</th>
+                        <th class="px-4 py-2 text-left font-semibold">
+                            Nullable
+                        </th>
+                        <th class="px-4 py-2 text-left font-semibold">
+                            Default
+                        </th>
+                        <th class="px-4 py-2 text-left font-semibold">
+                            Primary
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,8 +47,10 @@ defineProps<Props>();
                         <td class="px-4 py-2">
                             <span
                                 :class="{
-                                    'text-green-600 dark:text-green-400': column.nullable,
-                                    'text-red-600 dark:text-red-400': !column.nullable,
+                                    'text-green-600 dark:text-green-400':
+                                        column.nullable,
+                                    'text-red-600 dark:text-red-400':
+                                        !column.nullable,
                                 }"
                             >
                                 {{ column.nullable ? 'Yes' : 'No' }}
@@ -58,10 +63,7 @@ defineProps<Props>();
                             >
                                 {{ column.default }}
                             </code>
-                            <span
-                                v-else
-                                class="text-muted-foreground"
-                            >
+                            <span v-else class="text-muted-foreground">
                                 NULL
                             </span>
                         </td>
@@ -72,10 +74,7 @@ defineProps<Props>();
                             >
                                 Primary
                             </span>
-                            <span
-                                v-else
-                                class="text-muted-foreground"
-                            >
+                            <span v-else class="text-muted-foreground">
                                 -
                             </span>
                         </td>

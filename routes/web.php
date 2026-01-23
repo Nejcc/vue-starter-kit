@@ -56,17 +56,18 @@ Route::get('/cookie-policy', fn () => Inertia::render('CookiePolicy'))->name('co
 // About Page
 Route::get('/about', [App\Http\Controllers\AboutController::class, 'index'])->name('about');
 
-// Impersonation routes
+// Impersonation routes - only accessible to super-admin or admin roles
 Route::middleware(['auth'])->prefix('impersonate')->name('impersonate.')->group(function (): void {
-    Route::get('/', [App\Http\Controllers\ImpersonateController::class, 'index'])->name('index');
-    Route::post('/', [App\Http\Controllers\ImpersonateController::class, 'store'])->name('store');
+    Route::get('/', [App\Http\Controllers\ImpersonateController::class, 'index'])->middleware('role:super-admin,admin')->name('index');
+    Route::post('/', [App\Http\Controllers\ImpersonateController::class, 'store'])->middleware('role:super-admin,admin')->name('store');
+    // Stop impersonation doesn't require admin role (anyone being impersonated should be able to stop)
     Route::delete('/', [App\Http\Controllers\ImpersonateController::class, 'destroy'])->name('destroy');
 });
 
 require __DIR__.'/settings.php';
 
-// Admin routes - only accessible to super-admin role (and admin if it exists)
-Route::middleware('auth')->prefix('admin')->name('admin.')->group(function (): void {
+// Admin routes - only accessible to super-admin or admin roles
+Route::middleware(['auth', 'role:super-admin,admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', [App\Http\Controllers\Admin\AdminController::class, 'index'])->name('index');
     Route::resource('settings', App\Http\Controllers\Admin\SettingsController::class)->except(['show']);
     Route::patch('settings/bulk', [App\Http\Controllers\Admin\SettingsController::class, 'bulkUpdate'])->name('settings.bulk-update');

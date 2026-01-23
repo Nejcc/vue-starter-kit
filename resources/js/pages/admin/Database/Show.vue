@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { index } from '@/routes/admin/database';
 import connection from '@/routes/admin/database/connection';
 import { view } from '@/routes/admin/database/connection/show';
+import { index as databasesIndex } from '@/routes/admin/databases';
 import { Head, Link } from '@inertiajs/vue3';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Database, ArrowLeft } from 'lucide-vue-next';
+import { ArrowLeft, Database } from 'lucide-vue-next';
 
-import Structure from './show/Structure.vue';
-import Indexes from './show/Indexes.vue';
-import Data from './show/Data.vue';
 import Actions from './show/Actions.vue';
+import Data from './show/Data.vue';
+import Indexes from './show/Indexes.vue';
+import Structure from './show/Structure.vue';
 import type { TableInfo } from './show/types';
 
 interface DatabaseShowPageProps {
@@ -32,7 +32,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
     },
     {
         title: 'Databases',
-        href: '/admin/databases',
+        href: databasesIndex().url,
     },
     {
         title: props.currentConnection,
@@ -40,7 +40,16 @@ const breadcrumbItems: BreadcrumbItem[] = [
     },
     {
         title: props.table.name,
-        href: props.view ? view({ connection: props.currentConnection, table: props.table.name, view: props.view }).url : connection.show({ connection: props.currentConnection, table: props.table.name }).url,
+        href: props.view
+            ? view({
+                  connection: props.currentConnection,
+                  table: props.table.name,
+                  view: props.view,
+              }).url
+            : connection.show({
+                  connection: props.currentConnection,
+                  table: props.table.name,
+              }).url,
     },
 ];
 </script>
@@ -54,7 +63,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-4">
                         <Link
-                            :href="connection.index(props.currentConnection).url"
+                            :href="
+                                connection.index(props.currentConnection).url
+                            "
                             class="text-muted-foreground hover:text-foreground"
                         >
                             <ArrowLeft class="h-5 w-5" />
@@ -64,9 +75,14 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             :description="`Table details and structure`"
                         />
                     </div>
-                    <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div
+                        class="flex items-center gap-2 text-sm text-muted-foreground"
+                    >
                         <Database class="h-4 w-4" />
-                        <span>{{ props.driver.toUpperCase() }} - {{ props.currentConnection }}</span>
+                        <span
+                            >{{ props.driver.toUpperCase() }} -
+                            {{ props.currentConnection }}</span
+                        >
                     </div>
                 </div>
 
@@ -82,13 +98,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 />
 
                 <!-- Summary Stats (when view is not 'data') -->
-                <div
-                    v-else
-                    class="rounded-lg border p-4"
-                >
+                <div v-else class="rounded-lg border p-4">
                     <div class="flex items-center gap-4 text-sm">
                         <span class="text-muted-foreground">
-                            <strong>Rows:</strong> {{ table.rowCount.toLocaleString() }}
+                            <strong>Rows:</strong>
+                            {{ table.rowCount.toLocaleString() }}
                         </span>
                         <span class="text-muted-foreground">
                             <strong>Columns:</strong> {{ table.columns.length }}
@@ -97,7 +111,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <strong>Indexes:</strong> {{ table.indexes.length }}
                         </span>
                         <span class="text-muted-foreground">
-                            <strong>Foreign Keys:</strong> {{ table.foreignKeys.length }}
+                            <strong>Foreign Keys:</strong>
+                            {{ table.foreignKeys.length }}
                         </span>
                     </div>
                 </div>

@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { create, index } from '@/routes/admin/users';
 import { Head, Link, router } from '@inertiajs/vue3';
+import { useDebounceFn } from '@vueuse/core';
+import { Users } from 'lucide-vue-next';
 import { ref } from 'vue';
 
+import EmptyState from '@/components/EmptyState.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
+import SearchEmptyState from '@/components/SearchEmptyState.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
@@ -34,15 +38,23 @@ const props = defineProps<UsersPageProps>();
 
 const searchQuery = ref(props.filters?.search ?? '');
 
-const performSearch = (): void => {
+const debouncedSearch = useDebounceFn((query: string) => {
     router.get(
         index().url,
-        { search: searchQuery.value || null },
+        { search: query || null },
         {
             preserveState: true,
             preserveScroll: true,
-        }
+        },
     );
+}, 300);
+
+const handleSearch = (): void => {
+    debouncedSearch(searchQuery.value);
+};
+
+const performSearch = (): void => {
+    debouncedSearch(searchQuery.value);
 };
 
 const breadcrumbItems: BreadcrumbItem[] = [
@@ -70,7 +82,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     />
                     <Link
                         :href="create().url"
-                        class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                        class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
                     >
                         Create New User
                     </Link>
@@ -90,22 +102,47 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             type="text"
                             placeholder="Search users by name or email..."
                             class="w-full"
-                            @keyup.enter="performSearch"
+                            @input="handleSearch"
                         />
                     </div>
-                    <Button @click="performSearch">
-                        Search
-                    </Button>
                     <Button
                         v-if="filters?.search"
                         variant="outline"
-                        @click="router.get(index().url, {}, { preserveState: false })"
+                        @click="
+                            router.get(
+                                index().url,
+                                {},
+                                { preserveState: false },
+                            )
+                        "
                     >
                         Clear
                     </Button>
                 </div>
 
-                <div class="space-y-4">
+                <div v-if="users.data.length === 0">
+                    <SearchEmptyState
+                        v-if="filters?.search"
+                        :search-query="filters.search"
+                        @clear-search="
+                            router.get(
+                                index().url,
+                                {},
+                                { preserveState: false },
+                            )
+                        "
+                    />
+                    <EmptyState
+                        v-else
+                        :icon="Users"
+                        title="No users yet"
+                        description="Get started by creating your first user."
+                        action-text="Create User"
+                        :action-href="create().url"
+                    />
+                </div>
+
+                <div v-else class="space-y-4">
                     <div
                         v-for="user in users.data"
                         :key="user.id"
@@ -131,7 +168,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     v-if="user.roles.length > 0"
                                     class="flex items-center gap-2"
                                 >
-                                    <span class="text-sm font-medium text-muted-foreground">Roles:</span>
+                                    <span
+                                        class="text-sm font-medium text-muted-foreground"
+                                        >Roles:</span
+                                    >
                                     <span
                                         v-for="role in user.roles"
                                         :key="role"
@@ -141,7 +181,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     </span>
                                 </div>
                                 <p class="text-xs text-muted-foreground">
-                                    Joined: {{ new Date(user.created_at).toLocaleDateString() }}
+                                    Joined:
+                                    {{
+                                        new Date(
+                                            user.created_at,
+                                        ).toLocaleDateString()
+                                    }}
                                 </p>
                             </div>
                             <div class="flex items-center gap-2">
@@ -154,13 +199,6 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div
-                    v-if="users.data.length === 0"
-                    class="rounded-lg border p-8 text-center"
-                >
-                    <p class="text-muted-foreground">No users found.</p>
                 </div>
             </div>
         </div>

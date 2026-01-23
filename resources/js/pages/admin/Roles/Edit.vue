@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import RolesController from '@/actions/App/Http/Controllers/Admin/RolesController';
 import { destroy, index, update } from '@/routes/admin/roles';
 import { Form, Head, Link, router } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
@@ -11,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { type BreadcrumbItem } from '@/types';
+import { ArrowLeft } from 'lucide-vue-next';
 
 interface Role {
     id: number;
@@ -48,11 +48,17 @@ const formData = ref({
 
 const deleteRole = (): void => {
     if (props.role.is_super_admin) {
-        alert('The super-admin role cannot be deleted. It is a system role with all permissions.');
+        alert(
+            'The super-admin role cannot be deleted. It is a system role with all permissions.',
+        );
         return;
     }
 
-    if (confirm(`Are you sure you want to delete the role "${props.role.name}"?`)) {
+    if (
+        confirm(
+            `Are you sure you want to delete the role "${props.role.name}"?`,
+        )
+    ) {
         router.delete(destroy(props.role.id).url);
     }
 };
@@ -64,21 +70,30 @@ const deleteRole = (): void => {
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
+                <button
+                    @click="() => window.history.back()"
+                    class="flex w-fit cursor-pointer items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    <ArrowLeft class="h-4 w-4" />
+                    Back to Roles
+                </button>
                 <div class="flex items-center justify-between">
                     <div>
                         <HeadingSmall
                             title="Edit Role"
                             description="Update role details"
                         />
-                        <div
-                            v-if="role.is_super_admin"
-                            class="mt-2"
-                        >
-                            <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400">
+                        <div v-if="role.is_super_admin" class="mt-2">
+                            <span
+                                class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                            >
                                 System Role
                             </span>
-                            <p class="mt-1 text-sm text-muted-foreground italic">
-                                This role has all permissions automatically granted. No permissions need to be assigned.
+                            <p
+                                class="mt-1 text-sm text-muted-foreground italic"
+                            >
+                                This role has all permissions automatically
+                                granted. No permissions need to be assigned.
                             </p>
                         </div>
                     </div>
@@ -125,7 +140,9 @@ const deleteRole = (): void => {
                         class="grid gap-2"
                     >
                         <Label>Permissions</Label>
-                        <div class="space-y-2 max-h-60 overflow-y-auto rounded-md border p-4">
+                        <div
+                            class="max-h-60 space-y-2 overflow-y-auto rounded-md border p-4"
+                        >
                             <div
                                 v-for="permission in permissions"
                                 :key="permission"
@@ -154,7 +171,8 @@ const deleteRole = (): void => {
                         v-else-if="role.is_super_admin"
                         class="rounded-md border p-4 text-sm text-muted-foreground"
                     >
-                        Super-admin role has all permissions automatically. No need to assign specific permissions.
+                        Super-admin role has all permissions automatically. No
+                        need to assign specific permissions.
                     </div>
 
                     <div
@@ -165,10 +183,7 @@ const deleteRole = (): void => {
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button
-                            :disabled="processing"
-                            type="submit"
-                        >
+                        <Button :disabled="processing" type="submit">
                             Update Role
                         </Button>
                         <Link
@@ -185,7 +200,7 @@ const deleteRole = (): void => {
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-neutral-600 dark:text-neutral-400"
                             >
                                 Updated.
                             </p>

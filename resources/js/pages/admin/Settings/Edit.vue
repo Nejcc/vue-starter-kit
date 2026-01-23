@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
 import { destroy, index, update } from '@/routes/admin/settings';
 import { Form, Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -11,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { type BreadcrumbItem } from '@/types';
+import { ArrowLeft } from 'lucide-vue-next';
 
 interface Setting {
     id: number;
@@ -44,16 +44,21 @@ const breadcrumbItems: BreadcrumbItem[] = [
     },
 ];
 
-const fieldType = ref<'input' | 'checkbox' | 'multioptions'>(props.setting.field_type);
+const fieldType = ref<'input' | 'checkbox' | 'multioptions'>(
+    props.setting.field_type,
+);
 const formData = ref({
     key: props.setting.key,
     label: props.setting.label ?? '',
     description: props.setting.description ?? '',
     field_type: props.setting.field_type,
     options: props.setting.options ?? '',
-    value: props.setting.field_type === 'checkbox'
-        ? (props.setting.value === '1' || props.setting.value === 'true' || props.setting.value === true)
-        : (props.setting.value ?? ''),
+    value:
+        props.setting.field_type === 'checkbox'
+            ? props.setting.value === '1' ||
+              props.setting.value === 'true' ||
+              props.setting.value === true
+            : (props.setting.value ?? ''),
     role: props.setting.role,
 });
 
@@ -65,7 +70,11 @@ const deleteSetting = (): void => {
         return;
     }
 
-    if (confirm(`Are you sure you want to delete the setting "${props.setting.key}"?`)) {
+    if (
+        confirm(
+            `Are you sure you want to delete the setting "${props.setting.key}"?`,
+        )
+    ) {
         router.delete(destroy(props.setting.id).url);
     }
 };
@@ -77,6 +86,13 @@ const deleteSetting = (): void => {
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
+                <button
+                    @click="() => window.history.back()"
+                    class="flex w-fit cursor-pointer items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    <ArrowLeft class="h-4 w-4" />
+                    Back to Settings
+                </button>
                 <div class="flex items-center justify-between">
                     <div>
                         <HeadingSmall
@@ -86,9 +102,12 @@ const deleteSetting = (): void => {
                         <div class="mt-2">
                             <span
                                 :class="{
-                                    'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400': isSystemSetting,
-                                    'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400': formData.role === 'user',
-                                    'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400': formData.role === 'plugin',
+                                    'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400':
+                                        isSystemSetting,
+                                    'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400':
+                                        formData.role === 'user',
+                                    'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400':
+                                        formData.role === 'plugin',
                                 }"
                                 class="rounded-full px-2 py-0.5 text-xs font-medium capitalize"
                             >
@@ -142,7 +161,7 @@ const deleteSetting = (): void => {
                             v-model="formData.description"
                             name="description"
                             rows="3"
-                            class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         />
                         <InputError :message="errors.description" />
                     </div>
@@ -154,12 +173,16 @@ const deleteSetting = (): void => {
                             v-model="fieldType"
                             name="field_type"
                             required
-                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            @update:model-value="formData.field_type = fieldType"
+                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                            @update:model-value="
+                                formData.field_type = fieldType
+                            "
                         >
                             <option value="input">Input (Text)</option>
                             <option value="checkbox">Checkbox</option>
-                            <option value="multioptions">Multi-options (Select)</option>
+                            <option value="multioptions">
+                                Multi-options (Select)
+                            </option>
                         </select>
                         <InputError :message="errors.field_type" />
                     </div>
@@ -171,7 +194,7 @@ const deleteSetting = (): void => {
                             v-model="formData.role"
                             name="role"
                             :disabled="isSystemSetting"
-                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <option value="system">System</option>
                             <option value="user">User</option>
@@ -186,10 +209,7 @@ const deleteSetting = (): void => {
                         </p>
                     </div>
 
-                    <div
-                        v-if="fieldType === 'multioptions'"
-                        class="grid gap-2"
-                    >
+                    <div v-if="fieldType === 'multioptions'" class="grid gap-2">
                         <Label for="options">Options (comma-separated)</Label>
                         <Input
                             id="options"
@@ -204,7 +224,10 @@ const deleteSetting = (): void => {
                     <div class="grid gap-2">
                         <Label for="value">Value</Label>
                         <Input
-                            v-if="fieldType === 'input' || fieldType === 'multioptions'"
+                            v-if="
+                                fieldType === 'input' ||
+                                fieldType === 'multioptions'
+                            "
                             id="value"
                             v-model="formData.value"
                             name="value"
@@ -239,10 +262,7 @@ const deleteSetting = (): void => {
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button
-                            :disabled="processing"
-                            type="submit"
-                        >
+                        <Button :disabled="processing" type="submit">
                             Update Setting
                         </Button>
                         <Link
@@ -259,7 +279,7 @@ const deleteSetting = (): void => {
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-neutral-600 dark:text-neutral-400"
                             >
                                 Updated.
                             </p>

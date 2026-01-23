@@ -10,7 +10,21 @@ export function urlIsActive(
     urlToCheck: NonNullable<InertiaLinkProps['href']>,
     currentUrl: string,
 ) {
-    return toUrl(urlToCheck) === currentUrl;
+    const url = toUrl(urlToCheck);
+
+    // Exact match
+    if (url === currentUrl) {
+        return true;
+    }
+
+    // Check if current URL is a child route of the checked URL
+    // e.g., /admin/users matches /admin/users/1/edit
+    const normalizedUrl = url.endsWith('/') ? url : url + '/';
+    const normalizedCurrentUrl = currentUrl.endsWith('/')
+        ? currentUrl
+        : currentUrl + '/';
+
+    return normalizedCurrentUrl.startsWith(normalizedUrl);
 }
 
 export function toUrl(href: NonNullable<InertiaLinkProps['href']>) {

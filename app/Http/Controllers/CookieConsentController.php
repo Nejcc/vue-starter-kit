@@ -8,28 +8,90 @@ use App\Http\Requests\UpdateCookieConsentRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Log;
 
 final class CookieConsentController extends Controller
 {
+    /**
+     * Get the cookie name for storing guest consent.
+     */
+    private function getCookieName(): string
+    {
+        return config('cookie.storage.key_prefix', 'cookie_consent').'_guest';
+    }
+
+    /**
+     * Get the cookie lifetime in minutes.
+     */
+    private function getCookieLifetime(): int
+    {
+        $days = config('cookie.storage.lifetime', 365);
+
+        return $days * 24 * 60; // Convert days to minutes
+    }
+
+    /**
+     * Store guest cookie consent preferences in both session and browser cookie.
+     */
+    private function storeGuestPreferences(Request $request, array $preferences): void
+    {
+        // Store in session for immediate access
+        $request->session()->put(
+            config('cookie.storage.session_key'),
+            $preferences
+        );
+
+        // Also store in browser cookie for persistence across sessions
+        Cookie::queue(
+            $this->getCookieName(),
+            json_encode($preferences),
+            $this->getCookieLifetime()
+        );
+    }
+
+    /**
+     * Get guest cookie consent preferences from session or browser cookie.
+     */
+    private function getGuestPreferences(Request $request): array
+    {
+        // First check session
+        $preferences = $request->session()->get(
+            config('cookie.storage.session_key')
+        );
+
+        // If not in session, check browser cookie
+        if (empty($preferences)) {
+            $cookieValue = $request->cookie($this->getCookieName());
+            if ($cookieValue) {
+                $preferences = json_decode($cookieValue, true) ?? [];
+                // Restore to session
+                if (!empty($preferences)) {
+                    $request->session()->put(
+                        config('cookie.storage.session_key'),
+                        $preferences
+                    );
+                }
+            }
+        }
+
+        return $preferences ?? [];
+    }
+
     /**
      * Get the current cookie consent preferences.
      */
     public function getPreferences(Request $request): JsonResponse
     {
         $user = Auth::user();
-        $ipAddress = $request->ip();
 
         if ($user) {
             // For authenticated users, get preferences from database
             $preferences = $user->cookie_consent_preferences ?? [];
             $hasConsent = $user->hasCookieConsent();
         } else {
-            // For guest users, get preferences from session
-            $preferences = $request->session()->get(
-                config('cookie.storage.session_key'),
-                []
-            );
+            // For guest users, get preferences from session or browser cookie
+            $preferences = $this->getGuestPreferences($request);
             $hasConsent = !empty($preferences);
         }
 
@@ -69,11 +131,8 @@ final class CookieConsentController extends Controller
             // For authenticated users, save to database
             $user->updateCookieConsent($validated, $ipAddress);
         } else {
-            // For guest users, save to session
-            $request->session()->put(
-                config('cookie.storage.session_key'),
-                $validated
-            );
+            // For guest users, save to session and browser cookie
+            $this->storeGuestPreferences($request, $validated);
         }
 
         return response()->json([
@@ -109,10 +168,7 @@ final class CookieConsentController extends Controller
         if ($user) {
             $user->updateCookieConsent($preferences, $ipAddress);
         } else {
-            $request->session()->put(
-                config('cookie.storage.session_key'),
-                $preferences
-            );
+            $this->storeGuestPreferences($request, $preferences);
         }
 
         return response()->json([
@@ -151,10 +207,7 @@ final class CookieConsentController extends Controller
         if ($user) {
             $user->updateCookieConsent($preferences, $ipAddress);
         } else {
-            $request->session()->put(
-                config('cookie.storage.session_key'),
-                $preferences
-            );
+            $this->storeGuestPreferences($request, $preferences);
         }
 
         return response()->json([

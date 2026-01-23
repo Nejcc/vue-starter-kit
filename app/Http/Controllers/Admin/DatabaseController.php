@@ -42,6 +42,31 @@ final class DatabaseController extends Controller
     }
 
     /**
+     * Test database connection.
+     *
+     * @param  string  $connection  The connection name to test
+     * @return array{success: bool, driver?: string, error?: string}
+     */
+    private function testConnection(string $connection): array
+    {
+        try {
+            $db = DB::connection($connection);
+            $db->getPdo(); // This will throw exception if connection fails
+            $driver = $db->getDriverName();
+
+            return [
+                'success' => true,
+                'driver' => $driver,
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Show the database tables index page.
      *
      * @param  Request  $request  The incoming request
@@ -68,8 +93,16 @@ final class DatabaseController extends Controller
             $connection = config('database.default');
         }
 
+        // Test the connection before proceeding
+        $connectionTest = $this->testConnection($connection);
+        if (!$connectionTest['success']) {
+            return redirect()
+                ->route('admin.databases.index')
+                ->withErrors(['connection' => 'Failed to connect to database: '.$connectionTest['error']]);
+        }
+
         $db = DB::connection($connection);
-        $driver = $db->getDriverName();
+        $driver = $connectionTest['driver'];
 
         $tables = [];
 

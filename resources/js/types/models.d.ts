@@ -54,4 +54,3 @@ export interface Paginator<T> extends PaginatedResponse<T> {
         active: boolean;
     }>;
 }
-

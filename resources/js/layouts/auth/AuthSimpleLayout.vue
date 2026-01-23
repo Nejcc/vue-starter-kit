@@ -19,7 +19,9 @@ const isAuthenticated = computed(() => !!page.props.auth?.user);
     <div
         class="flex min-h-svh flex-col items-center justify-between gap-6 bg-background p-4 sm:p-6 md:p-8 lg:p-10"
     >
-        <header class="mb-4 w-full max-w-sm text-sm sm:mb-6 sm:max-w-2xl md:max-w-4xl lg:max-w-6xl">
+        <header
+            class="mb-4 w-full max-w-sm text-sm sm:mb-6 sm:max-w-2xl md:max-w-4xl lg:max-w-6xl"
+        >
             <nav class="flex items-center justify-between gap-2 sm:gap-4">
                 <Link
                     :href="home()"
@@ -58,7 +60,9 @@ const isAuthenticated = computed(() => !!page.props.auth?.user);
                             <span class="sr-only">{{ title }}</span>
                         </Link>
                         <div class="space-y-1.5 text-center sm:space-y-2">
-                            <h1 class="text-lg font-medium sm:text-xl">{{ title }}</h1>
+                            <h1 class="text-lg font-medium sm:text-xl">
+                                {{ title }}
+                            </h1>
                             <p class="text-xs text-muted-foreground sm:text-sm">
                                 {{ description }}
                             </p>
@@ -68,18 +72,25 @@ const isAuthenticated = computed(() => !!page.props.auth?.user);
                 </div>
             </div>
         </div>
-        
+
         <!-- Cookie Consent Banner -->
         <CookieConsentBanner :cookie-consent="cookieConsent" />
 
-        <footer class="mt-6 w-full max-w-sm text-xs text-[#706f6c] sm:mt-8 sm:max-w-2xl sm:text-sm md:max-w-4xl dark:text-[#A1A09A] lg:max-w-6xl">
-            <div class="flex flex-col items-center gap-3 border-t border-[#e3e3e0] pt-4 dark:border-[#3E3E3A] sm:gap-4 sm:pt-6 lg:flex-row lg:justify-between">
+        <footer
+            class="mt-6 w-full max-w-sm text-xs text-[#706f6c] sm:mt-8 sm:max-w-2xl sm:text-sm md:max-w-4xl lg:max-w-6xl dark:text-[#A1A09A]"
+        >
+            <div
+                class="flex flex-col items-center gap-3 border-t border-[#e3e3e0] pt-4 sm:gap-4 sm:pt-6 lg:flex-row lg:justify-between dark:border-[#3E3E3A]"
+            >
                 <div class="text-center lg:text-left">
                     <p class="text-[10px] sm:text-xs">
-                        © {{ new Date().getFullYear() }} LaravelPlus. All rights reserved.
+                        © {{ new Date().getFullYear() }} LaravelPlus. All rights
+                        reserved.
                     </p>
                 </div>
-                <nav class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 lg:justify-end">
+                <nav
+                    class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 lg:justify-end"
+                >
                     <Link
                         href="/privacy-policy"
                         class="text-[10px] text-[#706f6c] hover:text-[#1b1b18] hover:underline sm:text-xs dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"

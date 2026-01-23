@@ -1,43 +1,54 @@
 <template>
-  <button
-    type="button"
-    class="flex items-center gap-3 p-4 rounded-lg border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-left w-full"
-    @click="handleClick"
-  >
-    <div
-      class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium shrink-0"
+    <button
+        type="button"
+        class="flex w-full items-center gap-3 rounded-lg border border-border bg-card p-4 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
+        :disabled="isLoading"
+        :class="{ 'cursor-not-allowed opacity-60': isLoading }"
+        @click="handleClick"
     >
-      {{ user.initials }}
-    </div>
-    <div class="flex-1 min-w-0">
-      <div class="font-medium truncate">{{ user.name }}</div>
-      <div class="text-sm text-muted-foreground truncate">{{ user.email }}</div>
-    </div>
-    <UserRound class="h-4 w-4 text-muted-foreground shrink-0" />
-  </button>
+        <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground"
+        >
+            {{ user.initials }}
+        </div>
+        <div class="min-w-0 flex-1">
+            <div class="truncate font-medium">{{ user.name }}</div>
+            <div class="truncate text-sm text-muted-foreground">
+                {{ user.email }}
+            </div>
+        </div>
+        <Loader2
+            v-if="isLoading"
+            class="h-4 w-4 shrink-0 animate-spin text-muted-foreground"
+        />
+        <UserRound v-else class="h-4 w-4 shrink-0 text-muted-foreground" />
+    </button>
 </template>
 
 <script setup lang="ts">
-import { UserRound } from 'lucide-vue-next'
+import { Loader2, UserRound } from 'lucide-vue-next';
 
 interface User {
-  id: number
-  name: string
-  email: string
-  initials: string
+    id: number;
+    name: string;
+    email: string;
+    initials: string;
 }
 
 interface Props {
-  user: User
+    user: User;
+    isLoading?: boolean;
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+    isLoading: false,
+});
 
 const emit = defineEmits<{
-  impersonate: [userId: number]
-}>()
+    impersonate: [userId: number];
+}>();
 
 const handleClick = () => {
-  emit('impersonate', props.user.id)
-}
+    emit('impersonate', props.user.id);
+};
 </script>

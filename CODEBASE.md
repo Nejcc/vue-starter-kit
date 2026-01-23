@@ -7,18 +7,22 @@
 1. [Application Overview](#application-overview)
 2. [Architecture Patterns](#architecture-patterns)
 3. [Directory Structure](#directory-structure)
-4. [Key Technologies & Versions](#key-technologies--versions)
-5. [Authentication & Authorization](#authentication--authorization)
-6. [Frontend Architecture](#frontend-architecture)
-7. [Common Patterns & Examples](#common-patterns--examples)
-8. [Data Flow Examples](#data-flow-examples)
-9. [Performance Considerations](#performance-considerations)
-10. [Security Best Practices](#security-best-practices)
-11. [Troubleshooting](#troubleshooting)
-12. [Critical Code Standards & Conventions](#critical-code-standards--conventions)
-13. [Comprehensive File Inventory](#comprehensive-file-inventory)
-14. [Development Workflow](#development-workflow)
-15. [Tracking Changes](#tracking-changes)
+4. [Environment Setup](#environment-setup)
+5. [Key Technologies & Versions](#key-technologies--versions)
+6. [Database Schema & Migrations](#database-schema--migrations)
+7. [Authentication & Authorization](#authentication--authorization)
+8. [Frontend Architecture](#frontend-architecture)
+9. [Common Patterns & Examples](#common-patterns--examples)
+10. [Data Flow Examples](#data-flow-examples)
+11. [Performance Considerations](#performance-considerations)
+12. [Security Best Practices](#security-best-practices)
+13. [Troubleshooting](#troubleshooting)
+14. [Critical Code Standards & Conventions](#critical-code-standards--conventions)
+15. [Comprehensive File Inventory](#comprehensive-file-inventory)
+16. [Development Workflow](#development-workflow)
+17. [Tracking Changes](#tracking-changes)
+18. [Key Features Summary](#key-features-summary)
+19. [Quick Reference](#quick-reference)
 
 ---
 
@@ -31,9 +35,14 @@ This is a **generic Laravel starter kit** designed to be cloned and customized f
 - **Inertia.js 2** for seamless SPA experience + prefetch
 - **Tailwind CSS 4** for utility-first styling
 - **shadcn-vue** component library with Reka UI
-- **Laravel Fortify** for authentication
+- **Laravel Fortify** for authentication (login, register, 2FA, password reset)
 - **Spatie Laravel Permission** for roles and permissions
 - **Repository, Service, and Action patterns** for clean architecture
+- **User impersonation** for admin testing
+- **Cookie consent management** with GDPR compliance
+- **Database management UI** for viewing tables and data
+- **Last login tracking** for security auditing
+- **Theme/appearance management** (light/dark mode)
 
 ### Key Philosophy
 
@@ -394,6 +403,163 @@ SESSION_DRIVER=file
 
 ---
 
+## Database Schema & Migrations
+
+### Database Tables
+
+#### Users Table (`users`)
+
+**Columns**:
+- `id` - Primary key
+- `name` - User's full name
+- `email` - Email address (unique)
+- `email_verified_at` - Email verification timestamp
+- `password` - Hashed password
+- `remember_token` - "Remember me" token
+- `two_factor_secret` - 2FA secret key (encrypted)
+- `two_factor_recovery_codes` - 2FA recovery codes (encrypted)
+- `two_factor_confirmed_at` - 2FA activation timestamp
+- `cookie_consent_preferences` - JSON column for consent categories
+- `cookie_consent_given_at` - Cookie consent timestamp
+- `data_processing_consent` - Boolean for data processing consent
+- `data_processing_consent_given_at` - Data processing consent timestamp
+- `gdpr_ip_address` - IP address for GDPR compliance (audit trail)
+- `last_login_at` - Last login timestamp
+- `created_at` - Record creation timestamp
+- `updated_at` - Record update timestamp
+
+#### Settings Table (`settings`)
+
+**Columns**:
+- `id` - Primary key
+- `key` - Setting key (unique)
+- `value` - Setting value
+- `field_type` - Type of field (input, checkbox, multioptions)
+- `options` - JSON column for multi-select options
+- `label` - Display label for UI
+- `description` - Setting description
+- `role` - Setting role (system, user, plugin)
+- `created_at` - Record creation timestamp
+- `updated_at` - Record update timestamp
+
+#### Spatie Permission Tables
+
+**`roles`**:
+- `id` - Primary key
+- `name` - Role name (unique)
+- `guard_name` - Guard name (default: web)
+- `created_at`, `updated_at` - Timestamps
+
+**`permissions`**:
+- `id` - Primary key
+- `name` - Permission name (unique)
+- `guard_name` - Guard name (default: web)
+- `group_name` - Group for organizing permissions (e.g., "users", "roles")
+- `created_at`, `updated_at` - Timestamps
+
+**`role_has_permissions`** (pivot):
+- `permission_id` - Foreign key to permissions
+- `role_id` - Foreign key to roles
+
+**`model_has_roles`** (polymorphic pivot):
+- `role_id` - Foreign key to roles
+- `model_type` - Model class name
+- `model_id` - Model ID
+
+**`model_has_permissions`** (polymorphic pivot):
+- `permission_id` - Foreign key to permissions
+- `model_type` - Model class name
+- `model_id` - Model ID
+
+#### Laravel Core Tables
+
+**`password_reset_tokens`**:
+- `email` - Email address (primary key)
+- `token` - Reset token
+- `created_at` - Token creation timestamp
+
+**`sessions`**:
+- `id` - Session ID (primary key)
+- `user_id` - Foreign key to users (nullable)
+- `ip_address` - Client IP
+- `user_agent` - Client user agent
+- `payload` - Session data
+- `last_activity` - Last activity timestamp
+
+**`cache`**:
+- `key` - Cache key (primary key)
+- `value` - Cached value
+- `expiration` - Expiration timestamp
+
+**`jobs`**:
+- Queue jobs table for background processing
+
+### Migrations (10 total)
+
+1. **`create_users_table.php`** - Basic user schema
+2. **`create_cache_table.php`** - Cache storage
+3. **`create_jobs_table.php`** - Queue jobs
+4. **`add_two_factor_columns_to_users_table.php`** - 2FA support
+5. **`add_cookie_consent_columns_to_users_table.php`** - Cookie consent & GDPR
+6. **`add_last_login_at_to_users_table.php`** - Login tracking
+7. **`create_permission_tables.php`** - Spatie Permission tables
+8. **`add_group_name_to_permissions_table.php`** - Permission grouping
+9. **`create_settings_table.php`** - Application settings
+10. **`add_role_to_settings_table.php`** - Setting roles (system/user/plugin)
+
+### Database Seeders (5 seeders)
+
+**`DatabaseSeeder.php`**:
+- Main seeder that orchestrates all other seeders
+- Calls seeders in correct order to maintain referential integrity
+
+**`PermissionSeeder.php`**:
+- Creates base permissions for the application
+- Permissions created:
+  - `view users` - View user list
+  - `create users` - Create new users
+  - `edit users` - Modify existing users
+  - `delete users` - Delete users
+  - `impersonate` - Impersonate other users
+
+**`RoleSeeder.php`**:
+- Creates three system roles:
+  - `super-admin` - Full access (automatically has all permissions via Gate::before)
+  - `admin` - Administrative role (assigned specific permissions)
+  - `user` - Standard user role (limited permissions)
+- Assigns appropriate permissions to each role
+
+**`SettingsSeeder.php`**:
+- Creates default application settings
+- Example settings (customize as needed):
+  - Site configuration
+  - Feature flags
+  - System preferences
+
+**`UserSeeder.php`**:
+- Creates default users for testing and development
+- Creates users with different roles for testing
+- Default users can be customized per project needs
+
+### Default Roles & Permissions
+
+**Roles**:
+- `super-admin`: Has ALL permissions automatically (via `Gate::before()` in AuthServiceProvider)
+- `admin`: Administrative access with specific permissions
+- `user`: Standard user with limited access
+
+**Permissions** (grouped by resource):
+- **Users Group**:
+  - `view users`
+  - `create users`
+  - `edit users`
+  - `delete users`
+  - `impersonate`
+
+**Note**: More permissions and groups can be added via the admin panel or additional seeders.
+
+---
+
 ## Authentication & Authorization
 
 ### Laravel Fortify
@@ -426,9 +592,107 @@ The super-admin role is special - it automatically has all permissions via `Gate
 
 ### Cookie Consent & GDPR
 
-- Cookie consent preferences stored per user
+The application includes comprehensive GDPR-compliant cookie consent management:
+
+**Features**:
+- Cookie consent banner for both guests and authenticated users
+- Category-based consent (essential, analytics, marketing, preferences)
+- Accept all / Reject all functionality
+- Granular category preferences
 - Data processing consent tracking
-- GDPR-compliant cookie and privacy policy pages
+- IP address logging for audit trail
+- Timestamp tracking for consent given
+- Cookie consent preferences stored in both database and session
+- Privacy policy and cookie policy pages
+
+**Implementation**:
+- `EnsureCookieConsent` middleware enforces consent
+- User model tracks: `cookie_consent_preferences` (JSON), `cookie_consent_given_at`, `gdpr_ip_address`
+- `CookieConsentController` handles preference updates
+- Methods on User model: `hasCookieConsent()`, `hasDataProcessingConsent()`, `hasCookieConsentForCategory()`, `updateCookieConsent()`, `updateDataProcessingConsent()`
+
+### User Impersonation
+
+Allows administrators to impersonate other users for testing and support purposes:
+
+**Features**:
+- Super-admin and admin roles can impersonate users
+- Cannot impersonate yourself
+- Active impersonation banner displayed prominently
+- Session-based impersonation tracking
+- Easy "stop impersonating" functionality
+- Protected by role middleware
+
+**Implementation**:
+- `ImpersonateController` handles impersonation logic
+- `HandleInertiaRequests` middleware shares impersonation status
+- Frontend components: `ImpersonateButton`, `ImpersonateModal`, `ImpersonationBanner`
+- Routes: `/impersonate` (index), `/impersonate` (store), `/impersonate` (destroy)
+
+### Database Management
+
+Admin database browser for inspecting database structure and data:
+
+**Supported Databases**:
+- SQLite
+- MySQL
+- MariaDB
+- PostgreSQL
+- SQL Server
+
+**Features**:
+- List all database connections configured in the application
+- Browse tables and views for each connection
+- View table structure (columns, data types, nullability, defaults)
+- Browse table data with pagination
+- View indexes and foreign key constraints
+- Row count for each table
+- Support for multiple database connections
+
+**Implementation**:
+- `Admin\DatabaseController` handles all database operations
+- Uses `mcp__laravel-boost__database-schema` MCP tool for schema inspection
+- Uses `mcp__laravel-boost__database-query` MCP tool for data queries
+- Frontend pages: `Database/Index.vue`, `Database/Show.vue` with sub-views (Structure, Data, Indexes, Actions)
+- Routes under `/admin/database` prefix
+
+### Last Login Tracking
+
+Tracks when users last logged in for security auditing:
+
+**Features**:
+- Automatically records login timestamp
+- Does not update `updated_at` timestamp
+- Stored in `last_login_at` column
+- `hasLoggedIn()` helper method
+
+**Implementation**:
+- `TracksLastLogin` trait applied to User model
+- `recordLastLogin()` method called during authentication
+- Listener registered for `Login` event in Fortify
+
+### Development Features
+
+#### Quick Login (Local Development Only)
+
+Provides quick authentication during local development without entering credentials:
+
+**Features**:
+- Available only when `APP_ENV=local`
+- Route: `GET /quick-login`
+- Automatically logs in as first user in database
+- Bypasses password and 2FA requirements
+- Disabled in production for security
+
+**Security**:
+- Restricted to local environment only
+- Returns 404 in non-local environments
+- Should never be deployed to production
+
+**Usage**:
+- Visit `/quick-login` in browser during local development
+- Automatically authenticates and redirects to dashboard
+- Useful for rapid development and testing
 
 ---
 
@@ -449,6 +713,92 @@ Pages are organized by feature:
 **Location**: `resources/js/components/`
 
 Reusable Vue components built with shadcn-vue and Reka UI. Components follow the shadcn-vue pattern.
+
+#### Custom Application Components
+
+**App Shell & Layout**:
+- `AppShell.vue` - Main application shell wrapper
+- `AppHeader.vue` - Application header with navigation and user menu
+- `AppSidebar.vue` - Collapsible sidebar navigation
+- `AppContent.vue` - Main content area wrapper
+- `AppLogo.vue` / `AppLogoIcon.vue` - Application branding components
+- `AppSidebarHeader.vue` - Sidebar header component
+- `AdminSidebar.vue` - Admin panel specific sidebar
+
+**Navigation**:
+- `NavMain.vue` - Primary navigation menu
+- `NavFooter.vue` - Footer navigation links
+- `NavUser.vue` - User-specific navigation menu
+- `Breadcrumbs.vue` - Breadcrumb trail navigation
+- `TextLink.vue` - Styled text links
+
+**User Components**:
+- `UserCard.vue` - User profile card display
+- `UserInfo.vue` - User information display
+- `UserMenuContent.vue` - User dropdown menu content
+
+**Authentication & Security**:
+- `TwoFactorRecoveryCodes.vue` - Display 2FA recovery codes
+- `TwoFactorSetupModal.vue` - 2FA setup wizard with QR code
+- `DeleteUser.vue` - User account deletion confirmation
+
+**Impersonation**:
+- `ImpersonateButton.vue` - Button to trigger impersonation
+- `ImpersonateModal.vue` - Modal for selecting user to impersonate
+- `ImpersonationBanner.vue` - Banner displayed during active impersonation
+
+**Cookie Consent**:
+- `CookieConsentBanner.vue` - GDPR cookie consent banner
+- `AppearanceTabs.vue` - Theme selection tabs (light/dark/system)
+
+**UI Utilities**:
+- `AlertError.vue` - Error alert component
+- `Icon.vue` - Icon wrapper component
+- `Heading.vue` / `HeadingSmall.vue` - Typography components
+- `InputError.vue` - Form error message display
+- `PlaceholderPattern.vue` - Empty state placeholder
+
+**Public Pages**:
+- `PublicHeader.vue` - Public-facing header
+- `PublicFooter.vue` - Public-facing footer
+
+#### shadcn-vue UI Components (136+ components)
+
+Pre-built, accessible UI components from shadcn-vue library:
+
+**Layout & Structure**:
+- Card (Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, CardAction)
+- Sheet (drawer/mobile menu)
+- Separator
+- Collapsible
+
+**Navigation**:
+- Breadcrumb (full suite with ellipsis, separators)
+- Navigation Menu (multi-level navigation)
+- Dropdown Menu (context menus with shortcuts)
+- Tabs
+
+**Forms & Input**:
+- Button
+- Input
+- Label
+- Checkbox
+- Input OTP (one-time password input)
+- Form components
+
+**Feedback**:
+- Alert (Alert, AlertTitle, AlertDescription)
+- Badge
+- Avatar (Avatar, AvatarImage, AvatarFallback)
+
+**Overlays**:
+- Dialog (modals with scroll support)
+- Sheet (side drawer)
+
+**Data Display**:
+- Table components (full table suite)
+
+All components are customizable with Tailwind CSS and support dark mode.
 
 ### Layouts
 
@@ -1200,12 +1550,25 @@ This section documents every important file in the codebase, organized by catego
 - Renders `About` Inertia page
 
 **`app/Http/Controllers/CookieConsentController.php`**
-- Handles cookie consent preferences
-- Methods: `getPreferences()`, `updatePreferences()`, `acceptAll()`, `rejectAll()`
+- Handles cookie consent preferences for GDPR compliance
+- Methods:
+  - `getPreferences()` - Retrieve current consent preferences
+  - `updatePreferences()` - Update category-based consent
+  - `acceptAll()` - Accept all cookie categories
+  - `rejectAll()` - Reject all non-essential cookies
+- Logs IP address and timestamp for audit trail
+- Supports both authenticated users and guests
 
 **`app/Http/Controllers/ImpersonateController.php`**
-- Handles user impersonation
-- Methods: `index()` (list users), `store()` (start impersonation), `destroy()` (stop impersonation)
+- Handles user impersonation for admin testing and support
+- Methods:
+  - `index()` - List all users available for impersonation
+  - `store($userId)` - Start impersonating a user
+  - `destroy()` - Stop current impersonation session
+- Protected by 'role:super-admin,admin' middleware
+- Prevents self-impersonation
+- Uses `UserService` for user lookup
+- Stores impersonation state in session
 
 #### Admin Controllers
 
@@ -1229,8 +1592,17 @@ This section documents every important file in the codebase, organized by catego
 - Methods: `index()`, `create()`, `store()`, `edit()`, `update()`, `destroy()`, `bulkUpdate()`
 
 **`app/Http/Controllers/Admin/DatabaseController.php`**
-- Database browser/explorer
-- Methods: `index()`, `listConnections()`, `show()` (table/view details)
+- Database browser/explorer for all configured connections
+- Methods:
+  - `index()` - List all database connections and their tables
+  - `show($connection, $table)` - Show table details with multiple views
+- Features:
+  - Supports SQLite, MySQL, MariaDB, PostgreSQL, SQL Server
+  - View table structure (columns, types, constraints)
+  - Browse table data with pagination
+  - View indexes and foreign keys
+  - Display row counts for all tables
+- Uses Laravel Boost MCP tools for database inspection
 
 #### Settings Controllers
 
@@ -1303,17 +1675,47 @@ This section documents every important file in the codebase, organized by catego
 ### 9.7 Models
 
 **`app/Models/User.php`**
-- User Eloquent model
-- Uses traits: `HasFactory`, `HasRoles` (Spatie), `Notifiable`, `TracksLastLogin`, `TwoFactorAuthenticatable`
-- Fillable: name, email, password, cookie consent fields, data processing consent, last_login_at
-- Methods: `getFullNameAttribute()`, `getInitialsAttribute()`, `hasCookieConsent()`, `hasDataProcessingConsent()`, `hasCookieConsentForCategory()`, `updateCookieConsent()`, `updateDataProcessingConsent()`
+- User Eloquent model with comprehensive authentication and authorization features
+- **Traits used**:
+  - `HasFactory` - Factory support for testing
+  - `HasRoles` - Spatie Permission role-based access control
+  - `Notifiable` - Laravel notification system
+  - `TracksLastLogin` - Custom trait for login tracking
+  - `TwoFactorAuthenticatable` - Laravel Fortify 2FA support
+- **Fillable attributes**: name, email, password, cookie_consent_preferences, cookie_consent_given_at, data_processing_consent, data_processing_consent_given_at, gdpr_ip_address, last_login_at
+- **Hidden attributes**: password, remember_token, two_factor_recovery_codes, two_factor_secret
+- **Casts**: email_verified_at (datetime), password (hashed), cookie_consent_preferences (array)
+- **Accessor Methods**:
+  - `getFullNameAttribute()` - Returns full name (currently same as name)
+  - `getInitialsAttribute()` - Generates user initials from name
+  - `hasVerifiedEmail()` - Check if email is verified
+  - `getDisplayNameAttribute()` - Display name for UI
+- **Cookie Consent Methods**:
+  - `hasCookieConsent()` - Check if user has given cookie consent
+  - `hasDataProcessingConsent()` - Check if user has given data processing consent
+  - `hasCookieConsentForCategory($category)` - Check consent for specific category
+  - `updateCookieConsent($preferences)` - Update cookie consent preferences
+  - `updateDataProcessingConsent($consent)` - Update data processing consent
+- **Last Login Methods** (via TracksLastLogin trait):
+  - `recordLastLogin()` - Record last login timestamp
+  - `hasLoggedIn()` - Check if user has ever logged in
 
 **`app/Models/Setting.php`**
-- Setting Eloquent model
-- Stores application settings (key-value pairs)
-- Fillable: key, value, field_type, options, label, description, role
-- Casts: `role` to `SettingRole` enum, `options` to array
-- Static methods: `get()`, `set()`
+- Setting Eloquent model for dynamic application configuration
+- Stores key-value pairs with metadata for UI rendering
+- **Fillable attributes**: key, value, field_type, options, label, description, role
+- **Unique constraint**: key column is unique
+- **Casts**:
+  - `role` to `SettingRole` enum (System, User, Plugin)
+  - `options` to array (for multi-select fields)
+- **Field types supported**:
+  - `input` - Text input field
+  - `checkbox` - Boolean checkbox
+  - `multioptions` - Multi-select dropdown
+- **Static helper methods**:
+  - `get($key, $default = null)` - Retrieve setting value by key
+  - `set($key, $value)` - Update or create setting value
+- **Use cases**: Feature flags, system configuration, user preferences, plugin settings
 
 #### Traits
 
@@ -1335,6 +1737,12 @@ This section documents every important file in the codebase, organized by catego
 - Constants: `SUPER_ADMIN`, `ADMIN`, `USER`
 - Used throughout application for role checks
 
+#### Facades
+
+**`app/Facades/User.php`**
+- User facade for convenient static access to user operations
+- Provides static interface to user-related functionality
+
 ### 9.8 Middleware
 
 **`app/Http/Middleware/HandleInertiaRequests.php`**
@@ -1345,10 +1753,19 @@ This section documents every important file in the codebase, organized by catego
 **`app/Http/Middleware/EnsureCookieConsent.php`**
 - Ensures cookie consent is given
 - Handles cookie consent requirements
+- Shares consent status with Inertia pages
 
 **`app/Http/Middleware/HandleAppearance.php`**
-- Handles theme/appearance preferences
+- Handles theme/appearance preferences from cookies
 - Manages light/dark mode
+- Persists theme selection across sessions
+
+**`app/Http/Middleware/EnsureUserHasRole.php`**
+- Role-based access control middleware
+- Verifies user has required role(s) to access route
+- Registered as 'role' middleware alias in bootstrap/app.php
+- Usage: `Route::middleware('role:admin')` or `Route::middleware('role:super-admin,admin')`
+- Returns 403 Forbidden if user lacks required role
 
 ### 9.9 Frontend Files
 
@@ -1390,20 +1807,24 @@ This section documents every important file in the codebase, organized by catego
 
 **Admin Pages** (`resources/js/pages/admin/`):
 - `Dashboard.vue` - Admin dashboard
-- `Users/Index.vue` - User list
-- `Users/Create.vue` - Create user
-- `Roles/Index.vue` - Role list
-- `Roles/Create.vue` - Create role
-- `Roles/Edit.vue` - Edit role
-- `Permissions/Index.vue` - Permission list
-- `Permissions/Create.vue` - Create permission
-- `Permissions/Edit.vue` - Edit permission
-- `Settings.vue` - Settings list
-- `Settings/Create.vue` - Create setting
+- `Users/Index.vue` - User list with search
+- `Users/Create.vue` - Create user with role assignment
+- `Roles/Index.vue` - Role list with search
+- `Roles/Create.vue` - Create role with permission assignment
+- `Roles/Edit.vue` - Edit role with permission assignment
+- `Permissions/Index.vue` - Permission list with search/grouping
+- `Permissions/Create.vue` - Create permission with group
+- `Permissions/Edit.vue` - Edit permission with group
+- `Settings.vue` - Settings list with search
+- `Settings/Create.vue` - Create setting (key-value pairs)
 - `Settings/Edit.vue` - Edit setting
-- `Database/Index.vue` - Database connections list
-- `Databases/Index.vue` - Database browser
-- `Database/Show.vue` - Table/view details
+- `Database/Index.vue` - Database connections and tables list
+- `Database/Show.vue` - Table/view details (main wrapper)
+- `Database/show/Structure.vue` - Table structure view (columns, types, nullability)
+- `Database/show/Data.vue` - Table data browser with pagination
+- `Database/show/Indexes.vue` - Table indexes and foreign keys
+- `Database/show/Actions.vue` - Table actions (future functionality)
+- `Databases/Index.vue` - Database connections list (legacy/alternate view)
 
 **Other Pages**:
 - `resources/js/pages/Impersonate/Index.vue` - User impersonation interface
@@ -1474,16 +1895,58 @@ TypeScript type definitions for:
 
 #### Route Files
 
-**`routes/web.php`**
-- Main web routes file
-- Public routes, dashboard, cookie consent, privacy/cookie policy, about, impersonation, admin routes
+**`routes/web.php`** (94 routes total)
+- Main web routes file with all public and authenticated routes
+- **Public Routes**:
+  - `/` - Welcome page
+  - `/about` - About page
+  - `/privacy-policy` - Privacy policy
+  - `/cookie-policy` - Cookie policy
+- **Quick Login** (local development only):
+  - `/quick-login` - Development helper for quick authentication
+- **Authentication Routes**:
+  - Handled by Laravel Fortify (login, register, password reset, email verification, 2FA)
+- **Dashboard**:
+  - `/dashboard` - User dashboard (auth + verified middleware)
+- **Cookie Consent**:
+  - `GET /cookie-consent/preferences` - Get consent preferences
+  - `POST /cookie-consent/preferences` - Update preferences
+  - `POST /cookie-consent/accept-all` - Accept all cookies
+  - `POST /cookie-consent/reject-all` - Reject non-essential cookies
+- **Settings Routes**:
+  - Loaded from `routes/settings.php`
+- **Impersonation** (admin/super-admin only):
+  - `GET /impersonate` - List users for impersonation
+  - `POST /impersonate` - Start impersonating user
+  - `DELETE /impersonate` - Stop impersonation
+- **Admin Routes** (prefix: `/admin`):
+  - `/admin` - Admin dashboard
+  - `/admin/settings/*` - Settings CRUD + bulk update
+  - `/admin/users/*` - User management
+  - `/admin/roles/*` - Role CRUD
+  - `/admin/permissions/*` - Permission CRUD
+  - `/admin/database` - Database browser
+  - `/admin/database/{connection}/{table}` - Table details
 
-**`routes/settings.php`**
-- User settings routes
-- Profile, password, appearance, 2FA, cookie preferences
+**`routes/settings.php`** (6 routes)
+- User settings routes (prefix: `/settings`, auth + verified middleware)
+- **Profile**:
+  - `GET /settings/profile` - Edit profile
+  - `PATCH /settings/profile` - Update profile
+  - `DELETE /settings/profile` - Delete account
+- **Password**:
+  - `GET /settings/password` - Change password page
+  - `PUT /settings/password` - Update password
+- **Appearance**:
+  - `GET /settings/appearance` - Theme selection
+- **Two-Factor Authentication**:
+  - `GET /settings/two-factor` - 2FA management
+- **Cookie Preferences**:
+  - `GET /settings/cookie-preferences` - Cookie preference page
 
 **`routes/console.php`**
 - Console/Artisan command routes
+- `inspire` command - Display inspiring quote
 
 #### Configuration Files
 
@@ -1523,40 +1986,72 @@ TypeScript type definitions for:
 - Base test case class
 - All tests extend this
 
-#### Feature Tests
+#### Feature Tests (18 test files)
 
 **Location**: `tests/Feature/`
 
-Feature tests for HTTP endpoints and complete features. Examples:
-- Authentication tests
-- User management tests
-- Admin panel tests
-- Settings tests
+Feature tests for HTTP endpoints and complete user flows:
 
-#### Unit Tests
+**Authentication Tests** (`tests/Feature/Auth/`):
+- `AuthenticationTest.php` - Login flow, authentication attempts, logout
+- `RegistrationTest.php` - User registration process
+- `PasswordResetTest.php` - Password reset email and update flow
+- `EmailVerificationTest.php` - Email verification process
+- `VerificationNotificationTest.php` - Resending verification emails
+- `PasswordConfirmationTest.php` - Password confirmation for sensitive actions
+- `TwoFactorChallengeTest.php` - 2FA authentication challenges
+
+**User Feature Tests**:
+- `DashboardTest.php` - Dashboard access and authentication requirements
+- `LastLoginTrackingTest.php` - Last login timestamp tracking
+- `ImpersonateTest.php` - User impersonation functionality
+- `CookieConsentTest.php` - Cookie consent management
+
+**Settings Tests** (`tests/Feature/Settings/`):
+- `ProfileUpdateTest.php` - Profile information updates
+- `PasswordUpdateTest.php` - Password change functionality
+- `TwoFactorAuthenticationTest.php` - 2FA enable/disable/recovery codes
+
+**Admin Tests** (`tests/Feature/Admin/`):
+- `UsersControllerTest.php` - Admin user management
+
+**Integration Tests**:
+- `RepositoryServiceIntegrationTest.php` - Repository and Service integration
+- `ExampleTest.php` - Example feature test
+
+#### Unit Tests (12 test files)
 
 **Location**: `tests/Unit/`
 
-**`tests/Unit/Actions/`**
-- Unit tests for action classes
+**Action Tests** (`tests/Unit/Actions/User/`):
+- `CreateUserActionTest.php` - User creation action
+- `UpdateUserProfileActionTest.php` - Profile update action
+- `UpdateUserPasswordActionTest.php` - Password update action
+- `DeleteUserActionTest.php` - User deletion action
 
-**`tests/Unit/Repositories/`**
-- Unit tests for repository classes
+**Repository Tests** (`tests/Unit/Repositories/`):
+- `AbstractRepositoryTest.php` - Base repository functionality (caching, CRUD)
+- `UserRepositoryTest.php` - User repository specific methods
 
-**`tests/Unit/Services/`**
-- Unit tests for service classes
+**Service Tests** (`tests/Unit/Services/`):
+- `AbstractServiceTest.php` - Base service functionality (transactions, validation)
+- `UserServiceTest.php` - User service business logic
 
-**`tests/Unit/ExampleTest.php`**
-- Example unit test
+**Utility Tests**:
+- `ExampleTest.php` - Example unit test
+- `InstallerWorkflowTest.php` - Installation workflow logic
+- `OptionsTest.php` - Options utility functionality
+- `WorkflowResultTest.php` - Workflow result handling
 
-**`tests/Unit/InstallerWorkflowTest.php`**
-- Installer workflow tests
-
-**`tests/Unit/OptionsTest.php`**
-- Options tests
-
-**`tests/Unit/WorkflowResultTest.php`**
-- Workflow result tests
+**Test Coverage**:
+- All authentication flows (login, register, 2FA, password reset)
+- User management CRUD operations
+- Role-based access control
+- Cookie consent management
+- Impersonation functionality
+- Repository pattern with caching
+- Service pattern with transactions
+- Action pattern execution
 
 ---
 
@@ -1923,6 +2418,200 @@ This starter kit is designed to be cloned and customized. When using this as a b
 
 ---
 
+## Key Features Summary
+
+This starter kit includes the following comprehensive features out of the box:
+
+### Authentication & Security Features
+
+**Laravel Fortify Authentication**:
+- User registration (can be toggled via settings)
+- Login/logout with rate limiting (5 attempts/minute)
+- Password reset via email
+- Email verification
+- Two-factor authentication (TOTP) with QR codes
+- 2FA recovery codes
+- Password confirmation for sensitive actions
+- Quick login for local development
+
+**Authorization (Spatie Permission)**:
+- Role-based access control (RBAC)
+- Three default roles: super-admin, admin, user
+- Dynamic permission system with grouping
+- Permission-based route protection
+- Role middleware for route guards
+- Granular permission assignment
+
+### User Management
+
+**User Features**:
+- Full CRUD operations via admin panel
+- User search functionality
+- Profile management (name, email)
+- Password change with current password verification
+- Account deletion with password confirmation
+- Email verification workflow
+- Last login tracking
+- User impersonation for admins/super-admins
+
+**User Repository & Service Pattern**:
+- Clean architecture with Repository/Service layers
+- Transaction support for data integrity
+- Validation helpers
+- Caching with automatic invalidation
+
+### Admin Panel Features
+
+**User Management**:
+- List, create, and search users
+- Assign roles during creation
+- View user details
+
+**Role Management**:
+- Full CRUD for roles
+- Assign permissions to roles
+- Search and filter roles
+- Cannot delete super-admin role (protected)
+
+**Permission Management**:
+- Full CRUD for permissions
+- Group permissions by resource
+- Assign permissions to roles
+- Search and filter permissions
+
+**Settings Management**:
+- Dynamic application settings (key-value pairs)
+- Three field types: input, checkbox, multioptions
+- Role-based settings (system, user, plugin)
+- Bulk settings update
+- Settings search and filtering
+
+**Database Browser**:
+- View all configured database connections
+- Browse tables and views
+- Inspect table structure (columns, types, constraints)
+- Browse table data with pagination
+- View indexes and foreign keys
+- Support for: SQLite, MySQL, MariaDB, PostgreSQL, SQL Server
+- Row counts for all tables
+
+### Cookie Consent & GDPR
+
+**GDPR Compliance**:
+- Cookie consent banner for guests and authenticated users
+- Category-based consent (essential, analytics, marketing, preferences)
+- Accept all / Reject all functionality
+- Granular category preferences
+- Data processing consent tracking
+- IP address logging for audit trail
+- Timestamp tracking
+- Privacy policy and cookie policy pages
+- Session and database persistence
+
+### User Settings Pages
+
+**Profile Settings**:
+- Update name and email
+- Email verification reset on email change
+- Delete account with password confirmation
+
+**Security Settings**:
+- Change password (requires current password)
+- Enable/disable two-factor authentication
+- View and regenerate 2FA recovery codes
+- QR code setup for authenticator apps
+
+**Appearance Settings**:
+- Light/dark/system theme selection
+- Persistent theme across sessions
+- Full dark mode support throughout app
+
+**Cookie Preferences**:
+- Manage cookie consent categories
+- View current consent status
+- Update preferences anytime
+
+### Development & Testing Features
+
+**Development Tools**:
+- Laravel Pint for PHP code formatting
+- Laravel Pail for real-time log viewing
+- Laravel Debugbar for development debugging
+- Quick login for local development (disabled in production)
+- Comprehensive test suite (30+ tests)
+
+**Testing**:
+- 18 feature tests covering all major flows
+- 12 unit tests for actions, repositories, and services
+- Test coverage for authentication, authorization, CRUD operations
+- PHPUnit 11 test framework
+
+### Frontend Features
+
+**Vue 3 & Inertia.js 2**:
+- Seamless SPA experience with server-side routing
+- Prefetching for instant navigation
+- Type-safe routes with Laravel Wayfinder
+- Form component with validation
+- Deferred props support
+- TypeScript support
+
+**UI Components**:
+- 136+ shadcn-vue components
+- Custom app components (sidebar, header, navigation)
+- Responsive design
+- Dark mode support
+- Tailwind CSS 4 styling
+- Accessible components (Reka UI)
+
+**Layouts**:
+- Multiple layout options (auth, app, admin, settings, public)
+- Responsive sidebar navigation
+- Header with user menu
+- Breadcrumb navigation
+- Mobile-friendly design
+
+### Architecture Features
+
+**Clean Architecture**:
+- Repository pattern for data access
+- Service pattern for business logic
+- Action pattern for single-purpose operations
+- Dependency injection throughout
+- Interface-based programming
+- Separation of concerns
+
+**Caching**:
+- Repository-level caching
+- Automatic cache invalidation
+- Configurable TTL per repository
+- Redis/File/Database cache driver support
+
+**Code Quality**:
+- Strict PHP typing (declare(strict_types=1))
+- Explicit return types required
+- Laravel Pint formatting enforced
+- ESLint for frontend code
+- Comprehensive type definitions
+
+### Performance Features
+
+**Optimization**:
+- Repository caching with auto-invalidation
+- Eager loading for relationships
+- Vite code splitting
+- Inertia prefetching
+- Lazy loading support
+- Database indexing on key columns
+
+**Production Ready**:
+- Config/route/view caching
+- Optimized autoloader
+- Asset minification and bundling
+- SSR support ready
+
+---
+
 ## Quick Reference
 
 ### Key Files
@@ -1959,4 +2648,26 @@ php artisan route:clear       # Clear route cache
 
 ---
 
-**Last Updated**: This documentation should be updated when new features are added to the starter kit.
+## Documentation Updates
+
+**Last Updated**: 2026-01-22
+
+**Recent Changes**:
+- Added comprehensive Database Schema & Migrations section
+- Added detailed documentation for all middleware (including EnsureUserHasRole)
+- Expanded User model documentation with all methods and features
+- Added comprehensive testing documentation (18 feature tests, 12 unit tests)
+- Documented Quick Login development feature
+- Added detailed route documentation (94 web routes, 6 settings routes)
+- Expanded UI components section with 136+ components
+- Added Key Features Summary section for quick overview
+- Updated all controller documentation with detailed method descriptions
+- Added facades documentation
+- Enhanced Admin Database Management documentation
+- Added User Impersonation feature documentation
+- Expanded Cookie Consent & GDPR documentation
+- Added Last Login Tracking documentation
+- Updated migrations and seeders documentation with complete details
+
+**Documentation Maintenance**:
+This documentation should be updated whenever new features are added to the starter kit. Use `git log --follow CODEBASE.md` to track documentation changes over time.

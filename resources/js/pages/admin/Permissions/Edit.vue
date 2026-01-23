@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import PermissionsController from '@/actions/App/Http/Controllers/Admin/PermissionsController';
 import { index, update } from '@/routes/admin/permissions';
-import { Form, Head, Link, router } from '@inertiajs/vue3';
+import { Form, Head, Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { type BreadcrumbItem } from '@/types';
+import { ArrowLeft } from 'lucide-vue-next';
 
 interface Permission {
     id: number;
@@ -55,15 +56,19 @@ const deletePermission = (): void => {
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
+                <button
+                    @click="() => window.history.back()"
+                    class="flex w-fit cursor-pointer items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    <ArrowLeft class="h-4 w-4" />
+                    Back to Permissions
+                </button>
                 <div class="flex items-center justify-between">
                     <HeadingSmall
                         title="Edit Permission"
                         description="Update permission details"
                     />
-                    <Button
-                        variant="destructive"
-                        @click="deletePermission"
-                    >
+                    <Button variant="destructive" @click="deletePermission">
                         Delete Permission
                     </Button>
                 </div>
@@ -103,10 +108,7 @@ const deletePermission = (): void => {
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button
-                            :disabled="processing"
-                            type="submit"
-                        >
+                        <Button :disabled="processing" type="submit">
                             Update Permission
                         </Button>
                         <Link
@@ -123,7 +125,7 @@ const deletePermission = (): void => {
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-neutral-600 dark:text-neutral-400"
                             >
                                 Updated.
                             </p>

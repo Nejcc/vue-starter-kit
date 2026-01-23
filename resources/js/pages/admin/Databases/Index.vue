@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { index as databasesIndex } from '@/routes/admin/databases';
 import connection from '@/routes/admin/database/connection';
+import { index as databasesIndex } from '@/routes/admin/databases';
 import { Head, Link } from '@inertiajs/vue3';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -38,12 +38,16 @@ const getDriverColor = (driver: string): string => {
     const colors: Record<string, string> = {
         sqlite: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
         mysql: 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400',
-        mariadb: 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400',
+        mariadb:
+            'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400',
         pgsql: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400',
         sqlsrv: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
     };
 
-    return colors[driver] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
+    return (
+        colors[driver] ??
+        'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+    );
 };
 </script>
 
@@ -63,7 +67,7 @@ const getDriverColor = (driver: string): string => {
                         v-for="conn in connections"
                         :key="conn.name"
                         :href="connection.index(conn.name).url"
-                        class="rounded-lg border p-4 transition-colors hover:bg-accent/50 cursor-pointer"
+                        class="cursor-pointer rounded-lg border p-4 transition-colors hover:bg-accent/50"
                     >
                         <div class="flex items-start justify-between">
                             <div class="flex-1 space-y-2">
@@ -95,11 +99,14 @@ const getDriverColor = (driver: string): string => {
                                     v-if="conn.host"
                                     class="text-sm text-muted-foreground"
                                 >
-                                    Host: {{ conn.host }}{{ conn.port ? `:${conn.port}` : '' }}
+                                    Host: {{ conn.host
+                                    }}{{ conn.port ? `:${conn.port}` : '' }}
                                 </p>
                             </div>
                             <div class="flex items-center gap-2">
-                                <Database class="h-5 w-5 text-muted-foreground" />
+                                <Database
+                                    class="h-5 w-5 text-muted-foreground"
+                                />
                             </div>
                         </div>
                     </Link>
@@ -109,7 +116,9 @@ const getDriverColor = (driver: string): string => {
                     v-if="connections.length === 0"
                     class="rounded-lg border p-8 text-center"
                 >
-                    <p class="text-muted-foreground">No database connections found.</p>
+                    <p class="text-muted-foreground">
+                        No database connections found.
+                    </p>
                 </div>
             </div>
         </div>

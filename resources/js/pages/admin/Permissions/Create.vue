@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import PermissionsController from '@/actions/App/Http/Controllers/Admin/PermissionsController';
 import { index, store } from '@/routes/admin/permissions';
 import { Form, Head, Link } from '@inertiajs/vue3';
 
@@ -55,7 +54,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         />
                         <InputError :message="errors.name" />
                         <p class="text-sm text-muted-foreground">
-                            Use lowercase with spaces (e.g., edit posts, delete users)
+                            Use lowercase with spaces (e.g., edit posts, delete
+                            users)
                         </p>
                     </div>
 
@@ -69,15 +69,13 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         />
                         <InputError :message="errors.group_name" />
                         <p class="text-sm text-muted-foreground">
-                            Optional: Group permissions together (e.g., "users" for view users, create users, etc.)
+                            Optional: Group permissions together (e.g., "users"
+                            for view users, create users, etc.)
                         </p>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button
-                            :disabled="processing"
-                            type="submit"
-                        >
+                        <Button :disabled="processing" type="submit">
                             Create Permission
                         </Button>
                         <Link
@@ -94,7 +92,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-neutral-600 dark:text-neutral-400"
                             >
                                 Created.
                             </p>

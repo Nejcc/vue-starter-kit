@@ -200,6 +200,16 @@ final class RolesController extends Controller
                 ->with('error', 'The super-admin role cannot be deleted. It is a system role with all permissions.');
         }
 
+        // Check if role is assigned to any users
+        $usersCount = $role->users()->count();
+
+        if ($usersCount > 0) {
+            return redirect()->route('admin.roles.index')
+                ->withErrors([
+                    'role_deletion' => "Cannot delete role \"{$role->name}\" because it is assigned to {$usersCount} user(s). Please remove all user assignments before deleting this role.",
+                ]);
+        }
+
         $role->delete();
 
         return redirect()->route('admin.roles.index')->with('status', 'Role deleted successfully.');

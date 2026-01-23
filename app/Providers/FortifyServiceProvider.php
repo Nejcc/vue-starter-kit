@@ -53,7 +53,7 @@ final class FortifyServiceProvider extends ServiceProvider
     private function configureViews(): void
     {
         Fortify::loginView(fn (Request $request) => Inertia::render('auth/Login', [
-            'canResetPassword' => Features::enabled(Features::resetPasswords()),
+            'canResetPassword' => Features::enabled(Features::resetPasswords()) && $this->isEmailConfigured(),
             'canRegister' => $this->isRegistrationEnabled(),
             'status' => $request->session()->get('status'),
             'error' => $request->session()->get('error'),
@@ -64,12 +64,19 @@ final class FortifyServiceProvider extends ServiceProvider
             'token' => $request->route('token'),
         ]));
 
-        Fortify::requestPasswordResetLinkView(fn (Request $request) => Inertia::render('auth/ForgotPassword', [
-            'status' => $request->session()->get('status'),
-        ]));
+        Fortify::requestPasswordResetLinkView(function (Request $request) {
+            if (!$this->isEmailConfigured()) {
+                return Redirect::route('login')->with('error', 'Password reset is currently unavailable. Please contact an administrator.');
+            }
+
+            return Inertia::render('auth/ForgotPassword', [
+                'status' => $request->session()->get('status'),
+            ]);
+        });
 
         Fortify::verifyEmailView(fn (Request $request) => Inertia::render('auth/VerifyEmail', [
             'status' => $request->session()->get('status'),
+            'emailConfigured' => $this->isEmailConfigured(),
         ]));
 
         // Always register the view, but check inside if registration is enabled
@@ -114,5 +121,27 @@ final class FortifyServiceProvider extends ServiceProvider
             // If settings table doesn't exist yet, default to disabled
             return false;
         }
+    }
+
+    /**
+     * Check if email is properly configured for sending.
+     *
+     * Returns true if email is configured with a real mail driver.
+     * In development, 'log' and 'array' drivers are considered configured.
+     */
+    private function isEmailConfigured(): bool
+    {
+        $mailer = config('mail.default');
+        $driver = config("mail.mailers.{$mailer}.transport");
+
+        // In local/development, allow log and array drivers
+        if (app()->environment('local', 'testing')) {
+            return true;
+        }
+
+        // In production, require a real email driver
+        $invalidDrivers = ['log', 'array', null, ''];
+
+        return !in_array($driver, $invalidDrivers, true);
     }
 }

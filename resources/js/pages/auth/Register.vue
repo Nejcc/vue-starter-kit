@@ -2,15 +2,15 @@
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Spinner } from '@/components/ui/spinner';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
-import { Form, Head } from '@inertiajs/vue3';
 import type { RegisterPageProps } from '@/types';
+import { Form, Head } from '@inertiajs/vue3';
 
 defineProps<RegisterPageProps>();
 </script>
@@ -98,16 +98,22 @@ defineProps<RegisterPageProps>();
                         <div class="grid gap-1.5 leading-none">
                             <Label
                                 for="data_processing_consent"
-                                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                class="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
                                 I agree to the processing of my personal data
                             </Label>
                             <p class="text-xs text-muted-foreground">
-                                By creating an account, you agree to our 
-                                <a href="/privacy-policy" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+                                By creating an account, you agree to our
+                                <a
+                                    href="/privacy-policy"
+                                    class="text-primary hover:underline"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
                                     Privacy Policy
                                 </a>
-                                and the processing of your personal data in accordance with GDPR regulations.
+                                and the processing of your personal data in
+                                accordance with GDPR regulations.
                             </p>
                         </div>
                     </div>

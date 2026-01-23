@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
 import { view } from '@/routes/admin/database/connection/show';
+import { Link } from '@inertiajs/vue3';
+import { Database } from 'lucide-vue-next';
 import type { Column, Pagination } from './types';
 
 interface Props {
@@ -16,10 +17,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div
-        id="data"
-        class="rounded-lg border scroll-mt-4"
-    >
+    <div id="data" class="scroll-mt-4 rounded-lg border">
         <div class="border-b p-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -28,12 +26,10 @@ const props = defineProps<Props>();
                         v-if="pagination"
                         class="mt-1 text-sm text-muted-foreground"
                     >
-                        Showing {{ pagination.from }} to {{ pagination.to }} of {{ pagination.total.toLocaleString() }} rows
+                        Showing {{ pagination.from }} to {{ pagination.to }} of
+                        {{ pagination.total.toLocaleString() }} rows
                     </p>
-                    <p
-                        v-else
-                        class="mt-1 text-sm text-muted-foreground"
-                    >
+                    <p v-else class="mt-1 text-sm text-muted-foreground">
                         {{ rowCount.toLocaleString() }} total rows
                     </p>
                 </div>
@@ -64,15 +60,19 @@ const props = defineProps<Props>();
                             class="px-4 py-2"
                         >
                             <span
-                                v-if="row[column.name] !== null && row[column.name] !== undefined"
+                                v-if="
+                                    row[column.name] !== null &&
+                                    row[column.name] !== undefined
+                                "
                                 class="text-sm"
                             >
-                                {{ typeof row[column.name] === 'object' ? JSON.stringify(row[column.name]) : String(row[column.name]) }}
+                                {{
+                                    typeof row[column.name] === 'object'
+                                        ? JSON.stringify(row[column.name])
+                                        : String(row[column.name])
+                                }}
                             </span>
-                            <span
-                                v-else
-                                class="text-sm text-muted-foreground"
-                            >
+                            <span v-else class="text-sm text-muted-foreground">
                                 NULL
                             </span>
                         </td>
@@ -80,28 +80,51 @@ const props = defineProps<Props>();
                     <tr v-if="data.length === 0">
                         <td
                             :colspan="columns.length"
-                            class="px-4 py-8 text-center text-muted-foreground"
+                            class="px-4 py-16 text-center"
                         >
-                            No data available
+                            <div
+                                class="flex flex-col items-center justify-center space-y-3"
+                            >
+                                <Database
+                                    class="h-12 w-12 text-muted-foreground/40"
+                                />
+                                <div>
+                                    <p
+                                        class="text-sm font-medium text-muted-foreground"
+                                    >
+                                        No data in this table
+                                    </p>
+                                    <p
+                                        class="mt-1 text-xs text-muted-foreground/60"
+                                    >
+                                        The table "{{ tableName }}" is empty
+                                    </p>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <div
-            v-if="pagination && pagination.last_page > 1"
-            class="border-t p-4"
-        >
+        <div v-if="pagination && pagination.last_page > 1" class="border-t p-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-muted-foreground">
-                        Page {{ pagination.current_page }} of {{ pagination.last_page }}
+                        Page {{ pagination.current_page }} of
+                        {{ pagination.last_page }}
                     </span>
                 </div>
                 <div class="flex items-center gap-2">
                     <Link
                         v-if="pagination.current_page > 1"
-                        :href="view({ connection: currentConnection, table: tableName, view: 'data' }).url + `?page=${pagination.current_page - 1}&per_page=${pagination.per_page}`"
+                        :href="
+                            view({
+                                connection: currentConnection,
+                                table: tableName,
+                                view: 'data',
+                            }).url +
+                            `?page=${pagination.current_page - 1}&per_page=${pagination.per_page}`
+                        "
                         class="rounded-md border px-3 py-1.5 text-sm hover:bg-accent"
                     >
                         Previous
@@ -132,7 +155,14 @@ const props = defineProps<Props>();
                     </template>
                     <Link
                         v-if="pagination.current_page < pagination.last_page"
-                        :href="view({ connection: currentConnection, table: tableName, view: 'data' }).url + `?page=${pagination.current_page + 1}&per_page=${pagination.per_page}`"
+                        :href="
+                            view({
+                                connection: currentConnection,
+                                table: tableName,
+                                view: 'data',
+                            }).url +
+                            `?page=${pagination.current_page + 1}&per_page=${pagination.per_page}`
+                        "
                         class="rounded-md border px-3 py-1.5 text-sm hover:bg-accent"
                     >
                         Next

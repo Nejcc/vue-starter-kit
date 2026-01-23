@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/layouts/PublicLayout.vue';
+import { Head, Link } from '@inertiajs/vue3';
 </script>
 
 <template>
@@ -11,15 +11,25 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
             class="mx-auto w-full max-w-sm space-y-6 px-4 py-6 sm:max-w-2xl sm:space-y-8 sm:px-6 sm:py-8 md:max-w-4xl lg:max-w-6xl"
         >
             <div>
-                <h1 class="text-3xl font-bold text-[#1b1b18] dark:text-[#EDEDEC]">Privacy Policy</h1>
+                <h1
+                    class="text-3xl font-bold text-[#1b1b18] dark:text-[#EDEDEC]"
+                >
+                    Privacy Policy
+                </h1>
                 <p class="mt-2 text-[#706f6c] dark:text-[#A1A09A]">
                     Last updated: {{ new Date().toLocaleDateString() }}
                 </p>
             </div>
 
-            <div class="prose prose-slate dark:prose-invert max-w-none space-y-6 text-[#1b1b18] dark:text-[#EDEDEC]">
+            <div
+                class="prose prose-slate dark:prose-invert max-w-none space-y-6 text-[#1b1b18] dark:text-[#EDEDEC]"
+            >
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">Introduction</h2>
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
+                        Introduction
+                    </h2>
                     <p>
                         This Privacy Policy describes how we collect, use, and
                         protect your personal information when you use our
@@ -29,10 +39,14 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
                         Information We Collect
                     </h2>
-                    <p>We collect information that you provide directly to us:</p>
+                    <p>
+                        We collect information that you provide directly to us:
+                    </p>
                     <ul>
                         <li>
                             <strong>Account Information:</strong> Name, email
@@ -54,13 +68,18 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
                         How We Use Your Information
                     </h2>
                     <p>We use the information we collect to:</p>
                     <ul>
                         <li>Provide, maintain, and improve our services</li>
-                        <li>Process your transactions and send related information</li>
+                        <li>
+                            Process your transactions and send related
+                            information
+                        </li>
                         <li>Send you technical notices and support messages</li>
                         <li>Respond to your comments and questions</li>
                         <li>Monitor and analyze trends and usage</li>
@@ -69,7 +88,9 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
                         Data Protection
                     </h2>
                     <p>
@@ -82,7 +103,11 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">Your Rights</h2>
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
+                        Your Rights
+                    </h2>
                     <p>You have the right to:</p>
                     <ul>
                         <li>Access your personal data</li>
@@ -95,7 +120,11 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">Cookies</h2>
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
+                        Cookies
+                    </h2>
                     <p>
                         We use cookies and similar tracking technologies to
                         track activity on our service. You can control cookie
@@ -113,7 +142,11 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">Contact Us</h2>
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
+                        Contact Us
+                    </h2>
                     <p>
                         If you have any questions about this Privacy Policy,
                         please contact us through the appropriate channels
@@ -124,4 +157,3 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
         </main>
     </PublicLayout>
 </template>
-

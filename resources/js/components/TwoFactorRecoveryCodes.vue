@@ -11,12 +11,20 @@ import {
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form } from '@inertiajs/vue3';
-import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-vue-next';
+import {
+    Check,
+    Copy,
+    Eye,
+    EyeOff,
+    LockKeyhole,
+    RefreshCw,
+} from 'lucide-vue-next';
 import { nextTick, onMounted, ref, useTemplateRef } from 'vue';
 
 const { recoveryCodesList, fetchRecoveryCodes, errors } = useTwoFactorAuth();
 const isRecoveryCodesVisible = ref<boolean>(false);
 const recoveryCodeSectionRef = useTemplateRef('recoveryCodeSectionRef');
+const isCopied = ref<boolean>(false);
 
 const toggleRecoveryCodesVisibility = async () => {
     if (!isRecoveryCodesVisible.value && !recoveryCodesList.value.length) {
@@ -28,6 +36,19 @@ const toggleRecoveryCodesVisibility = async () => {
     if (isRecoveryCodesVisible.value) {
         await nextTick();
         recoveryCodeSectionRef.value?.scrollIntoView({ behavior: 'smooth' });
+    }
+};
+
+const copyToClipboard = async () => {
+    const codes = recoveryCodesList.value.join('\n');
+    try {
+        await navigator.clipboard.writeText(codes);
+        isCopied.value = true;
+        setTimeout(() => {
+            isCopied.value = false;
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy recovery codes:', err);
     }
 };
 
@@ -62,22 +83,38 @@ onMounted(async () => {
                     Codes
                 </Button>
 
-                <Form
+                <div
                     v-if="isRecoveryCodesVisible && recoveryCodesList.length"
-                    v-bind="regenerateRecoveryCodes.form()"
-                    method="post"
-                    :options="{ preserveScroll: true }"
-                    @success="fetchRecoveryCodes"
-                    #default="{ processing }"
+                    class="flex flex-col gap-3 sm:flex-row"
                 >
                     <Button
-                        variant="secondary"
-                        type="submit"
-                        :disabled="processing"
+                        variant="outline"
+                        @click="copyToClipboard"
+                        :disabled="isCopied"
                     >
-                        <RefreshCw /> Regenerate Codes
+                        <component
+                            :is="isCopied ? Check : Copy"
+                            class="size-4"
+                        />
+                        {{ isCopied ? 'Copied!' : 'Copy Codes' }}
                     </Button>
-                </Form>
+
+                    <Form
+                        v-bind="regenerateRecoveryCodes.form()"
+                        method="post"
+                        :options="{ preserveScroll: true }"
+                        @success="fetchRecoveryCodes"
+                        #default="{ processing }"
+                    >
+                        <Button
+                            variant="secondary"
+                            type="submit"
+                            :disabled="processing"
+                        >
+                            <RefreshCw /> Regenerate Codes
+                        </Button>
+                    </Form>
+                </div>
             </div>
             <div
                 :class="[

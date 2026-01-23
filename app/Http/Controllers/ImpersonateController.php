@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Constants\RoleNames;
-use App\Services\UserService;
+use App\Services\ImpersonationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -17,9 +16,12 @@ final class ImpersonateController extends Controller
      * Create a new impersonate controller instance.
      */
     public function __construct(
-        protected UserService $userService
+        protected ImpersonationService $impersonationService
     ) {
         $this->middleware('auth');
+
+        // Rate limit impersonation: 5 attempts per minute
+        $this->middleware('throttle:5,1')->only('store');
     }
 
     /**
@@ -32,8 +34,8 @@ final class ImpersonateController extends Controller
         $search = $request->input('search', '');
 
         $users = $search
-            ? $this->userService->search($search, 50)
-            : $this->userService->getAllForImpersonation(Auth::id());
+            ? $this->impersonationService->searchUsers($search, 50)
+            : $this->impersonationService->getUsersForImpersonation(Auth::id());
 
         $usersData = $users->map(fn ($user) => [
             'id' => $user->id,
@@ -68,23 +70,15 @@ final class ImpersonateController extends Controller
             'user_id' => ['required', 'integer', 'exists:users,id'],
         ]);
 
-        $user = $this->userService->findById($request->input('user_id'));
+        $result = $this->impersonationService->startImpersonation(
+            Auth::user(),
+            $request->integer('user_id'),
+            $request
+        );
 
-        if (!$user) {
-            return back()->withErrors(['user_id' => 'User not found.']);
+        if (!$result['success']) {
+            return back()->withErrors(['user_id' => $result['error']]);
         }
-
-        // Prevent impersonating yourself
-        if ($user->id === Auth::id()) {
-            return back()->withErrors(['user_id' => 'You cannot impersonate yourself.']);
-        }
-
-        // Store the original user ID in session
-        session()->put('impersonator_id', Auth::id());
-
-        // Log in as the impersonated user
-        Auth::login($user);
-        $request->session()->regenerate();
 
         // Use Inertia location for full page reload to update all shared props
         return Inertia::location(route('dashboard'));
@@ -95,24 +89,17 @@ final class ImpersonateController extends Controller
      */
     public function destroy(Request $request): \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
     {
-        $impersonatorId = session()->pull('impersonator_id');
+        $result = $this->impersonationService->stopImpersonation($request);
 
-        if (!$impersonatorId) {
+        if (!$result['success']) {
+            if (isset($result['logout']) && $result['logout']) {
+                return redirect()
+                    ->route('login')
+                    ->with('error', $result['error']);
+            }
+
             return redirect()->route('dashboard');
         }
-
-        $impersonator = $this->userService->findById($impersonatorId);
-
-        if (!$impersonator) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return redirect()->route('login');
-        }
-
-        Auth::login($impersonator);
-        $request->session()->regenerate();
 
         // Use Inertia location for full page reload to update all shared props
         return Inertia::location(route('dashboard'));
@@ -129,9 +116,8 @@ final class ImpersonateController extends Controller
             abort(403, 'Unauthorized.');
         }
 
-        // Check if user is super-admin or has impersonate permission
-        if (!$user->hasRole(RoleNames::SUPER_ADMIN) && !$user->can('impersonate')) {
-            abort(403, 'Unauthorized. Impersonation requires super-admin role or impersonate permission.');
+        if (!$this->impersonationService->canImpersonate($user)) {
+            abort(403, 'Unauthorized. Impersonation requires super-admin/admin role or impersonate permission.');
         }
     }
 }

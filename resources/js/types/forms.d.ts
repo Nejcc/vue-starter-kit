@@ -59,4 +59,3 @@ export interface PasswordUpdateFormData {
 export interface CookieConsentFormData {
     preferences: Record<string, boolean>;
 }
-

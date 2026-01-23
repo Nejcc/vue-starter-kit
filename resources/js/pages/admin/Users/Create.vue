@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import UsersController from '@/actions/App/Http/Controllers/Admin/UsersController';
 import { index, store } from '@/routes/admin/users';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -90,7 +89,9 @@ const selectedRoles = ref<string[]>([]);
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="password_confirmation">Confirm Password</Label>
+                        <Label for="password_confirmation"
+                            >Confirm Password</Label
+                        >
                         <Input
                             id="password_confirmation"
                             name="password_confirmation"
@@ -101,10 +102,7 @@ const selectedRoles = ref<string[]>([]);
                         <InputError :message="errors.password_confirmation" />
                     </div>
 
-                    <div
-                        v-if="roles.length > 0"
-                        class="grid gap-2"
-                    >
+                    <div v-if="roles.length > 0" class="grid gap-2">
                         <Label>Roles</Label>
                         <div class="space-y-2">
                             <div
@@ -132,10 +130,7 @@ const selectedRoles = ref<string[]>([]);
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button
-                            :disabled="processing"
-                            type="submit"
-                        >
+                        <Button :disabled="processing" type="submit">
                             Create User
                         </Button>
                         <Link
@@ -152,7 +147,7 @@ const selectedRoles = ref<string[]>([]);
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-neutral-600 dark:text-neutral-400"
                             >
                                 Created.
                             </p>

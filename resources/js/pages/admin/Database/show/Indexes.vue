@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
 import connection from '@/routes/admin/database/connection';
-import type { Index, ForeignKey } from './types';
+import { Link } from '@inertiajs/vue3';
+import type { ForeignKey, Index } from './types';
 
 interface Props {
     indexes: Index[];
@@ -18,7 +18,7 @@ const props = defineProps<Props>();
         <div
             v-if="indexes.length > 0"
             id="indexes"
-            class="rounded-lg border scroll-mt-4"
+            class="scroll-mt-4 rounded-lg border"
         >
             <div class="border-b p-4">
                 <h2 class="text-lg font-semibold">Indexes</h2>
@@ -27,9 +27,15 @@ const props = defineProps<Props>();
                 <table class="w-full">
                     <thead>
                         <tr class="border-b">
-                            <th class="px-4 py-2 text-left font-semibold">Name</th>
-                            <th class="px-4 py-2 text-left font-semibold">Unique</th>
-                            <th class="px-4 py-2 text-left font-semibold">Columns</th>
+                            <th class="px-4 py-2 text-left font-semibold">
+                                Name
+                            </th>
+                            <th class="px-4 py-2 text-left font-semibold">
+                                Unique
+                            </th>
+                            <th class="px-4 py-2 text-left font-semibold">
+                                Columns
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -48,10 +54,7 @@ const props = defineProps<Props>();
                                 >
                                     Unique
                                 </span>
-                                <span
-                                    v-else
-                                    class="text-muted-foreground"
-                                >
+                                <span v-else class="text-muted-foreground">
                                     No
                                 </span>
                             </td>
@@ -73,10 +76,7 @@ const props = defineProps<Props>();
         </div>
 
         <!-- Foreign Keys Section -->
-        <div
-            v-if="foreignKeys.length > 0"
-            class="rounded-lg border"
-        >
+        <div v-if="foreignKeys.length > 0" class="rounded-lg border">
             <div class="border-b p-4">
                 <h2 class="text-lg font-semibold">Foreign Keys</h2>
             </div>
@@ -84,11 +84,21 @@ const props = defineProps<Props>();
                 <table class="w-full">
                     <thead>
                         <tr class="border-b">
-                            <th class="px-4 py-2 text-left font-semibold">Name</th>
-                            <th class="px-4 py-2 text-left font-semibold">Columns</th>
-                            <th class="px-4 py-2 text-left font-semibold">References</th>
-                            <th class="px-4 py-2 text-left font-semibold">On Delete</th>
-                            <th class="px-4 py-2 text-left font-semibold">On Update</th>
+                            <th class="px-4 py-2 text-left font-semibold">
+                                Name
+                            </th>
+                            <th class="px-4 py-2 text-left font-semibold">
+                                Columns
+                            </th>
+                            <th class="px-4 py-2 text-left font-semibold">
+                                References
+                            </th>
+                            <th class="px-4 py-2 text-left font-semibold">
+                                On Delete
+                            </th>
+                            <th class="px-4 py-2 text-left font-semibold">
+                                On Update
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -114,7 +124,12 @@ const props = defineProps<Props>();
                             <td class="px-4 py-2">
                                 <div class="flex flex-col gap-1">
                                     <Link
-                                        :href="connection.show(props.currentConnection, fk.referencedTable).url"
+                                        :href="
+                                            connection.show(
+                                                props.currentConnection,
+                                                fk.referencedTable,
+                                            ).url
+                                        "
                                         class="font-medium text-primary hover:underline"
                                     >
                                         {{ fk.referencedTable }}
@@ -137,10 +152,7 @@ const props = defineProps<Props>();
                                 >
                                     {{ fk.onDelete }}
                                 </code>
-                                <span
-                                    v-else
-                                    class="text-muted-foreground"
-                                >
+                                <span v-else class="text-muted-foreground">
                                     -
                                 </span>
                             </td>
@@ -151,10 +163,7 @@ const props = defineProps<Props>();
                                 >
                                     {{ fk.onUpdate }}
                                 </code>
-                                <span
-                                    v-else
-                                    class="text-muted-foreground"
-                                >
+                                <span v-else class="text-muted-foreground">
                                     -
                                 </span>
                             </td>

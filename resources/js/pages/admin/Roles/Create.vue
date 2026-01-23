@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import RolesController from '@/actions/App/Http/Controllers/Admin/RolesController';
 import { index, store } from '@/routes/admin/roles';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -68,12 +67,11 @@ const selectedPermissions = ref<string[]>([]);
                         </p>
                     </div>
 
-                    <div
-                        v-if="permissions.length > 0"
-                        class="grid gap-2"
-                    >
+                    <div v-if="permissions.length > 0" class="grid gap-2">
                         <Label>Permissions</Label>
-                        <div class="space-y-2 max-h-60 overflow-y-auto rounded-md border p-4">
+                        <div
+                            class="max-h-60 space-y-2 overflow-y-auto rounded-md border p-4"
+                        >
                             <div
                                 v-for="permission in permissions"
                                 :key="permission"
@@ -106,10 +104,7 @@ const selectedPermissions = ref<string[]>([]);
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button
-                            :disabled="processing"
-                            type="submit"
-                        >
+                        <Button :disabled="processing" type="submit">
                             Create Role
                         </Button>
                         <Link
@@ -126,7 +121,7 @@ const selectedPermissions = ref<string[]>([]);
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-neutral-600 dark:text-neutral-400"
                             >
                                 Created.
                             </p>

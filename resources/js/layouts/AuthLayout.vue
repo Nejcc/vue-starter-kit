@@ -9,7 +9,11 @@ defineProps<{
 </script>
 
 <template>
-    <AuthLayout :title="title" :description="description" :cookie-consent="cookieConsent">
+    <AuthLayout
+        :title="title"
+        :description="description"
+        :cookie-consent="cookieConsent"
+    >
         <slot />
     </AuthLayout>
 </template>

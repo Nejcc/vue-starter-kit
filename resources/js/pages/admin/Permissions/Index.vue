@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { create, edit, index } from '@/routes/admin/permissions';
 import { Head, Link, router } from '@inertiajs/vue3';
+import { useDebounceFn } from '@vueuse/core';
 import { ref } from 'vue';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -31,15 +32,23 @@ const props = defineProps<PermissionsPageProps>();
 
 const searchQuery = ref(props.filters?.search ?? '');
 
-const performSearch = (): void => {
+const debouncedSearch = useDebounceFn((query: string) => {
     router.get(
         index().url,
-        { search: searchQuery.value || null },
+        { search: query || null },
         {
             preserveState: true,
             preserveScroll: true,
-        }
+        },
     );
+}, 300);
+
+const handleSearch = (): void => {
+    debouncedSearch(searchQuery.value);
+};
+
+const performSearch = (): void => {
+    debouncedSearch(searchQuery.value);
 };
 
 const breadcrumbItems: BreadcrumbItem[] = [
@@ -67,7 +76,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     />
                     <Link
                         :href="create().url"
-                        class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                        class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
                     >
                         Create New Permission
                     </Link>
@@ -87,25 +96,25 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             type="text"
                             placeholder="Search permissions by name or group..."
                             class="w-full"
-                            @keyup.enter="performSearch"
+                            @input="handleSearch"
                         />
                     </div>
-                    <Button @click="performSearch">
-                        Search
-                    </Button>
                     <Button
                         v-if="filters?.search"
                         variant="outline"
-                        @click="router.get(index().url, {}, { preserveState: false })"
+                        @click="
+                            router.get(
+                                index().url,
+                                {},
+                                { preserveState: false },
+                            )
+                        "
                     >
                         Clear
                     </Button>
                 </div>
 
-                <div
-                    v-if="groupedPermissions"
-                    class="space-y-6"
-                >
+                <div v-if="groupedPermissions" class="space-y-6">
                     <div
                         v-for="(group, groupName) in groupedPermissions"
                         :key="groupName || 'ungrouped'"
@@ -134,14 +143,22 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             </Link>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-sm font-medium text-muted-foreground">Roles:</span>
-                                            <span class="text-sm">{{ permission.roles_count }}</span>
+                                            <span
+                                                class="text-sm font-medium text-muted-foreground"
+                                                >Roles:</span
+                                            >
+                                            <span class="text-sm">{{
+                                                permission.roles_count
+                                            }}</span>
                                         </div>
                                         <div
                                             v-if="permission.roles.length > 0"
                                             class="space-y-1"
                                         >
-                                            <span class="text-sm font-medium text-muted-foreground">Assigned to roles:</span>
+                                            <span
+                                                class="text-sm font-medium text-muted-foreground"
+                                                >Assigned to roles:</span
+                                            >
                                             <div class="flex flex-wrap gap-2">
                                                 <span
                                                     v-for="role in permission.roles"
@@ -152,8 +169,15 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                 </span>
                                             </div>
                                         </div>
-                                        <p class="text-xs text-muted-foreground">
-                                            Created: {{ new Date(permission.created_at).toLocaleDateString() }}
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                        >
+                                            Created:
+                                            {{
+                                                new Date(
+                                                    permission.created_at,
+                                                ).toLocaleDateString()
+                                            }}
                                         </p>
                                     </div>
                                 </div>
@@ -161,10 +185,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         </div>
                     </div>
                 </div>
-                <div
-                    v-else
-                    class="space-y-4"
-                >
+                <div v-else class="space-y-4">
                     <div
                         v-for="permission in permissions"
                         :key="permission.id"
@@ -190,14 +211,22 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     </Link>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-sm font-medium text-muted-foreground">Roles:</span>
-                                    <span class="text-sm">{{ permission.roles_count }}</span>
+                                    <span
+                                        class="text-sm font-medium text-muted-foreground"
+                                        >Roles:</span
+                                    >
+                                    <span class="text-sm">{{
+                                        permission.roles_count
+                                    }}</span>
                                 </div>
                                 <div
                                     v-if="permission.roles.length > 0"
                                     class="space-y-1"
                                 >
-                                    <span class="text-sm font-medium text-muted-foreground">Assigned to roles:</span>
+                                    <span
+                                        class="text-sm font-medium text-muted-foreground"
+                                        >Assigned to roles:</span
+                                    >
                                     <div class="flex flex-wrap gap-2">
                                         <span
                                             v-for="role in permission.roles"
@@ -209,7 +238,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     </div>
                                 </div>
                                 <p class="text-xs text-muted-foreground">
-                                    Created: {{ new Date(permission.created_at).toLocaleDateString() }}
+                                    Created:
+                                    {{
+                                        new Date(
+                                            permission.created_at,
+                                        ).toLocaleDateString()
+                                    }}
                                 </p>
                             </div>
                         </div>

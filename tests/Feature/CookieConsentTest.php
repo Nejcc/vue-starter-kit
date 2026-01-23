@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -167,6 +168,9 @@ final class CookieConsentTest extends TestCase
      */
     public function test_registration_requires_data_processing_consent(): void
     {
+        // Enable registration
+        Setting::create(['key' => 'registration_enabled', 'value' => true]);
+
         $userData = [
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
@@ -185,6 +189,9 @@ final class CookieConsentTest extends TestCase
      */
     public function test_registration_succeeds_with_data_processing_consent(): void
     {
+        // Enable registration
+        Setting::create(['key' => 'registration_enabled', 'value' => true]);
+
         $userData = [
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),

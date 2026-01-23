@@ -4,10 +4,10 @@ import { Link } from '@inertiajs/vue3';
 
 <template>
     <footer
-        class="mt-6 w-full max-w-sm text-xs text-[#706f6c] sm:mt-8 sm:max-w-2xl sm:text-sm md:max-w-4xl dark:text-[#A1A09A] lg:max-w-6xl"
+        class="mt-6 w-full max-w-sm text-xs text-[#706f6c] sm:mt-8 sm:max-w-2xl sm:text-sm md:max-w-4xl lg:max-w-6xl dark:text-[#A1A09A]"
     >
         <div
-            class="flex flex-col items-center gap-3 border-t border-[#e3e3e0] pt-4 dark:border-[#3E3E3A] sm:gap-4 sm:pt-6 lg:flex-row lg:justify-between"
+            class="flex flex-col items-center gap-3 border-t border-[#e3e3e0] pt-4 sm:gap-4 sm:pt-6 lg:flex-row lg:justify-between dark:border-[#3E3E3A]"
         >
             <div class="text-center lg:text-left">
                 <p class="text-[10px] sm:text-xs">
@@ -36,4 +36,3 @@ import { Link } from '@inertiajs/vue3';
         </div>
     </footer>
 </template>
-

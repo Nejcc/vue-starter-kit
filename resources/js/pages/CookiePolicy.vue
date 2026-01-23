@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/layouts/PublicLayout.vue';
+import { Head, Link } from '@inertiajs/vue3';
 </script>
 
 <template>
@@ -11,15 +11,25 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
             class="mx-auto w-full max-w-sm space-y-6 px-4 py-6 sm:max-w-2xl sm:space-y-8 sm:px-6 sm:py-8 md:max-w-4xl lg:max-w-6xl"
         >
             <div>
-                <h1 class="text-3xl font-bold text-[#1b1b18] dark:text-[#EDEDEC]">Cookie Policy</h1>
+                <h1
+                    class="text-3xl font-bold text-[#1b1b18] dark:text-[#EDEDEC]"
+                >
+                    Cookie Policy
+                </h1>
                 <p class="mt-2 text-[#706f6c] dark:text-[#A1A09A]">
                     Last updated: {{ new Date().toLocaleDateString() }}
                 </p>
             </div>
 
-            <div class="prose prose-slate dark:prose-invert max-w-none space-y-6 text-[#1b1b18] dark:text-[#EDEDEC]">
+            <div
+                class="prose prose-slate dark:prose-invert max-w-none space-y-6 text-[#1b1b18] dark:text-[#EDEDEC]"
+            >
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">What Are Cookies</h2>
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
+                        What Are Cookies
+                    </h2>
                     <p>
                         Cookies are small text files that are placed on your
                         computer or mobile device when you visit a website. They
@@ -29,12 +39,12 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
                         How We Use Cookies
                     </h2>
-                    <p>
-                        We use cookies for various purposes, including:
-                    </p>
+                    <p>We use cookies for various purposes, including:</p>
                     <ul>
                         <li>
                             <strong>Essential Cookies:</strong> Required for the
@@ -59,12 +69,12 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
                         Managing Cookies
                     </h2>
-                    <p>
-                        You can control and manage cookies in several ways:
-                    </p>
+                    <p>You can control and manage cookies in several ways:</p>
                     <ul>
                         <li>
                             Through your browser settings (most browsers allow
@@ -80,9 +90,8 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                                 class="text-primary hover:underline"
                                 prefetch
                             >
-                                Cookie Preferences
-                            </Link>{' '}
-                            page
+                                Cookie Preferences </Link
+                            >{' '} page
                         </li>
                     </ul>
                     <p class="mt-4">
@@ -92,7 +101,9 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
                         Third-Party Cookies
                     </h2>
                     <p>
@@ -105,7 +116,9 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
                         Cookie Consent
                     </h2>
                     <p>
@@ -117,7 +130,11 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">More Information</h2>
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
+                        More Information
+                    </h2>
                     <p>
                         For more information about how we handle your personal
                         data, please see our{' '}
@@ -133,7 +150,11 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">Contact Us</h2>
+                    <h2
+                        class="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]"
+                    >
+                        Contact Us
+                    </h2>
                     <p>
                         If you have any questions about our use of cookies,
                         please contact us through the appropriate channels
@@ -144,4 +165,3 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
         </main>
     </PublicLayout>
 </template>
-

@@ -1,5 +1,5 @@
 import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
-import { computed, ref, type Ref, type ComputedRef } from 'vue';
+import { computed, ref, type ComputedRef, type Ref } from 'vue';
 
 /**
  * Return type for useTwoFactorAuth composable.

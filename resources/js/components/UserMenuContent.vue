@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue';
 import UserInfo from '@/components/UserInfo.vue';
 import {
     DropdownMenuGroup,
@@ -8,11 +7,12 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { logout } from '@/routes';
-import { edit } from '@/routes/profile';
 import { index as adminIndex } from '@/routes/admin';
+import { edit } from '@/routes/profile';
 import type { User } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
 import { LogOut, Settings, Shield, UserRound } from 'lucide-vue-next';
+import { computed, nextTick, ref } from 'vue';
 import ImpersonateModal from './ImpersonateModal.vue';
 
 interface Props {
@@ -29,18 +29,20 @@ const isAdmin = computed(() => {
 const canImpersonate = computed(() => {
     const roles = props.user.roles ?? [];
     const permissions = props.user.permissions ?? [];
-    
+
     // Check if user is super-admin or has impersonate permission
     return roles.includes('super-admin') || permissions.includes('impersonate');
 });
 
 const isModalOpen = ref(false);
-const users = ref<Array<{ id: number; name: string; email: string; initials: string }>>([]);
+const users = ref<
+    Array<{ id: number; name: string; email: string; initials: string }>
+>([]);
 
 const openModal = async () => {
     // Load users when modal opens
     await loadUsers();
-    
+
     // Use nextTick to ensure modal opens after any dropdown state changes
     await nextTick();
     isModalOpen.value = true;
@@ -51,7 +53,7 @@ const loadUsers = async () => {
         const response = await fetch('/impersonate?partial=1', {
             method: 'GET',
             headers: {
-                'Accept': 'application/json',
+                Accept: 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
             },
             credentials: 'same-origin',
@@ -87,10 +89,7 @@ const handleLogout = () => {
                 Settings
             </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem
-            v-if="isAdmin"
-            :as-child="true"
-        >
+        <DropdownMenuItem v-if="isAdmin" :as-child="true">
             <Link
                 class="block w-full"
                 :href="adminIndex().url"
@@ -118,16 +117,16 @@ const handleLogout = () => {
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
-        <Link
-            class="block w-full"
-            :href="logout()"
-            @click="handleLogout"
-            as="button"
-            data-test="logout-button"
-        >
-            <LogOut class="mr-2 h-4 w-4" />
-            Log out
-        </Link>
+            <Link
+                class="block w-full"
+                :href="logout()"
+                @click="handleLogout"
+                as="button"
+                data-test="logout-button"
+            >
+                <LogOut class="mr-2 h-4 w-4" />
+                Log out
+            </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>
 </template>

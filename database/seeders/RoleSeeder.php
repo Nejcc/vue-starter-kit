@@ -20,6 +20,10 @@ final class RoleSeeder extends Seeder
                 'permissions' => ['view users', 'create users', 'edit users', 'delete users'],
             ],
             [
+                'name' => 'admin',
+                'permissions' => ['view users', 'create users', 'edit users', 'delete users'],
+            ],
+            [
                 'name' => 'user',
                 'permissions' => ['view users'],
             ],
