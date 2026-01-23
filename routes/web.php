@@ -22,14 +22,14 @@ Route::get('/', function () {
 
 Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-// Quick login for development (user 1) - only available in local environment
+// Quick login for development - only available in local environment
 if (app()->environment('local')) {
-    Route::post('quick-login', function () {
-        $user = App\Models\User::find(1);
+    Route::post('quick-login/{userId}', function (int $userId) {
+        $user = App\Models\User::find($userId);
 
         if (!$user) {
             return back()->withErrors([
-                'email' => 'User 1 does not exist.',
+                'email' => "User {$userId} does not exist.",
             ]);
         }
 
