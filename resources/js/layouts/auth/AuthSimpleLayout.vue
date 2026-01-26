@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import CookieConsentBanner from '@/components/CookieConsentBanner.vue';
 import { home, login } from '@/routes';
-import { Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
 
 defineProps<{
     title?: string;

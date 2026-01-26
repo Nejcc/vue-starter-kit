@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { Link, router } from '@inertiajs/vue3';
+import { LogOut, Settings, Shield, UserRound } from 'lucide-vue-next';
+import { computed, nextTick, ref } from 'vue';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -6,14 +9,11 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import UserInfo from '@/components/UserInfo.vue';
+import ImpersonateModal from './ImpersonateModal.vue';
 import { logout } from '@/routes';
 import { index as adminIndex } from '@/routes/admin';
 import { edit } from '@/routes/profile';
 import type { User } from '@/types';
-import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings, Shield, UserRound } from 'lucide-vue-next';
-import { computed, nextTick, ref } from 'vue';
-import ImpersonateModal from './ImpersonateModal.vue';
 
 type Props = {
     user: User;
