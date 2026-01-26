@@ -17,6 +17,7 @@ export interface WelcomePageProps {
  */
 export interface LoginPageProps {
     status?: string;
+    error?: string;
     canResetPassword: boolean;
     canRegister: boolean;
 }

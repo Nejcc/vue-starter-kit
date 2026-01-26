@@ -1,9 +1,8 @@
 <script setup lang="ts">
+import { Head } from '@inertiajs/vue3';
 import CookieConsentBanner from '@/components/CookieConsentBanner.vue';
 import PublicFooter from '@/components/PublicFooter.vue';
 import PublicHeader from '@/components/PublicHeader.vue';
-import { Head } from '@inertiajs/vue3';
-
 import type { WelcomePageProps } from '@/types';
 
 interface Props extends WelcomePageProps {

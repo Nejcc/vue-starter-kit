@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Form, Head, router } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -10,11 +11,11 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { Form, Head, router } from '@inertiajs/vue3';
-
 import type { LoginPageProps } from '@/types';
 
 defineProps<LoginPageProps>();
+
+const isDevelopment = import.meta.env.DEV;
 
 const quickLogin = (userId: number): void => {
     router.post(`/quick-login/${userId}`);
@@ -107,7 +108,7 @@ const quickLogin = (userId: number): void => {
                     Log in
                 </Button>
 
-                <div class="flex flex-col gap-2">
+                <div v-if="isDevelopment" class="flex flex-col gap-2">
                     <p class="text-center text-xs text-muted-foreground">
                         Development Quick Login
                     </p>

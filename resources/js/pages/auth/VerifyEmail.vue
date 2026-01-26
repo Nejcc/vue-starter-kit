@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Form, Head } from '@inertiajs/vue3';
+import { AlertTriangle } from 'lucide-vue-next';
 import TextLink from '@/components/TextLink.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -7,8 +9,6 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 import type { VerifyEmailPageProps } from '@/types';
-import { Form, Head } from '@inertiajs/vue3';
-import { AlertTriangle } from 'lucide-vue-next';
 
 interface Props extends VerifyEmailPageProps {
     emailConfigured?: boolean;

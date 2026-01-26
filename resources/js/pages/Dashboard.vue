@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem, type DashboardPageProps } from '@/types';
-import { Head } from '@inertiajs/vue3';
 import PlaceholderPattern from '../components/PlaceholderPattern.vue';
 
 defineProps<DashboardPageProps>();

@@ -10,6 +10,12 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { useCookieConsent } from '@/composables/useCookieConsent';
+import Heading from '@/components/Heading.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
+import SettingsLayout from '@/layouts/settings/Layout.vue';
+import { edit } from '@/routes/cookie-preferences';
+import { type BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/vue3';
 import {
     BarChart3,
     Calendar,
@@ -21,6 +27,13 @@ import {
 import { onMounted, ref } from 'vue';
 
 import type { CookiePreferencesPageProps } from '@/types';
+
+const breadcrumbItems: BreadcrumbItem[] = [
+    {
+        title: 'Cookie preferences',
+        href: edit().url,
+    },
+];
 
 const props = withDefaults(defineProps<CookiePreferencesPageProps>(), {
     cookieConsent: () => ({
@@ -112,13 +125,18 @@ const formatDate = (dateString: string) => {
 </script>
 
 <template>
-    <div class="space-y-6">
-        <div>
-            <h1 class="text-2xl font-semibold">Cookie Preferences</h1>
-            <p class="text-muted-foreground">
-                Manage your cookie preferences and review your consent history.
-            </p>
-        </div>
+    <AppLayout :breadcrumbs="breadcrumbItems">
+        <Head title="Cookie preferences" />
+
+        <h1 class="sr-only">Cookie Preferences</h1>
+
+        <SettingsLayout>
+            <div class="space-y-6">
+                <Heading
+                    variant="small"
+                    title="Cookie Preferences"
+                    description="Manage your cookie preferences and review your consent history"
+                />
 
         <!-- Current Status -->
         <Card>
@@ -320,5 +338,7 @@ const formatDate = (dateString: string) => {
                 </div>
             </CardContent>
         </Card>
-    </div>
+            </div>
+        </SettingsLayout>
+    </AppLayout>
 </template>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { usePage } from '@inertiajs/vue3';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import Toaster from '@/components/ui/sonner/Toaster.vue';
 import type { AppShellVariant } from '@/types';
-import { usePage } from '@inertiajs/vue3';
 
 type Props = {
     variant?: AppShellVariant;
