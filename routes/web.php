@@ -69,11 +69,14 @@ require __DIR__.'/settings.php';
 // Admin routes - only accessible to super-admin or admin roles
 Route::middleware(['auth', 'role:super-admin,admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', [App\Http\Controllers\Admin\AdminController::class, 'index'])->name('index');
-    Route::resource('settings', App\Http\Controllers\Admin\SettingsController::class)->except(['show']);
     Route::patch('settings/bulk', [App\Http\Controllers\Admin\SettingsController::class, 'bulkUpdate'])->name('settings.bulk-update');
+    Route::resource('settings', App\Http\Controllers\Admin\SettingsController::class)->except(['show']);
     Route::get('users', [App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
     Route::get('users/create', [App\Http\Controllers\Admin\UsersController::class, 'create'])->name('users.create');
     Route::post('users', [App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');
+    Route::get('users/{user}/edit', [App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('users.edit');
+    Route::patch('users/{user}', [App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
+    Route::delete('users/{user}', [App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy');
     Route::get('roles', [App\Http\Controllers\Admin\RolesController::class, 'index'])->name('roles.index');
     Route::get('roles/create', [App\Http\Controllers\Admin\RolesController::class, 'create'])->name('roles.create');
     Route::post('roles', [App\Http\Controllers\Admin\RolesController::class, 'store'])->name('roles.store');

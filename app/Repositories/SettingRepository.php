@@ -26,9 +26,15 @@ final class SettingRepository extends BaseRepository implements SettingsReposito
     /**
      * Get a setting value by key.
      *
+     * Automatically decodes JSON strings and returns the appropriate value type.
+     *
      * @param  string  $key  The setting key
      * @param  mixed  $default  The default value if not found
      * @return mixed The setting value or default
+     *
+     * @example
+     * $siteName = $repository->get('site_name', 'Default Site');
+     * $settings = $repository->get('mail_settings', []);
      */
     public function get(string $key, mixed $default = null): mixed
     {
@@ -54,9 +60,17 @@ final class SettingRepository extends BaseRepository implements SettingsReposito
     /**
      * Set a setting value by key.
      *
+     * Automatically converts booleans to strings and encodes arrays/objects as JSON.
+     * Creates a new setting if it doesn't exist, otherwise updates the existing one.
+     *
      * @param  string  $key  The setting key
      * @param  mixed  $value  The value to set
      * @return bool True if successful
+     *
+     * @example
+     * $repository->set('site_name', 'My Site');
+     * $repository->set('maintenance_mode', true);
+     * $repository->set('mail_settings', ['driver' => 'smtp']);
      */
     public function set(string $key, mixed $value): bool
     {
@@ -84,6 +98,11 @@ final class SettingRepository extends BaseRepository implements SettingsReposito
      *
      * @param  string  $key  The setting key
      * @return bool True if the setting exists
+     *
+     * @example
+     * if ($repository->has('maintenance_mode')) {
+     *     // Setting exists
+     * }
      */
     public function has(string $key): bool
     {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { create, index } from '@/routes/admin/users';
+import { create, edit, index } from '@/routes/admin/users';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { Users } from 'lucide-vue-next';
@@ -191,7 +191,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             </div>
                             <div class="flex items-center gap-2">
                                 <Link
-                                    :href="`#`"
+                                    :href="edit(user.id).url"
                                     class="text-sm text-primary hover:underline"
                                 >
                                     Edit

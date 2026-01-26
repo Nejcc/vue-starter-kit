@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Contracts\Repositories\SettingsRepositoryInterface;
 use App\Models\Setting;
+use App\SettingRole;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -150,7 +151,7 @@ final class SettingsService extends AbstractService
             return false;
         }
 
-        if ($setting->role === 'system') {
+        if ($setting->role === SettingRole::System) {
             throw new Exception('System settings cannot be deleted.');
         }
 

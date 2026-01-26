@@ -49,8 +49,13 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Find a model by its primary key.
      *
-     * @param  array<string>  $columns
-     * @return TModel|null
+     * @param  mixed  $id  The primary key value
+     * @param  array<string>  $columns  The columns to retrieve
+     * @return TModel|null The model instance or null if not found
+     *
+     * @example
+     * $user = $repository->find(1);
+     * $user = $repository->find(1, ['id', 'name']);
      */
     public function find(mixed $id, array $columns = ['*']): ?Model
     {
@@ -60,8 +65,14 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Create a new model instance.
      *
-     * @param  array<string, mixed>  $attributes
-     * @return TModel
+     * @param  array<string, mixed>  $attributes  The model attributes
+     * @return TModel The newly created model instance
+     *
+     * @example
+     * $user = $repository->create([
+     *     'name' => 'John Doe',
+     *     'email' => 'john@example.com',
+     * ]);
      */
     public function create(array $attributes): Model
     {
@@ -71,7 +82,12 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Update a model by its primary key.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  mixed  $id  The primary key value
+     * @param  array<string, mixed>  $attributes  The attributes to update
+     * @return bool True if the update was successful, false otherwise
+     *
+     * @example
+     * $success = $repository->update(1, ['name' => 'Updated Name']);
      */
     public function update(mixed $id, array $attributes): bool
     {
@@ -86,6 +102,12 @@ abstract class BaseRepository implements RepositoryInterface
 
     /**
      * Delete a model by its primary key.
+     *
+     * @param  mixed  $id  The primary key value
+     * @return bool True if the deletion was successful, false otherwise
+     *
+     * @example
+     * $success = $repository->delete(1);
      */
     public function delete(mixed $id): bool
     {
@@ -101,8 +123,12 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Get all models.
      *
-     * @param  array<string>  $columns
-     * @return Collection<int, TModel>
+     * @param  array<string>  $columns  The columns to retrieve
+     * @return Collection<int, TModel> Collection of all models
+     *
+     * @example
+     * $allUsers = $repository->all();
+     * $allUsers = $repository->all(['id', 'name']);
      */
     public function all(array $columns = ['*']): Collection
     {
@@ -112,7 +138,13 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Paginate the query results.
      *
-     * @param  array<string>  $columns
+     * @param  int  $perPage  Number of items per page
+     * @param  array<string>  $columns  The columns to retrieve
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated result set
+     *
+     * @example
+     * $users = $repository->paginate(10);
+     * $users = $repository->paginate(25, ['id', 'name']);
      */
     public function paginate(int $perPage = 15, array $columns = ['*']): \Illuminate\Pagination\LengthAwarePaginator
     {
@@ -122,10 +154,17 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Find a model by its primary key or throw an exception.
      *
-     * @param  array<string>  $columns
-     * @return TModel
+     * Unlike find(), this method throws a ModelNotFoundException if the model
+     * is not found.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @param  mixed  $id  The primary key value
+     * @param  array<string>  $columns  The columns to retrieve
+     * @return TModel The model instance
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If the model is not found
+     *
+     * @example
+     * $user = $repository->findOrFail(1);
      */
     public function findOrFail(mixed $id, array $columns = ['*']): Model
     {
@@ -135,9 +174,16 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Find a model by given attributes.
      *
-     * @param  array<string, mixed>  $attributes
-     * @param  array<string>  $columns
-     * @return TModel|null
+     * Searches for a model matching all provided attributes. Multiple attributes
+     * are combined with AND logic.
+     *
+     * @param  array<string, mixed>  $attributes  Key-value pairs to search for
+     * @param  array<string>  $columns  The columns to retrieve
+     * @return TModel|null The first matching model or null if not found
+     *
+     * @example
+     * $user = $repository->findBy(['email' => 'user@example.com']);
+     * $user = $repository->findBy(['name' => 'John', 'active' => true]);
      */
     public function findBy(array $attributes, array $columns = ['*']): ?Model
     {
@@ -147,9 +193,15 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Find all models by given attributes.
      *
-     * @param  array<string, mixed>  $attributes
-     * @param  array<string>  $columns
-     * @return Collection<int, TModel>
+     * Returns a collection of all models matching the provided attributes.
+     * Multiple attributes are combined with AND logic.
+     *
+     * @param  array<string, mixed>  $attributes  Key-value pairs to search for
+     * @param  array<string>  $columns  The columns to retrieve
+     * @return Collection<int, TModel> Collection of matching models
+     *
+     * @example
+     * $users = $repository->findAllBy(['active' => true]);
      */
     public function findAllBy(array $attributes, array $columns = ['*']): Collection
     {

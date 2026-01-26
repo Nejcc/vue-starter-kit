@@ -163,7 +163,7 @@ final class SettingsController extends Controller
 
         // Prevent changing role of system settings
         if ($setting->role === SettingRole::System && isset($validated['role']) && $validated['role'] !== SettingRole::System->value) {
-            unset($validated['role']);
+            $validated['role'] = SettingRole::System->value;
         }
 
         // Handle checkbox values
