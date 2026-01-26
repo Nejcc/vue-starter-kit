@@ -81,8 +81,8 @@ This starter kit extends the base Laravel installation with the following additi
 - **Code Splitting** - Optimized bundle sizes with manual chunks
 
 ### 🧪 Testing
-- **PHPUnit** - Comprehensive test suite
-- **Feature Tests** - Full HTTP endpoint testing
+- **PHPUnit** - Comprehensive test suite (248+ tests, 900+ assertions)
+- **Feature Tests** - Full HTTP endpoint testing (Auth, Admin, Settings, Users)
 - **Unit Tests** - Individual class and method testing
 - **GitHub Actions CI** - Automated testing on push/PR
 
@@ -101,6 +101,16 @@ This starter kit extends the base Laravel installation with the following additi
 - **Privacy Policy** - GDPR-compliant privacy policy page
 - **Cookie Policy** - Comprehensive cookie policy page
 - **Public Layout Components** - Reusable header and footer components
+
+### 🛡️ Admin Panel
+- **Admin Dashboard** - Overview with system stats
+- **User Management** - Full CRUD with role assignment, search, pagination
+- **Role Management** - Create, edit, delete roles with permission assignment
+- **Permission Management** - Granular permission control
+- **Settings Management** - Dynamic application settings with field types
+- **Database Browser** - View tables, structure, indexes, and data
+- **Impersonation** - Login as other users for debugging (super-admin only)
+- **Audit Logging** - Track sensitive actions like impersonation
 
 ### 🔧 Configuration
 - **Fortify Configuration** - Pre-configured authentication features
