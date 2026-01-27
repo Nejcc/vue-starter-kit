@@ -19,7 +19,7 @@ import { index as settingsIndex } from '@/routes/admin/settings';
 import { index as usersIndex } from '@/routes/admin/users';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { Database, Home, Key, Settings, Shield, Users } from 'lucide-vue-next';
+import { CreditCard, Database, Home, Key, Settings, Shield, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -47,6 +47,11 @@ const mainNavItems: NavItem[] = [
         title: 'Database',
         href: databaseIndex().url,
         icon: Database,
+    },
+    {
+        title: 'Payments',
+        href: '/admin/payments',
+        icon: CreditCard,
     },
     {
         title: 'Settings',

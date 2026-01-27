@@ -8,6 +8,15 @@
         "framework"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/nejcc/payment-gateway",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "require": {
         "php": "^8.4",
         "inertiajs/inertia-laravel": "^2.0.19",
@@ -15,6 +24,7 @@
         "laravel/framework": "^12.48.1",
         "laravel/tinker": "^2.11.0",
         "laravel/wayfinder": "^0.1.13",
+        "nejcc/payment-gateway": "@dev",
         "spatie/laravel-permission": "^6.24"
     },
     "require-dev": {

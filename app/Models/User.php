@@ -10,12 +10,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Nejcc\PaymentGateway\Traits\Billable;
 use Spatie\Permission\Traits\HasRoles;
 
 final class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable, TracksLastLogin, TwoFactorAuthenticatable;
+    use Billable, HasFactory, HasRoles, Notifiable, TracksLastLogin, TwoFactorAuthenticatable;
 
     /**
      * Boot the model.

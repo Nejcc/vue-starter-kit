@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "342454f56b4e9ff9417fca46e59307ca",
+    "content-hash": "b74396af45b74c8e9314a295b1475051",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2422,6 +2422,74 @@
                 }
             ],
             "time": "2026-01-02T08:56:05+00:00"
+        },
+        {
+            "name": "nejcc/payment-gateway",
+            "version": "dev-dev",
+            "dist": {
+                "type": "path",
+                "url": "packages/nejcc/payment-gateway",
+                "reference": "b8673ed174542d5296796d2f3959080ac8a5bb5f"
+            },
+            "require": {
+                "illuminate/database": "^11.0|^12.0",
+                "illuminate/http": "^11.0|^12.0",
+                "illuminate/support": "^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "suggest": {
+                "coinbase/coinbase-commerce": "Required for Coinbase Crypto gateway",
+                "paypal/paypal-checkout-sdk": "Required for PayPal gateway (^1.0)",
+                "stripe/stripe-php": "Required for Stripe gateway (^13.0|^14.0|^15.0)"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Nejcc\\PaymentGateway\\PaymentGatewayServiceProvider"
+                    ],
+                    "aliases": {
+                        "Payment": "Nejcc\\PaymentGateway\\Facades\\Payment"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Nejcc\\PaymentGateway\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Nejcc\\PaymentGateway\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nejc",
+                    "email": "nejc@example.com"
+                }
+            ],
+            "description": "A flexible multi-provider payment gateway for Laravel with support for Stripe, PayPal, Crypto, and more.",
+            "keywords": [
+                "crypto",
+                "gateway",
+                "laravel",
+                "payment",
+                "paypal",
+                "stripe",
+                "subscriptions"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "nesbot/carbon",
@@ -9342,7 +9410,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "nejcc/payment-gateway": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

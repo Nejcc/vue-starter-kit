@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import {
-    AlertDialogRoot,
-    type AlertDialogRootEmits,
-    type AlertDialogRootProps,
-    useForwardPropsEmits,
-} from 'reka-ui';
+import { AlertDialogRoot, useForwardPropsEmits } from 'reka-ui';
 import { computed, type HTMLAttributes } from 'vue';
 
-const props = defineProps<AlertDialogRootProps & { class?: HTMLAttributes['class'] }>();
+interface Props {
+    defaultOpen?: boolean;
+    open?: boolean;
+    class?: HTMLAttributes['class'];
+}
 
-const emits = defineEmits<AlertDialogRootEmits>();
+const props = defineProps<Props>();
+
+const emits = defineEmits<{
+    'update:open': [value: boolean];
+}>();
 
 const delegatedProps = computed(() => {
     const { class: _, ...delegated } = props;
