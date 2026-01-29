@@ -37,8 +37,15 @@ export type {
 
 import type { Auth } from './auth';
 
+export interface InstalledModules {
+    payments: boolean;
+    subscribers: boolean;
+    horizon: boolean;
+}
+
 export interface AppPageProps {
     name: string;
     auth: Auth;
     sidebarOpen: boolean;
+    modules: InstalledModules;
 }

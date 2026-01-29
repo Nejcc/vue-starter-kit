@@ -6,6 +6,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Inertia\Middleware;
 
 final class HandleInertiaRequests extends Middleware
@@ -67,6 +68,21 @@ final class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'modules' => $this->getInstalledModules(),
+        ];
+    }
+
+    /**
+     * Detect which optional packages/modules are installed.
+     *
+     * @return array<string, bool>
+     */
+    private function getInstalledModules(): array
+    {
+        return [
+            'payments' => Route::has('admin.payments.dashboard'),
+            'subscribers' => Route::has('admin.subscribers.index'),
+            'horizon' => Route::has('horizon.index'),
         ];
     }
 }

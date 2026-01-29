@@ -15,6 +15,13 @@
             "options": {
                 "symlink": true
             }
+        },
+        {
+            "type": "path",
+            "url": "packages/nejcc/subscribe",
+            "options": {
+                "symlink": true
+            }
         }
     ],
     "require": {
@@ -22,9 +29,11 @@
         "inertiajs/inertia-laravel": "^2.0.19",
         "laravel/fortify": "^1.33.0",
         "laravel/framework": "^12.48.1",
+        "laravel/horizon": "^5.43",
         "laravel/tinker": "^2.11.0",
         "laravel/wayfinder": "^0.1.13",
         "nejcc/payment-gateway": "@dev",
+        "nejcc/subscribe": "@dev",
         "spatie/laravel-permission": "^6.24"
     },
     "require-dev": {
