@@ -144,7 +144,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <CardContent class="space-y-4">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="space-y-2">
-                                        <Label for="amount">Amount (cents)</Label>
+                                        <Label for="amount"
+                                            >Amount (cents)</Label
+                                        >
                                         <Input
                                             id="amount"
                                             v-model.number="form.amount"
@@ -152,7 +154,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             min="0"
                                             required
                                         />
-                                        <p class="text-xs text-muted-foreground">
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                        >
                                             {{ formatPrice(form.amount) }}
                                             {{ form.currency }}
                                         </p>
@@ -235,7 +239,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         class="w-full rounded-md border bg-background px-3 py-2 text-sm"
                                     >
                                         <option
-                                            v-for="(label, days) in trialOptions"
+                                            v-for="(
+                                                label, days
+                                            ) in trialOptions"
                                             :key="days"
                                             :value="Number(days)"
                                         >
@@ -305,7 +311,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                     <div class="flex gap-4">
                         <Button type="submit" :disabled="form.processing">
-                            {{ form.processing ? 'Creating...' : 'Create Plan' }}
+                            {{
+                                form.processing ? 'Creating...' : 'Create Plan'
+                            }}
                         </Button>
                         <Link href="/admin/payments/plans">
                             <Button type="button" variant="outline">

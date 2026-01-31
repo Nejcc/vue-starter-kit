@@ -20,7 +20,7 @@ final class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
-            SettingsSeeder::class,
+            \LaravelPlus\GlobalSettings\Database\Seeders\SettingsSeeder::class,
             UserSeeder::class,
         ]);
     }

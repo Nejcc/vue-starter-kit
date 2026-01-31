@@ -6,11 +6,11 @@ namespace App\Actions\Fortify;
 
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
-use App\Contracts\Repositories\SettingsRepositoryInterface;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
+use LaravelPlus\GlobalSettings\Contracts\SettingsRepositoryInterface;
 
 final class CreateNewUser implements CreatesNewUsers
 {

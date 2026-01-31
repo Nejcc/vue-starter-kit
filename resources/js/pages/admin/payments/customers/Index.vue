@@ -98,9 +98,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                 <!-- Filters -->
                 <div class="flex flex-wrap items-center gap-4">
-                    <div class="relative flex-1 min-w-[200px]">
+                    <div class="relative min-w-[200px] flex-1">
                         <Search
-                            class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                            class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                         />
                         <Input
                             v-model="searchQuery"
@@ -156,20 +156,34 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 <p class="text-sm text-muted-foreground">
                                     {{ customer.email }}
                                 </p>
-                                <div class="flex items-center gap-4 text-sm text-muted-foreground">
-                                    <span v-if="customer.stripe_id" class="font-mono text-xs">
+                                <div
+                                    class="flex items-center gap-4 text-sm text-muted-foreground"
+                                >
+                                    <span
+                                        v-if="customer.stripe_id"
+                                        class="font-mono text-xs"
+                                    >
                                         Stripe: {{ customer.stripe_id }}
                                     </span>
-                                    <span v-if="customer.paypal_id" class="font-mono text-xs">
+                                    <span
+                                        v-if="customer.paypal_id"
+                                        class="font-mono text-xs"
+                                    >
                                         PayPal: {{ customer.paypal_id }}
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-4 text-sm">
                                     <span>
-                                        {{ customer.transactions_count }} transactions
+                                        {{
+                                            customer.transactions_count
+                                        }}
+                                        transactions
                                     </span>
                                     <span>
-                                        {{ customer.subscriptions_count }} subscriptions
+                                        {{
+                                            customer.subscriptions_count
+                                        }}
+                                        subscriptions
                                     </span>
                                 </div>
                                 <p
@@ -177,7 +191,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     class="text-xs text-muted-foreground"
                                 >
                                     Linked to:
-                                    {{ customer.user.name }} ({{ customer.user.email }})
+                                    {{ customer.user.name }} ({{
+                                        customer.user.email
+                                    }})
                                 </p>
                             </div>
                             <div class="flex items-center gap-2">

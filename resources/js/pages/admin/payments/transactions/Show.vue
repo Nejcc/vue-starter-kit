@@ -71,12 +71,15 @@ const refundForm = useForm({
 });
 
 const submitRefund = (): void => {
-    refundForm.post(`/admin/payments/transactions/${props.transaction.id}/refund`, {
-        onSuccess: () => {
-            showRefundForm.value = false;
-            refundForm.reset();
+    refundForm.post(
+        `/admin/payments/transactions/${props.transaction.id}/refund`,
+        {
+            onSuccess: () => {
+                showRefundForm.value = false;
+                refundForm.reset();
+            },
         },
-    });
+    );
 };
 
 const getStatusColor = (status: string): string => {
@@ -135,7 +138,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         <Badge :class="getStatusColor(transaction.status)">
                             {{ transaction.status }}
                         </Badge>
-                        <Badge variant="outline">{{ transaction.driver }}</Badge>
+                        <Badge variant="outline">{{
+                            transaction.driver
+                        }}</Badge>
                     </div>
                 </div>
 
@@ -167,7 +172,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     <p class="text-sm text-muted-foreground">
                                         Status
                                     </p>
-                                    <Badge :class="getStatusColor(transaction.status)">
+                                    <Badge
+                                        :class="
+                                            getStatusColor(transaction.status)
+                                        "
+                                    >
                                         {{ transaction.status }}
                                     </Badge>
                                 </div>
@@ -249,7 +258,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div v-if="transaction.user">
-                                <p class="text-sm text-muted-foreground">User</p>
+                                <p class="text-sm text-muted-foreground">
+                                    User
+                                </p>
                                 <p class="font-medium">
                                     {{ transaction.user.name }}
                                 </p>
@@ -262,7 +273,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     Payment Customer
                                 </p>
                                 <p class="font-medium">
-                                    {{ transaction.customer.name || transaction.customer.email }}
+                                    {{
+                                        transaction.customer.name ||
+                                        transaction.customer.email
+                                    }}
                                 </p>
                                 <Link
                                     :href="`/admin/payments/customers/${transaction.customer.id}`"
@@ -272,7 +286,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 </Link>
                             </div>
                             <div
-                                v-if="!transaction.user && !transaction.customer"
+                                v-if="
+                                    !transaction.user && !transaction.customer
+                                "
                                 class="text-sm text-muted-foreground"
                             >
                                 No customer associated
@@ -282,7 +298,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                     <!-- Failure Details -->
                     <Card
-                        v-if="transaction.failure_code || transaction.failure_message"
+                        v-if="
+                            transaction.failure_code ||
+                            transaction.failure_message
+                        "
                     >
                         <CardHeader>
                             <CardTitle class="text-red-600">
@@ -291,7 +310,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div v-if="transaction.failure_code">
-                                <p class="text-sm text-muted-foreground">Code</p>
+                                <p class="text-sm text-muted-foreground">
+                                    Code
+                                </p>
                                 <p class="font-mono text-sm">
                                     {{ transaction.failure_code }}
                                 </p>
@@ -309,7 +330,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                     <!-- Refunds -->
                     <Card>
-                        <CardHeader class="flex flex-row items-center justify-between">
+                        <CardHeader
+                            class="flex flex-row items-center justify-between"
+                        >
                             <CardTitle>Refunds</CardTitle>
                             <Button
                                 v-if="transaction.can_refund && !showRefundForm"
@@ -325,13 +348,17 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <!-- Refund Form -->
                             <form
                                 v-if="showRefundForm"
-                                class="space-y-4 border-b pb-4 mb-4"
+                                class="mb-4 space-y-4 border-b pb-4"
                                 @submit.prevent="submitRefund"
                             >
                                 <div class="space-y-2">
                                     <Label for="amount">
                                         Amount (cents, max:
-                                        {{ formatMoney(transaction.refundable_amount) }})
+                                        {{
+                                            formatMoney(
+                                                transaction.refundable_amount,
+                                            )
+                                        }})
                                     </Label>
                                     <Input
                                         id="amount"
@@ -342,7 +369,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     />
                                 </div>
                                 <div class="space-y-2">
-                                    <Label for="reason">Reason (optional)</Label>
+                                    <Label for="reason"
+                                        >Reason (optional)</Label
+                                    >
                                     <Textarea
                                         id="reason"
                                         v-model="refundForm.reason"
@@ -367,7 +396,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             </form>
 
                             <!-- Refund List -->
-                            <div v-if="transaction.refunds.length === 0" class="text-sm text-muted-foreground">
+                            <div
+                                v-if="transaction.refunds.length === 0"
+                                class="text-sm text-muted-foreground"
+                            >
                                 No refunds issued
                             </div>
                             <div v-else class="space-y-3">
@@ -386,7 +418,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         >
                                             {{ refund.reason }}
                                         </p>
-                                        <p class="text-xs text-muted-foreground">
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                        >
                                             {{
                                                 new Date(
                                                     refund.created_at,
@@ -394,7 +428,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             }}
                                         </p>
                                     </div>
-                                    <Badge :class="getStatusColor(refund.status)">
+                                    <Badge
+                                        :class="getStatusColor(refund.status)"
+                                    >
                                         {{ refund.status }}
                                     </Badge>
                                 </div>
@@ -403,14 +439,18 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <!-- Refund Summary -->
                             <div
                                 v-if="transaction.amount_refunded > 0"
-                                class="mt-4 pt-4 border-t"
+                                class="mt-4 border-t pt-4"
                             >
                                 <div class="flex justify-between text-sm">
                                     <span class="text-muted-foreground">
                                         Total Refunded
                                     </span>
                                     <span class="font-medium">
-                                        {{ formatMoney(transaction.amount_refunded) }}
+                                        {{
+                                            formatMoney(
+                                                transaction.amount_refunded,
+                                            )
+                                        }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between text-sm">
@@ -418,7 +458,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         Remaining
                                     </span>
                                     <span class="font-medium">
-                                        {{ formatMoney(transaction.refundable_amount) }}
+                                        {{
+                                            formatMoney(
+                                                transaction.refundable_amount,
+                                            )
+                                        }}
                                     </span>
                                 </div>
                             </div>
@@ -431,7 +475,16 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <CardTitle>Metadata</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <pre class="text-xs bg-muted p-3 rounded overflow-auto">{{ JSON.stringify(transaction.metadata, null, 2) }}</pre>
+                            <pre
+                                class="overflow-auto rounded bg-muted p-3 text-xs"
+                                >{{
+                                    JSON.stringify(
+                                        transaction.metadata,
+                                        null,
+                                        2,
+                                    )
+                                }}</pre
+                            >
                         </CardContent>
                     </Card>
                 </div>

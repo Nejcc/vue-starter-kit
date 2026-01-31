@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { destroy, index, update } from '@/routes/admin/users';
 import { Form, Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -9,10 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { destroy, index, update } from '@/routes/admin/users';
 import { type BreadcrumbItem } from '@/types';
 
 interface User {
     id: number;
+    slug: string;
     name: string;
     email: string;
     email_verified_at: string | null;
@@ -45,8 +46,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
 const selectedRoles = ref<string[]>(props.user.roles);
 
 const confirmDelete = () => {
-    if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-        router.delete(destroy(props.user.id).url);
+    if (
+        confirm(
+            'Are you sure you want to delete this user? This action cannot be undone.',
+        )
+    ) {
+        router.delete(destroy(props.user.slug).url);
     }
 };
 </script>
@@ -69,7 +74,7 @@ const confirmDelete = () => {
                 </div>
 
                 <Form
-                    :action="update(user.id).url"
+                    :action="update(user.slug).url"
                     method="patch"
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
@@ -115,7 +120,9 @@ const confirmDelete = () => {
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="password_confirmation">Confirm New Password</Label>
+                        <Label for="password_confirmation"
+                            >Confirm New Password</Label
+                        >
                         <Input
                             id="password_confirmation"
                             name="password_confirmation"
@@ -154,10 +161,18 @@ const confirmDelete = () => {
 
                     <div class="rounded-lg border border-muted bg-muted/50 p-4">
                         <h4 class="text-sm font-medium">User Information</h4>
-                        <dl class="mt-2 space-y-1 text-sm text-muted-foreground">
+                        <dl
+                            class="mt-2 space-y-1 text-sm text-muted-foreground"
+                        >
                             <div class="flex gap-2">
                                 <dt>Created:</dt>
-                                <dd>{{ new Date(user.created_at).toLocaleDateString() }}</dd>
+                                <dd>
+                                    {{
+                                        new Date(
+                                            user.created_at,
+                                        ).toLocaleDateString()
+                                    }}
+                                </dd>
                             </div>
                             <div class="flex gap-2">
                                 <dt>Email verified:</dt>
@@ -166,9 +181,16 @@ const confirmDelete = () => {
                                         v-if="user.email_verified_at"
                                         class="text-green-600 dark:text-green-400"
                                     >
-                                        {{ new Date(user.email_verified_at).toLocaleDateString() }}
+                                        {{
+                                            new Date(
+                                                user.email_verified_at,
+                                            ).toLocaleDateString()
+                                        }}
                                     </span>
-                                    <span v-else class="text-yellow-600 dark:text-yellow-400">
+                                    <span
+                                        v-else
+                                        class="text-yellow-600 dark:text-yellow-400"
+                                    >
                                         Not verified
                                     </span>
                                 </dd>

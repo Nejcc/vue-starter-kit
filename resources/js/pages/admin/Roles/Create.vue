@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { index, store } from '@/routes/admin/roles';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -9,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { index, store } from '@/routes/admin/roles';
 import { type BreadcrumbItem } from '@/types';
 
 interface CreateRolePageProps {
@@ -41,7 +41,8 @@ const selectedPermissions = ref<string[]>([]);
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
-                <Heading variant="small"
+                <Heading
+                    variant="small"
                     title="Create New Role"
                     description="Add a new role to the system"
                 />

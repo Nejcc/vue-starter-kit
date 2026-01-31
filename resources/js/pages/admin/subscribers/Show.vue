@@ -93,7 +93,9 @@ const saveSubscriber = () => {
 };
 
 const confirmSubscriber = () => {
-    router.post(`/admin/subscribers/subscribers/${props.subscriber.id}/confirm`);
+    router.post(
+        `/admin/subscribers/subscribers/${props.subscriber.id}/confirm`,
+    );
 };
 
 const resendConfirmation = () => {
@@ -142,7 +144,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         <Button
                             variant="ghost"
                             size="icon"
-                            @click="router.visit('/admin/subscribers/subscribers')"
+                            @click="
+                                router.visit('/admin/subscribers/subscribers')
+                            "
                         >
                             <ArrowLeft class="h-4 w-4" />
                         </Button>
@@ -184,7 +188,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                 <div class="grid gap-6 lg:grid-cols-3">
                     <!-- Main Form -->
-                    <div class="lg:col-span-2 space-y-6">
+                    <div class="space-y-6 lg:col-span-2">
                         <Card>
                             <CardHeader>
                                 <CardTitle>Subscriber Details</CardTitle>
@@ -203,7 +207,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                 <Mail
                                                     class="h-4 w-4 text-muted-foreground"
                                                 />
-                                                <span>{{ subscriber.email }}</span>
+                                                <span>{{
+                                                    subscriber.email
+                                                }}</span>
                                             </div>
                                         </div>
                                         <div class="space-y-2">
@@ -212,9 +218,15 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                 v-model="form.status"
                                                 class="w-full rounded-md border bg-background px-3 py-2 text-sm"
                                             >
-                                                <option value="pending">Pending</option>
-                                                <option value="subscribed">Subscribed</option>
-                                                <option value="unsubscribed">Unsubscribed</option>
+                                                <option value="pending">
+                                                    Pending
+                                                </option>
+                                                <option value="subscribed">
+                                                    Subscribed
+                                                </option>
+                                                <option value="unsubscribed">
+                                                    Unsubscribed
+                                                </option>
                                             </select>
                                         </div>
                                     </div>
@@ -259,7 +271,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                                     <div class="space-y-2">
                                         <Label>Tags</Label>
-                                        <div class="flex flex-wrap gap-2 mb-2">
+                                        <div class="mb-2 flex flex-wrap gap-2">
                                             <Badge
                                                 v-for="tag in form.tags"
                                                 :key="tag"
@@ -268,7 +280,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                 @click="removeTag(tag)"
                                             >
                                                 {{ tag }}
-                                                <span class="ml-1">&times;</span>
+                                                <span class="ml-1"
+                                                    >&times;</span
+                                                >
                                             </Badge>
                                         </div>
                                         <div class="flex gap-2">
@@ -311,8 +325,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     >
                                         <Checkbox
                                             :id="`list-${list.id}`"
-                                            :checked="form.lists.includes(list.id)"
-                                            @update:checked="toggleList(list.id)"
+                                            :checked="
+                                                form.lists.includes(list.id)
+                                            "
+                                            @update:checked="
+                                                toggleList(list.id)
+                                            "
                                         />
                                         <Label
                                             :for="`list-${list.id}`"
@@ -367,7 +385,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     <p class="text-sm text-muted-foreground">
                                         Source
                                     </p>
-                                    <p class="font-medium truncate">
+                                    <p class="truncate font-medium">
                                         {{ subscriber.source }}
                                     </p>
                                 </div>
@@ -398,10 +416,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Button
-                        variant="outline"
-                        @click="deleteDialogOpen = false"
-                    >
+                    <Button variant="outline" @click="deleteDialogOpen = false">
                         Cancel
                     </Button>
                     <Button

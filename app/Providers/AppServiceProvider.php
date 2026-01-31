@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\Services\NotificationServiceInterface;
+use App\Contracts\Services\PermissionServiceInterface;
+use App\Contracts\Services\RoleServiceInterface;
 use App\Contracts\Services\UserServiceInterface;
 use App\Listeners\UpdateLastLoginAt;
+use App\Services\NotificationService;
+use App\Services\PermissionService;
+use App\Services\RoleService;
 use App\Services\UserService;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
@@ -24,6 +30,9 @@ final class AppServiceProvider extends ServiceProvider
     {
         // Service bindings
         $this->app->bind(UserServiceInterface::class, UserService::class);
+        $this->app->bind(RoleServiceInterface::class, RoleService::class);
+        $this->app->bind(PermissionServiceInterface::class, PermissionService::class);
+        $this->app->bind(NotificationServiceInterface::class, NotificationService::class);
     }
 
     /**

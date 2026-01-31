@@ -10,6 +10,7 @@ export type {
     DashboardPageProps,
     ForgotPasswordPageProps,
     LoginPageProps,
+    NotificationsPageProps,
     PasswordPageProps,
     ProfilePageProps,
     RegisterPageProps,
@@ -22,7 +23,11 @@ export type {
 } from './pages';
 
 // Re-export model types
-export type { PaginatedResponse, Paginator } from './models';
+export type {
+    DatabaseNotification,
+    PaginatedResponse,
+    Paginator,
+} from './models';
 
 // Re-export form types
 export type {
@@ -46,6 +51,10 @@ export interface InstalledModules {
 export interface AppPageProps {
     name: string;
     auth: Auth;
+    auth_layout: 'simple' | 'split';
     sidebarOpen: boolean;
     modules: InstalledModules;
+    notifications: {
+        unreadCount: number;
+    };
 }

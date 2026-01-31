@@ -200,25 +200,33 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     <p class="text-sm text-muted-foreground">
                                         Email
                                     </p>
-                                    <p class="font-medium">{{ customer.email }}</p>
+                                    <p class="font-medium">
+                                        {{ customer.email }}
+                                    </p>
                                 </div>
                                 <div v-if="customer.name">
                                     <p class="text-sm text-muted-foreground">
                                         Name
                                     </p>
-                                    <p class="font-medium">{{ customer.name }}</p>
+                                    <p class="font-medium">
+                                        {{ customer.name }}
+                                    </p>
                                 </div>
                                 <div v-if="customer.phone">
                                     <p class="text-sm text-muted-foreground">
                                         Phone
                                     </p>
-                                    <p class="font-medium">{{ customer.phone }}</p>
+                                    <p class="font-medium">
+                                        {{ customer.phone }}
+                                    </p>
                                 </div>
                                 <div v-if="customer.company">
                                     <p class="text-sm text-muted-foreground">
                                         Company
                                     </p>
-                                    <p class="font-medium">{{ customer.company }}</p>
+                                    <p class="font-medium">
+                                        {{ customer.company }}
+                                    </p>
                                 </div>
                             </div>
                             <div v-if="customer.stripe_id">
@@ -240,7 +248,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <div v-if="customer.tax_id || customer.vat_number">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div v-if="customer.tax_id">
-                                        <p class="text-sm text-muted-foreground">
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
                                             Tax ID
                                         </p>
                                         <p class="font-medium">
@@ -248,7 +258,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         </p>
                                     </div>
                                     <div v-if="customer.vat_number">
-                                        <p class="text-sm text-muted-foreground">
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
                                             VAT Number
                                         </p>
                                         <p class="font-medium">
@@ -267,12 +279,20 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div>
-                                <p class="text-sm text-muted-foreground">Name</p>
-                                <p class="font-medium">{{ customer.user.name }}</p>
+                                <p class="text-sm text-muted-foreground">
+                                    Name
+                                </p>
+                                <p class="font-medium">
+                                    {{ customer.user.name }}
+                                </p>
                             </div>
                             <div>
-                                <p class="text-sm text-muted-foreground">Email</p>
-                                <p class="font-medium">{{ customer.user.email }}</p>
+                                <p class="text-sm text-muted-foreground">
+                                    Email
+                                </p>
+                                <p class="font-medium">
+                                    {{ customer.user.email }}
+                                </p>
                             </div>
                         </CardContent>
                     </Card>
@@ -308,12 +328,16 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     class="flex items-center justify-between rounded-lg border p-3"
                                 >
                                     <div class="flex items-center gap-3">
-                                        <CreditCard class="h-5 w-5 text-muted-foreground" />
+                                        <CreditCard
+                                            class="h-5 w-5 text-muted-foreground"
+                                        />
                                         <div>
                                             <p class="font-medium">
                                                 {{ pm.display_name }}
                                             </p>
-                                            <p class="text-xs text-muted-foreground">
+                                            <p
+                                                class="text-xs text-muted-foreground"
+                                            >
                                                 {{ pm.type }} - {{ pm.driver }}
                                             </p>
                                         </div>
@@ -345,7 +369,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                     <!-- Recent Transactions -->
                     <Card>
-                        <CardHeader class="flex flex-row items-center justify-between">
+                        <CardHeader
+                            class="flex flex-row items-center justify-between"
+                        >
                             <CardTitle>Recent Transactions</CardTitle>
                             <Link
                                 href="/admin/payments/transactions"
@@ -369,12 +395,16 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     class="flex items-center justify-between rounded-lg border p-3 hover:bg-accent"
                                 >
                                     <div class="flex items-center gap-3">
-                                        <Receipt class="h-5 w-5 text-muted-foreground" />
+                                        <Receipt
+                                            class="h-5 w-5 text-muted-foreground"
+                                        />
                                         <div>
                                             <p class="font-medium">
                                                 {{ tx.formatted_amount }}
                                             </p>
-                                            <p class="text-xs text-muted-foreground">
+                                            <p
+                                                class="text-xs text-muted-foreground"
+                                            >
                                                 {{
                                                     new Date(
                                                         tx.created_at,
@@ -393,7 +423,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                     <!-- Subscriptions -->
                     <Card>
-                        <CardHeader class="flex flex-row items-center justify-between">
+                        <CardHeader
+                            class="flex flex-row items-center justify-between"
+                        >
                             <CardTitle>Subscriptions</CardTitle>
                             <Link
                                 href="/admin/payments/subscriptions"
@@ -418,9 +450,13 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 >
                                     <div>
                                         <p class="font-medium">
-                                            {{ sub.plan?.name || 'Custom Plan' }}
+                                            {{
+                                                sub.plan?.name || 'Custom Plan'
+                                            }}
                                         </p>
-                                        <p class="text-xs text-muted-foreground">
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                        >
                                             {{ sub.billing_description }}
                                         </p>
                                     </div>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { create, edit, index } from '@/routes/admin/permissions';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { ref } from 'vue';
@@ -8,6 +7,7 @@ import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { create, edit, index } from '@/routes/admin/permissions';
 import { type BreadcrumbItem } from '@/types';
 
 interface Permission {
@@ -70,7 +70,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <Heading variant="small"
+                    <Heading
+                        variant="small"
                         title="Permissions"
                         description="Manage application permissions"
                     />
@@ -136,7 +137,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                 {{ permission.name }}
                                             </h3>
                                             <Link
-                                                :href="edit(permission.id).url"
+                                                :href="edit(permission.name).url"
                                                 class="text-sm text-primary hover:underline"
                                             >
                                                 Edit
@@ -204,7 +205,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         {{ permission.group_name }}
                                     </span>
                                     <Link
-                                        :href="edit(permission.id).url"
+                                        :href="edit(permission.name).url"
                                         class="text-sm text-primary hover:underline"
                                     >
                                         Edit

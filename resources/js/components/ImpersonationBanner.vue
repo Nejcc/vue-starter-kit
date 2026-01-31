@@ -27,10 +27,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
 import { router, usePage } from '@inertiajs/vue3';
 import { AlertTriangle } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { Button } from '@/components/ui/button';
 
 const page = usePage();
 

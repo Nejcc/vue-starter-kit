@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { create, edit, index } from '@/routes/admin/users';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { Users } from 'lucide-vue-next';
@@ -11,10 +10,12 @@ import SearchEmptyState from '@/components/SearchEmptyState.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { create, edit, index } from '@/routes/admin/users';
 import { type BreadcrumbItem } from '@/types';
 
 interface User {
     id: number;
+    slug: string;
     name: string;
     email: string;
     email_verified_at: string | null;
@@ -76,7 +77,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <Heading variant="small"
+                    <Heading
+                        variant="small"
                         title="Users"
                         description="Manage application users"
                     />
@@ -191,7 +193,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             </div>
                             <div class="flex items-center gap-2">
                                 <Link
-                                    :href="edit(user.id).url"
+                                    :href="edit(user.slug).url"
                                     class="text-sm text-primary hover:underline"
                                 >
                                     Edit

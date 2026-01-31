@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import connection from '@/routes/admin/database/connection';
-import { index as databasesIndex } from '@/routes/admin/databases';
 import { Head, Link } from '@inertiajs/vue3';
-
+import { Database } from 'lucide-vue-next';
 import Heading from '@/components/Heading.vue';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import connection from '@/routes/admin/database/connection';
+import { index as databasesIndex } from '@/routes/admin/databases';
+
 import { type BreadcrumbItem } from '@/types';
-import { Database } from 'lucide-vue-next';
 
 interface ConnectionInfo {
     name: string;
@@ -57,7 +57,8 @@ const getDriverColor = (driver: string): string => {
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
-                <Heading variant="small"
+                <Heading
+                    variant="small"
                     title="Database Connections"
                     description="View and manage all database connections"
                 />

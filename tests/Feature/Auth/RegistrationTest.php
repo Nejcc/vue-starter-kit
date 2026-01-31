@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Auth;
 
-use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use LaravelPlus\GlobalSettings\Models\Setting;
 use Tests\TestCase;
 
 final class RegistrationTest extends TestCase

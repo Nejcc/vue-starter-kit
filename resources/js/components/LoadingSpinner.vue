@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-vue-next';
 import type { HTMLAttributes } from 'vue';
+import { cn } from '@/lib/utils';
 
 interface Props {
     size?: 'sm' | 'md' | 'lg';

@@ -6,8 +6,8 @@ namespace App\Http\Requests\Admin;
 
 use App\Constants\RoleNames;
 use App\Http\Requests\AbstractFormRequest;
+use App\Models\Role;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
 
 final class StoreRoleRequest extends AbstractFormRequest
 {

@@ -121,7 +121,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                 <div class="grid gap-6 lg:grid-cols-3">
                     <!-- Settings Form -->
-                    <div class="lg:col-span-2 space-y-6">
+                    <div class="space-y-6 lg:col-span-2">
                         <Card>
                             <CardHeader>
                                 <CardTitle>List Settings</CardTitle>
@@ -162,7 +162,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         <div class="flex items-center gap-2">
                                             <Checkbox
                                                 id="is_default"
-                                                v-model:checked="form.is_default"
+                                                v-model:checked="
+                                                    form.is_default
+                                                "
                                             />
                                             <Label for="is_default"
                                                 >Default list</Label
@@ -242,11 +244,31 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     <table class="w-full">
                                         <thead>
                                             <tr class="border-b">
-                                                <th class="px-4 py-3 text-left text-sm font-semibold">Email</th>
-                                                <th class="px-4 py-3 text-left text-sm font-semibold">Name</th>
-                                                <th class="px-4 py-3 text-left text-sm font-semibold">Status</th>
-                                                <th class="px-4 py-3 text-left text-sm font-semibold">Joined</th>
-                                                <th class="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                                >
+                                                    Email
+                                                </th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                                >
+                                                    Name
+                                                </th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                                >
+                                                    Status
+                                                </th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                                >
+                                                    Joined
+                                                </th>
+                                                <th
+                                                    class="px-4 py-3 text-right text-sm font-semibold"
+                                                >
+                                                    Actions
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -291,7 +313,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                         ).toLocaleDateString()
                                                     }}
                                                 </td>
-                                                <td class="px-4 py-3 text-right">
+                                                <td
+                                                    class="px-4 py-3 text-right"
+                                                >
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
@@ -300,13 +324,18 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                         <Link
                                                             :href="`/admin/subscribers/subscribers/${subscriber.id}`"
                                                         >
-                                                            <Eye class="h-4 w-4" />
+                                                            <Eye
+                                                                class="h-4 w-4"
+                                                            />
                                                         </Link>
                                                     </Button>
                                                 </td>
                                             </tr>
                                             <tr
-                                                v-if="subscribers.data.length === 0"
+                                                v-if="
+                                                    subscribers.data.length ===
+                                                    0
+                                                "
                                             >
                                                 <td
                                                     colspan="5"
@@ -344,7 +373,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             <ChevronLeft class="h-4 w-4" />
                                         </Button>
                                         <span class="text-sm">
-                                            Page {{ subscribers.current_page }} of
+                                            Page
+                                            {{ subscribers.current_page }} of
                                             {{ subscribers.last_page }}
                                         </span>
                                         <Button
@@ -387,7 +417,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     <p class="text-sm text-muted-foreground">
                                         Active Subscribers
                                     </p>
-                                    <p class="text-2xl font-bold text-green-600">
+                                    <p
+                                        class="text-2xl font-bold text-green-600"
+                                    >
                                         {{ list.active_subscribers_count }}
                                     </p>
                                 </div>

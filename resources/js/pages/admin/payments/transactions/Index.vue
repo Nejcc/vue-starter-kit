@@ -141,9 +141,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                 <!-- Filters -->
                 <div class="flex flex-wrap items-center gap-4">
-                    <div class="relative flex-1 min-w-[200px]">
+                    <div class="relative min-w-[200px] flex-1">
                         <Search
-                            class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                            class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                         />
                         <Input
                             v-model="searchQuery"
@@ -244,19 +244,22 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 >
                                     {{ tx.description }}
                                 </p>
-                                <div class="flex items-center gap-4 text-sm text-muted-foreground">
+                                <div
+                                    class="flex items-center gap-4 text-sm text-muted-foreground"
+                                >
                                     <span v-if="tx.user">
                                         {{ tx.user.name }} ({{ tx.user.email }})
                                     </span>
-                                    <span v-if="tx.provider_id" class="font-mono text-xs">
+                                    <span
+                                        v-if="tx.provider_id"
+                                        class="font-mono text-xs"
+                                    >
                                         {{ tx.provider_id }}
                                     </span>
                                 </div>
                                 <p class="text-xs text-muted-foreground">
                                     {{
-                                        new Date(
-                                            tx.created_at,
-                                        ).toLocaleString()
+                                        new Date(tx.created_at).toLocaleString()
                                     }}
                                 </p>
                             </div>

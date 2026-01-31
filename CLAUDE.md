@@ -1,3 +1,107 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+Laravel 12 + Vue 3 + Inertia.js v2 starter kit with TypeScript, Tailwind CSS v4, and shadcn-vue components. Uses PHP 8.4, PHPUnit 11, ESLint 9, and Prettier 3.
+
+## Commands
+
+### Development
+```bash
+composer run dev          # Starts Laravel server, queue worker, Pail log viewer, and Vite concurrently
+composer run dev:ssr      # Same but with SSR
+composer run setup        # First-time setup (install deps, migrate, build)
+```
+
+### Testing
+```bash
+php artisan test --compact                              # Run all tests
+php artisan test --compact tests/Feature/ExampleTest.php  # Run single file
+php artisan test --compact --filter=testName             # Run single test
+```
+
+### Code Formatting & Linting
+```bash
+vendor/bin/pint --dirty   # Format changed PHP files with Pint
+vendor/bin/pint           # Format all PHP files
+npm run lint              # ESLint
+npm run format            # Prettier
+```
+
+### Frontend
+```bash
+npm run build             # Production build
+npm run build:ssr         # SSR build
+```
+
+## Architecture
+
+### Backend Layer Flow
+```
+Controllers → Services → Repositories → Models
+     ↓
+  Actions (single-responsibility operations)
+```
+
+- **Repositories** (`app/Repositories/`): Extend `AbstractRepository` which provides caching (3600s TTL), CRUD, and query building. Bound via `RepositoryInterface`.
+- **Services** (`app/Services/`): Extend `AbstractService` with transaction support. Bound via contracts in `app/Contracts/Services/`.
+- **Actions** (`app/Actions/`): Single-responsibility classes implementing `ActionInterface`. Organized by domain (`User/`, `Fortify/`).
+- **Form Requests** (`app/Http/Requests/`): All validation goes in Form Request classes, never inline in controllers.
+
+### Frontend Structure
+- **Pages**: `resources/js/pages/` — Inertia page components organized by feature (auth, admin, settings)
+- **Layouts**: `resources/js/layouts/` — AppLayout, AuthLayout, PublicLayout, AdminLayout with sub-variants (sidebar, header, card, split)
+- **Components**: `resources/js/components/` — shadcn-vue UI components in `ui/` subdirectory
+- **Wayfinder**: `resources/js/actions/` — Auto-generated TypeScript route functions. Import controllers from `@/actions/`, named routes from `@/routes/`
+- **Types**: `resources/js/types/` — TypeScript interfaces for page props, models, forms
+
+### Key Configuration Files
+- `bootstrap/app.php` — Middleware registration, routing, exceptions (no `Kernel.php` in Laravel 12)
+- `bootstrap/providers.php` — Service provider registration
+- `routes/web.php` — Main web routes (admin routes use `role:super-admin,admin` middleware)
+- `routes/settings.php` — Settings routes (loaded separately)
+
+### Authentication & Authorization
+- **Fortify**: Handles login, registration, 2FA, email verification, password reset
+- **Spatie Permission**: RBAC with roles (super-admin, admin, user) and granular permissions
+- **Impersonation**: Admin can impersonate users, tracked via `AuditLog`
+- **GDPR**: Cookie consent system with per-user tracking
+
+### Models
+- `User` — Has roles/permissions (Spatie), 2FA (Fortify), cookie consent fields, `Billable` trait
+- `Setting` — Key-value store with field types and role-based access (`SettingRole` enum)
+- `AuditLog` — Polymorphic audit trail (user, event, old/new values, IP, user agent)
+
+### Custom Packages
+Two local symlinked packages in `packages/nejcc/`:
+- `payment-gateway` — Payment/billing features, provides `Billable` trait
+- `subscribe` — Subscriber management
+
+### PHP Conventions
+- Every file uses `declare(strict_types=1)`
+- All methods have explicit return type declarations
+- PHP 8 constructor property promotion required
+- PHPDoc blocks preferred over inline comments
+- Enum keys use TitleCase
+- Model casts use `casts()` method (not `$casts` property)
+
+### Testing Conventions
+- PHPUnit only (convert Pest to PHPUnit if encountered)
+- Create tests via `php artisan make:test --phpunit {name}` (add `--unit` for unit tests)
+- Use model factories with custom states; follow existing `fake()` vs `$this->faker` convention
+- Tests use in-memory SQLite (`:memory:`)
+- Every change requires a passing test
+
+### Tailwind CSS v4 Breakpoints
+- `xs`: < 768px (phones)
+- `sm`: >= 768px (tablets)
+- `md`: >= 992px (small laptops)
+- `lg`: >= 1200px (desktops)
+
+===
+
 <laravel-boost-guidelines>
 === foundation rules ===
 
@@ -34,6 +138,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 - `wayfinder-development` — Activates whenever referencing backend routes in frontend components. Use when importing from @/actions or @/routes, calling Laravel routes from TypeScript, or working with Wayfinder route functions.
 - `inertia-vue-development` — Develops Inertia.js v2 Vue client-side applications. Activates when creating Vue pages, forms, or navigation; using &lt;Link&gt;, &lt;Form&gt;, useForm, or router; working with deferred props, prefetching, or polling; or when user mentions Vue with Inertia, Vue pages, Vue forms, or Vue navigation.
 - `tailwindcss-development` — Styles applications using Tailwind CSS v4 utilities. Activates when adding styles, restyling components, working with gradients, spacing, layout, flex, grid, responsive design, dark mode, colors, typography, or borders; or when the user mentions CSS, styling, classes, Tailwind, restyle, hero section, cards, buttons, or any visual/UI changes.
+- `developing-with-fortify` — Laravel Fortify headless authentication backend development. Activate when implementing authentication features including login, registration, password reset, email verification, two-factor authentication (2FA/TOTP), profile updates, headless auth, authentication scaffolding, or auth guards in Laravel applications.
 
 ## Conventions
 
@@ -292,4 +397,12 @@ Vue components must have a single root element.
 - Always use existing Tailwind conventions; check project patterns before adding new ones.
 - IMPORTANT: Always use `search-docs` tool for version-specific Tailwind CSS documentation and updated code examples. Never rely on training data.
 - IMPORTANT: Activate `tailwindcss-development` every time you're working with a Tailwind CSS or styling-related task.
+
+=== laravel/fortify rules ===
+
+# Laravel Fortify
+
+- Fortify is a headless authentication backend that provides authentication routes and controllers for Laravel applications.
+- IMPORTANT: Always use the `search-docs` tool for detailed Laravel Fortify patterns and documentation.
+- IMPORTANT: Activate `developing-with-fortify` skill when working with Fortify authentication features.
 </laravel-boost-guidelines>

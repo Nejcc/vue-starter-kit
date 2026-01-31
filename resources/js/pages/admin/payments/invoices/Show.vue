@@ -142,7 +142,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     <div class="flex items-center gap-2">
                         <Badge
                             :class="
-                                getStatusColor(invoice.status, invoice.is_overdue)
+                                getStatusColor(
+                                    invoice.status,
+                                    invoice.is_overdue,
+                                )
                             "
                         >
                             {{
@@ -157,7 +160,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <Download class="h-4 w-4" />
                             Download PDF
                         </a>
-                        <Button variant="outline" size="sm" @click="regeneratePdf">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            @click="regeneratePdf"
+                        >
                             <RefreshCw class="mr-2 h-4 w-4" />
                             Regenerate PDF
                         </Button>
@@ -176,7 +183,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     <p class="text-sm text-muted-foreground">
                                         Invoice Number
                                     </p>
-                                    <p class="font-medium">{{ invoice.number }}</p>
+                                    <p class="font-medium">
+                                        {{ invoice.number }}
+                                    </p>
                                 </div>
                                 <div>
                                     <p class="text-sm text-muted-foreground">
@@ -237,7 +246,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     <p class="text-sm text-muted-foreground">
                                         Driver
                                     </p>
-                                    <p class="font-medium">{{ invoice.driver }}</p>
+                                    <p class="font-medium">
+                                        {{ invoice.driver }}
+                                    </p>
                                 </div>
                             </div>
                             <div v-if="invoice.provider_id">
@@ -258,8 +269,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div v-if="invoice.billing_name">
-                                <p class="text-sm text-muted-foreground">Name</p>
-                                <p class="font-medium">{{ invoice.billing_name }}</p>
+                                <p class="text-sm text-muted-foreground">
+                                    Name
+                                </p>
+                                <p class="font-medium">
+                                    {{ invoice.billing_name }}
+                                </p>
                             </div>
                             <div v-if="invoice.billing_company">
                                 <p class="text-sm text-muted-foreground">
@@ -270,7 +285,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 </p>
                             </div>
                             <div v-if="invoice.billing_email">
-                                <p class="text-sm text-muted-foreground">Email</p>
+                                <p class="text-sm text-muted-foreground">
+                                    Email
+                                </p>
                                 <p class="font-medium">
                                     {{ invoice.billing_email }}
                                 </p>
@@ -305,20 +322,28 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             <th class="pb-3 font-medium">
                                                 Description
                                             </th>
-                                            <th class="pb-3 font-medium text-right">
+                                            <th
+                                                class="pb-3 text-right font-medium"
+                                            >
                                                 Qty
                                             </th>
-                                            <th class="pb-3 font-medium text-right">
+                                            <th
+                                                class="pb-3 text-right font-medium"
+                                            >
                                                 Unit Price
                                             </th>
-                                            <th class="pb-3 font-medium text-right">
+                                            <th
+                                                class="pb-3 text-right font-medium"
+                                            >
                                                 Amount
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr
-                                            v-for="(item, idx) in invoice.line_items"
+                                            v-for="(
+                                                item, idx
+                                            ) in invoice.line_items"
                                             :key="idx"
                                             class="border-b"
                                         >
@@ -338,7 +363,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="3" class="pt-4 text-right font-medium">
+                                            <td
+                                                colspan="3"
+                                                class="pt-4 text-right font-medium"
+                                            >
                                                 Subtotal
                                             </td>
                                             <td class="pt-4 text-right">
@@ -346,7 +374,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             </td>
                                         </tr>
                                         <tr v-if="invoice.tax > 0">
-                                            <td colspan="3" class="pt-2 text-right text-muted-foreground">
+                                            <td
+                                                colspan="3"
+                                                class="pt-2 text-right text-muted-foreground"
+                                            >
                                                 Tax
                                                 <span v-if="invoice.tax_rate">
                                                     ({{ invoice.tax_rate }}%)
@@ -357,15 +388,25 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             </td>
                                         </tr>
                                         <tr v-if="invoice.discount > 0">
-                                            <td colspan="3" class="pt-2 text-right text-muted-foreground">
+                                            <td
+                                                colspan="3"
+                                                class="pt-2 text-right text-muted-foreground"
+                                            >
                                                 Discount
                                             </td>
-                                            <td class="pt-2 text-right text-green-600">
-                                                -{{ invoice.formatted_discount }}
+                                            <td
+                                                class="pt-2 text-right text-green-600"
+                                            >
+                                                -{{
+                                                    invoice.formatted_discount
+                                                }}
                                             </td>
                                         </tr>
                                         <tr class="text-lg font-bold">
-                                            <td colspan="3" class="pt-4 text-right">
+                                            <td
+                                                colspan="3"
+                                                class="pt-4 text-right"
+                                            >
                                                 Total
                                             </td>
                                             <td class="pt-4 text-right">
@@ -373,11 +414,18 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             </td>
                                         </tr>
                                         <tr v-if="invoice.amount_due > 0">
-                                            <td colspan="3" class="pt-2 text-right text-muted-foreground">
+                                            <td
+                                                colspan="3"
+                                                class="pt-2 text-right text-muted-foreground"
+                                            >
                                                 Amount Due
                                             </td>
-                                            <td class="pt-2 text-right font-medium text-red-600">
-                                                {{ invoice.formatted_amount_due }}
+                                            <td
+                                                class="pt-2 text-right font-medium text-red-600"
+                                            >
+                                                {{
+                                                    invoice.formatted_amount_due
+                                                }}
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -387,14 +435,24 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     </Card>
 
                     <!-- Related -->
-                    <Card v-if="invoice.user || invoice.transaction || invoice.subscription">
+                    <Card
+                        v-if="
+                            invoice.user ||
+                            invoice.transaction ||
+                            invoice.subscription
+                        "
+                    >
                         <CardHeader>
                             <CardTitle>Related</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div v-if="invoice.user">
-                                <p class="text-sm text-muted-foreground">User</p>
-                                <p class="font-medium">{{ invoice.user.name }}</p>
+                                <p class="text-sm text-muted-foreground">
+                                    User
+                                </p>
+                                <p class="font-medium">
+                                    {{ invoice.user.name }}
+                                </p>
                                 <p class="text-sm text-muted-foreground">
                                     {{ invoice.user.email }}
                                 </p>
@@ -431,13 +489,17 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div v-if="invoice.notes">
-                                <p class="text-sm text-muted-foreground">Notes</p>
+                                <p class="text-sm text-muted-foreground">
+                                    Notes
+                                </p>
                                 <p class="text-sm whitespace-pre-line">
                                     {{ invoice.notes }}
                                 </p>
                             </div>
                             <div v-if="invoice.footer">
-                                <p class="text-sm text-muted-foreground">Footer</p>
+                                <p class="text-sm text-muted-foreground">
+                                    Footer
+                                </p>
                                 <p class="text-sm">{{ invoice.footer }}</p>
                             </div>
                         </CardContent>
@@ -449,7 +511,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <CardTitle>Metadata</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <pre class="text-xs bg-muted p-3 rounded overflow-auto">{{ JSON.stringify(invoice.metadata, null, 2) }}</pre>
+                            <pre
+                                class="overflow-auto rounded bg-muted p-3 text-xs"
+                                >{{
+                                    JSON.stringify(invoice.metadata, null, 2)
+                                }}</pre
+                            >
                         </CardContent>
                     </Card>
                 </div>

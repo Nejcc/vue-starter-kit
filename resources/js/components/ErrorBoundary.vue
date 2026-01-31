@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/vue3';
 import { AlertTriangle } from 'lucide-vue-next';
 import { onErrorCaptured, ref } from 'vue';
+import { Button } from '@/components/ui/button';
 
 interface Props {
     fallbackMessage?: string;

@@ -56,6 +56,8 @@
 
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
+import { useDebounceFn } from '@vueuse/core';
+import { Search } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 // Import shadcn-vue components - adjust path if needed
 // If these don't exist, install with: npx shadcn-vue@latest add dialog input
@@ -67,8 +69,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { useDebounceFn } from '@vueuse/core';
-import { Search } from 'lucide-vue-next';
 import UserCard from './UserCard.vue';
 
 interface User {

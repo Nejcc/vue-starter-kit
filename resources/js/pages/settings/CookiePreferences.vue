@@ -1,4 +1,15 @@
 <script setup lang="ts">
+import { Head } from '@inertiajs/vue3';
+import {
+    BarChart3,
+    Calendar,
+    Cookie,
+    Settings,
+    Shield,
+    Target,
+} from 'lucide-vue-next';
+import { onMounted, ref } from 'vue';
+import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -10,21 +21,10 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { useCookieConsent } from '@/composables/useCookieConsent';
-import Heading from '@/components/Heading.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { edit } from '@/routes/cookie-preferences';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
-import {
-    BarChart3,
-    Calendar,
-    Cookie,
-    Settings,
-    Shield,
-    Target,
-} from 'lucide-vue-next';
-import { onMounted, ref } from 'vue';
 
 import type { CookiePreferencesPageProps } from '@/types';
 
@@ -138,206 +138,224 @@ const formatDate = (dateString: string) => {
                     description="Manage your cookie preferences and review your consent history"
                 />
 
-        <!-- Current Status -->
-        <Card>
-            <CardHeader>
-                <CardTitle class="flex items-center gap-2">
-                    <Cookie class="h-5 w-5" />
-                    Current Status
-                </CardTitle>
-            </CardHeader>
-            <CardContent class="space-y-4">
-                <div class="flex items-center justify-between">
-                    <span class="font-medium">Cookie Consent:</span>
-                    <span
-                        :class="
-                            hasConsent
-                                ? 'text-green-600 dark:text-green-500'
-                                : 'text-red-600 dark:text-red-500'
-                        "
-                    >
-                        {{ hasConsent ? 'Given' : 'Not Given' }}
-                    </span>
-                </div>
-
-                <div
-                    v-if="lastUpdated"
-                    class="flex items-center justify-between"
-                >
-                    <span class="font-medium">Last Updated:</span>
-                    <div
-                        class="flex items-center gap-2 text-sm text-muted-foreground"
-                    >
-                        <Calendar class="h-4 w-4" />
-                        {{ formatDate(lastUpdated) }}
-                    </div>
-                </div>
-
-                <div
-                    v-if="props.cookieConsent?.config?.gdpr_mode"
-                    class="flex items-center justify-between"
-                >
-                    <span class="font-medium">GDPR Mode:</span>
-                    <span class="text-green-600 dark:text-green-500"
-                        >Enabled</span
-                    >
-                </div>
-            </CardContent>
-        </Card>
-
-        <!-- Cookie Categories -->
-        <Card>
-            <CardHeader>
-                <CardTitle>Cookie Categories</CardTitle>
-                <CardDescription>
-                    Choose which types of cookies you want to allow. Essential
-                    cookies are required for the website to function.
-                </CardDescription>
-            </CardHeader>
-            <CardContent class="space-y-6">
-                <!-- Essential Cookies -->
-                <div>
-                    <h3
-                        class="mb-3 flex items-center gap-2 text-lg font-medium"
-                    >
-                        <Shield class="h-5 w-5" />
-                        Essential Cookies
-                    </h3>
-                    <div class="space-y-3">
-                        <div
-                            v-for="(category, key) in categories"
-                            :key="key"
-                            v-show="category.required"
-                            class="flex items-center justify-between rounded-lg border bg-muted/50 p-4"
-                        >
-                            <div class="flex items-center gap-3">
-                                <component
-                                    :is="getCategoryIcon(key)"
-                                    class="h-5 w-5"
-                                />
-                                <div>
-                                    <div class="font-medium">
-                                        {{ category.name }}
-                                    </div>
-                                    <div class="text-sm text-muted-foreground">
-                                        {{ category.description }}
-                                    </div>
-                                    <div
-                                        class="mt-1 text-xs text-muted-foreground"
-                                    >
-                                        Cookies:
-                                        {{ category.cookies.join(', ') }}
-                                    </div>
-                                </div>
-                            </div>
-                            <Checkbox
-                                :checked="true"
-                                disabled
-                                class="pointer-events-none"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <Separator />
-
-                <!-- Optional Cookies -->
-                <div>
-                    <h3
-                        class="mb-3 flex items-center gap-2 text-lg font-medium"
-                    >
-                        <Settings class="h-5 w-5" />
-                        Optional Cookies
-                    </h3>
-                    <div class="space-y-3">
-                        <div
-                            v-for="(category, key) in categories"
-                            :key="key"
-                            v-show="!category.required"
-                            class="flex items-center justify-between rounded-lg border p-4"
-                        >
-                            <div class="flex items-center gap-3">
-                                <component
-                                    :is="getCategoryIcon(key)"
-                                    class="h-5 w-5"
-                                />
-                                <div>
-                                    <div class="font-medium">
-                                        {{ category.name }}
-                                    </div>
-                                    <div class="text-sm text-muted-foreground">
-                                        {{ category.description }}
-                                    </div>
-                                    <div
-                                        class="mt-1 text-xs text-muted-foreground"
-                                    >
-                                        Cookies:
-                                        {{ category.cookies.join(', ') }}
-                                    </div>
-                                </div>
-                            </div>
-                            <Checkbox
-                                :checked="localPreferences[key] || false"
-                                @update:checked="
-                                    (checked) =>
-                                        updateLocalPreference(key, checked)
+                <!-- Current Status -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle class="flex items-center gap-2">
+                            <Cookie class="h-5 w-5" />
+                            Current Status
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">Cookie Consent:</span>
+                            <span
+                                :class="
+                                    hasConsent
+                                        ? 'text-green-600 dark:text-green-500'
+                                        : 'text-red-600 dark:text-red-500'
                                 "
-                            />
+                            >
+                                {{ hasConsent ? 'Given' : 'Not Given' }}
+                            </span>
                         </div>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
 
-        <!-- Actions -->
-        <div class="flex justify-between">
-            <Button
-                variant="outline"
-                @click="handleResetToDefaults"
-                :disabled="isProcessing"
-            >
-                Reset to Defaults
-            </Button>
+                        <div
+                            v-if="lastUpdated"
+                            class="flex items-center justify-between"
+                        >
+                            <span class="font-medium">Last Updated:</span>
+                            <div
+                                class="flex items-center gap-2 text-sm text-muted-foreground"
+                            >
+                                <Calendar class="h-4 w-4" />
+                                {{ formatDate(lastUpdated) }}
+                            </div>
+                        </div>
 
-            <Button @click="handleSavePreferences" :disabled="isProcessing">
-                {{ isProcessing ? 'Saving...' : 'Save Preferences' }}
-            </Button>
-        </div>
+                        <div
+                            v-if="props.cookieConsent?.config?.gdpr_mode"
+                            class="flex items-center justify-between"
+                        >
+                            <span class="font-medium">GDPR Mode:</span>
+                            <span class="text-green-600 dark:text-green-500"
+                                >Enabled</span
+                            >
+                        </div>
+                    </CardContent>
+                </Card>
 
-        <!-- Information -->
-        <Card>
-            <CardHeader>
-                <CardTitle>More Information</CardTitle>
-            </CardHeader>
-            <CardContent class="space-y-4">
-                <div class="text-sm text-muted-foreground">
-                    <p>
-                        Your cookie preferences are stored locally in your
-                        browser and are also saved to your account if you're
-                        logged in. You can change these preferences at any time.
-                    </p>
-                </div>
+                <!-- Cookie Categories -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Cookie Categories</CardTitle>
+                        <CardDescription>
+                            Choose which types of cookies you want to allow.
+                            Essential cookies are required for the website to
+                            function.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent class="space-y-6">
+                        <!-- Essential Cookies -->
+                        <div>
+                            <h3
+                                class="mb-3 flex items-center gap-2 text-lg font-medium"
+                            >
+                                <Shield class="h-5 w-5" />
+                                Essential Cookies
+                            </h3>
+                            <div class="space-y-3">
+                                <div
+                                    v-for="(category, key) in categories"
+                                    :key="key"
+                                    v-show="category.required"
+                                    class="flex items-center justify-between rounded-lg border bg-muted/50 p-4"
+                                >
+                                    <div class="flex items-center gap-3">
+                                        <component
+                                            :is="getCategoryIcon(key)"
+                                            class="h-5 w-5"
+                                        />
+                                        <div>
+                                            <div class="font-medium">
+                                                {{ category.name }}
+                                            </div>
+                                            <div
+                                                class="text-sm text-muted-foreground"
+                                            >
+                                                {{ category.description }}
+                                            </div>
+                                            <div
+                                                class="mt-1 text-xs text-muted-foreground"
+                                            >
+                                                Cookies:
+                                                {{
+                                                    category.cookies.join(', ')
+                                                }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Checkbox
+                                        :checked="true"
+                                        disabled
+                                        class="pointer-events-none"
+                                    />
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="flex gap-4">
-                    <a
-                        href="/privacy-policy"
-                        class="text-sm text-primary hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        <Separator />
+
+                        <!-- Optional Cookies -->
+                        <div>
+                            <h3
+                                class="mb-3 flex items-center gap-2 text-lg font-medium"
+                            >
+                                <Settings class="h-5 w-5" />
+                                Optional Cookies
+                            </h3>
+                            <div class="space-y-3">
+                                <div
+                                    v-for="(category, key) in categories"
+                                    :key="key"
+                                    v-show="!category.required"
+                                    class="flex items-center justify-between rounded-lg border p-4"
+                                >
+                                    <div class="flex items-center gap-3">
+                                        <component
+                                            :is="getCategoryIcon(key)"
+                                            class="h-5 w-5"
+                                        />
+                                        <div>
+                                            <div class="font-medium">
+                                                {{ category.name }}
+                                            </div>
+                                            <div
+                                                class="text-sm text-muted-foreground"
+                                            >
+                                                {{ category.description }}
+                                            </div>
+                                            <div
+                                                class="mt-1 text-xs text-muted-foreground"
+                                            >
+                                                Cookies:
+                                                {{
+                                                    category.cookies.join(', ')
+                                                }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Checkbox
+                                        :checked="
+                                            localPreferences[key] || false
+                                        "
+                                        @update:checked="
+                                            (checked) =>
+                                                updateLocalPreference(
+                                                    key,
+                                                    checked,
+                                                )
+                                        "
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- Actions -->
+                <div class="flex justify-between">
+                    <Button
+                        variant="outline"
+                        @click="handleResetToDefaults"
+                        :disabled="isProcessing"
                     >
-                        Privacy Policy
-                    </a>
-                    <a
-                        href="/cookie-policy"
-                        class="text-sm text-primary hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        Reset to Defaults
+                    </Button>
+
+                    <Button
+                        @click="handleSavePreferences"
+                        :disabled="isProcessing"
                     >
-                        Cookie Policy
-                    </a>
+                        {{ isProcessing ? 'Saving...' : 'Save Preferences' }}
+                    </Button>
                 </div>
-            </CardContent>
-        </Card>
+
+                <!-- Information -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle>More Information</CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-4">
+                        <div class="text-sm text-muted-foreground">
+                            <p>
+                                Your cookie preferences are stored locally in
+                                your browser and are also saved to your account
+                                if you're logged in. You can change these
+                                preferences at any time.
+                            </p>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <a
+                                href="/privacy-policy"
+                                class="text-sm text-primary hover:underline"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Privacy Policy
+                            </a>
+                            <a
+                                href="/cookie-policy"
+                                class="text-sm text-primary hover:underline"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Cookie Policy
+                            </a>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </SettingsLayout>
     </AppLayout>

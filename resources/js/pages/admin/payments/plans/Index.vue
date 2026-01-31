@@ -123,9 +123,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                 <!-- Filters -->
                 <div class="flex flex-wrap items-center gap-4">
-                    <div class="relative flex-1 min-w-[200px]">
+                    <div class="relative min-w-[200px] flex-1">
                         <Search
-                            class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                            class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                         />
                         <Input
                             v-model="searchQuery"
@@ -214,13 +214,18 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     >
                                         Featured
                                     </Badge>
-                                    <Badge v-if="plan.is_free" variant="outline">
+                                    <Badge
+                                        v-if="plan.is_free"
+                                        variant="outline"
+                                    >
                                         Free
                                     </Badge>
                                 </div>
                                 <p class="text-lg font-semibold">
                                     {{ plan.formatted_price }}
-                                    <span class="text-sm font-normal text-muted-foreground">
+                                    <span
+                                        class="text-sm font-normal text-muted-foreground"
+                                    >
                                         / {{ plan.billing_description }}
                                     </span>
                                 </p>
@@ -230,17 +235,28 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 >
                                     {{ plan.description }}
                                 </p>
-                                <div class="flex items-center gap-4 text-sm text-muted-foreground">
+                                <div
+                                    class="flex items-center gap-4 text-sm text-muted-foreground"
+                                >
                                     <span>
-                                        {{ plan.subscriptions_count }} subscriber(s)
+                                        {{
+                                            plan.subscriptions_count
+                                        }}
+                                        subscriber(s)
                                     </span>
                                     <span v-if="plan.trial_days">
                                         {{ plan.trial_days }} day trial
                                     </span>
-                                    <span v-if="plan.stripe_price_id" class="font-mono text-xs">
+                                    <span
+                                        v-if="plan.stripe_price_id"
+                                        class="font-mono text-xs"
+                                    >
                                         Stripe synced
                                     </span>
-                                    <span v-if="plan.paypal_plan_id" class="font-mono text-xs">
+                                    <span
+                                        v-if="plan.paypal_plan_id"
+                                        class="font-mono text-xs"
+                                    >
                                         PayPal synced
                                     </span>
                                 </div>

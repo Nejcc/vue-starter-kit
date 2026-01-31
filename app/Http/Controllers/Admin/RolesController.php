@@ -5,22 +5,23 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Constants\RoleNames;
+use App\Contracts\Services\RoleServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRoleRequest;
 use App\Http\Requests\Admin\UpdateRoleRequest;
+use App\Models\Role;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use InvalidArgumentException;
 
 final class RolesController extends Controller
 {
     /**
      * Create a new admin roles controller instance.
      */
-    public function __construct()
+    public function __construct(private RoleServiceInterface $roleService)
     {
         $this->middleware('auth');
     }
@@ -38,14 +39,6 @@ final class RolesController extends Controller
     }
 
     /**
-     * Check if a role is the special super-admin role.
-     */
-    private function isSuperAdminRole(Role $role): bool
-    {
-        return $role->name === RoleNames::SUPER_ADMIN;
-    }
-
-    /**
      * Display a listing of roles.
      *
      * @param  Request  $request  The incoming request
@@ -55,25 +48,10 @@ final class RolesController extends Controller
     {
         $this->authorizeAdmin();
 
-        $query = Role::with('permissions');
-
-        // Search functionality
-        if ($request->has('search') && $request->filled('search')) {
-            $search = $request->get('search');
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        $roles = $query->latest()->get();
+        $search = $request->filled('search') ? $request->get('search') : null;
 
         return Inertia::render('admin/Roles/Index', [
-            'roles' => $roles->map(fn ($role) => [
-                'id' => $role->id,
-                'name' => $role->name,
-                'is_super_admin' => $this->isSuperAdminRole($role),
-                'permissions' => $role->permissions->pluck('name'),
-                'users_count' => $role->users()->count(),
-                'created_at' => $role->created_at,
-            ]),
+            'roles' => $this->roleService->getAll($search),
             'status' => $request->session()->get('status'),
             'filters' => [
                 'search' => $request->get('search', ''),
@@ -90,10 +68,8 @@ final class RolesController extends Controller
     {
         $this->authorizeAdmin();
 
-        $permissions = Permission::all()->pluck('name');
-
         return Inertia::render('admin/Roles/Create', [
-            'permissions' => $permissions,
+            'permissions' => $this->roleService->getAllPermissions(),
         ]);
     }
 
@@ -107,18 +83,11 @@ final class RolesController extends Controller
     {
         $this->authorizeAdmin();
 
-        // Prevent creating super-admin role
-        if ($request->validated()['name'] === RoleNames::SUPER_ADMIN) {
+        try {
+            $this->roleService->create($request->validated());
+        } catch (InvalidArgumentException $e) {
             return redirect()->route('admin.roles.create')
-                ->withErrors(['name' => 'The super-admin role cannot be created. It is a system role.']);
-        }
-
-        $role = Role::create([
-            'name' => $request->validated()['name'],
-        ]);
-
-        if ($request->has('permissions') && is_array($request->validated()['permissions'])) {
-            $role->givePermissionTo($request->validated()['permissions']);
+                ->withErrors(['name' => $e->getMessage()]);
         }
 
         return redirect()->route('admin.roles.index')->with('status', 'Role created successfully.');
@@ -134,16 +103,9 @@ final class RolesController extends Controller
     {
         $this->authorizeAdmin();
 
-        $permissions = Permission::all()->pluck('name');
-
         return Inertia::render('admin/Roles/Edit', [
-            'role' => [
-                'id' => $role->id,
-                'name' => $role->name,
-                'is_super_admin' => $this->isSuperAdminRole($role),
-                'permissions' => $role->permissions->pluck('name'),
-            ],
-            'permissions' => $permissions,
+            'role' => $this->roleService->getForEdit($role),
+            'permissions' => $this->roleService->getAllPermissions(),
         ]);
     }
 
@@ -158,27 +120,11 @@ final class RolesController extends Controller
     {
         $this->authorizeAdmin();
 
-        // Prevent renaming super-admin role
-        if ($this->isSuperAdminRole($role) && $request->validated()['name'] !== RoleNames::SUPER_ADMIN) {
+        try {
+            $this->roleService->update($role, $request->validated());
+        } catch (InvalidArgumentException $e) {
             return redirect()->route('admin.roles.edit', $role)
-                ->withErrors(['name' => 'The super-admin role name cannot be changed.']);
-        }
-
-        // Prevent changing another role to super-admin
-        if (!$this->isSuperAdminRole($role) && $request->validated()['name'] === RoleNames::SUPER_ADMIN) {
-            return redirect()->route('admin.roles.edit', $role)
-                ->withErrors(['name' => 'The super-admin role name cannot be used. It is a system role.']);
-        }
-
-        $role->update([
-            'name' => $request->validated()['name'],
-        ]);
-
-        // Update permissions
-        if ($request->has('permissions') && is_array($request->validated()['permissions'])) {
-            $role->syncPermissions($request->validated()['permissions']);
-        } else {
-            $role->syncPermissions([]);
+                ->withErrors(['name' => $e->getMessage()]);
         }
 
         return redirect()->route('admin.roles.index')->with('status', 'Role updated successfully.');
@@ -194,23 +140,17 @@ final class RolesController extends Controller
     {
         $this->authorizeAdmin();
 
-        // Prevent deletion of super-admin role
-        if ($this->isSuperAdminRole($role)) {
+        try {
+            $this->roleService->delete($role);
+        } catch (InvalidArgumentException $e) {
+            if (str_contains($e->getMessage(), 'assigned to')) {
+                return redirect()->route('admin.roles.index')
+                    ->withErrors(['role_deletion' => $e->getMessage()]);
+            }
+
             return redirect()->route('admin.roles.index')
-                ->with('error', 'The super-admin role cannot be deleted. It is a system role with all permissions.');
+                ->with('error', $e->getMessage());
         }
-
-        // Check if role is assigned to any users
-        $usersCount = $role->users()->count();
-
-        if ($usersCount > 0) {
-            return redirect()->route('admin.roles.index')
-                ->withErrors([
-                    'role_deletion' => "Cannot delete role \"{$role->name}\" because it is assigned to {$usersCount} user(s). Please remove all user assignments before deleting this role.",
-                ]);
-        }
-
-        $role->delete();
 
         return redirect()->route('admin.roles.index')->with('status', 'Role deleted successfully.');
     }

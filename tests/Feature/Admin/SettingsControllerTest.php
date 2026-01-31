@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature\Admin;
 
 use App\Constants\RoleNames;
-use App\Models\Setting;
+use App\Models\Role;
 use App\Models\User;
-use App\SettingRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
+use LaravelPlus\GlobalSettings\Enums\SettingRole;
+use LaravelPlus\GlobalSettings\Models\Setting;
 use Tests\TestCase;
 
 final class SettingsControllerTest extends TestCase

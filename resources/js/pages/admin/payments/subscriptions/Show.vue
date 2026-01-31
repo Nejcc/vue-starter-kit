@@ -97,15 +97,20 @@ const cancelForm = useForm({
 
 const handleCancel = (): void => {
     cancelForm.immediately = cancelImmediately.value;
-    cancelForm.post(`/admin/payments/subscriptions/${props.subscription.id}/cancel`, {
-        onSuccess: () => {
-            showCancelDialog.value = false;
+    cancelForm.post(
+        `/admin/payments/subscriptions/${props.subscription.id}/cancel`,
+        {
+            onSuccess: () => {
+                showCancelDialog.value = false;
+            },
         },
-    });
+    );
 };
 
 const handleResume = (): void => {
-    router.post(`/admin/payments/subscriptions/${props.subscription.id}/resume`);
+    router.post(
+        `/admin/payments/subscriptions/${props.subscription.id}/resume`,
+    );
 };
 
 const getStatusColor = (status: string): string => {
@@ -151,7 +156,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                 <div class="flex items-center justify-between">
                     <Heading
-                        :title="subscription.plan?.name || 'Custom Subscription'"
+                        :title="
+                            subscription.plan?.name || 'Custom Subscription'
+                        "
                         :description="subscription.billing_description"
                         variant="small"
                     />
@@ -171,7 +178,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         >
                             Grace Period
                         </Badge>
-                        <Badge variant="outline">{{ subscription.driver }}</Badge>
+                        <Badge variant="outline">{{
+                            subscription.driver
+                        }}</Badge>
                     </div>
                 </div>
 
@@ -240,7 +249,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     <p class="text-sm text-muted-foreground">
                                         Status
                                     </p>
-                                    <Badge :class="getStatusColor(subscription.status)">
+                                    <Badge
+                                        :class="
+                                            getStatusColor(subscription.status)
+                                        "
+                                    >
                                         {{ subscription.status }}
                                     </Badge>
                                 </div>
@@ -282,7 +295,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div>
-                                <p class="text-sm text-muted-foreground">Name</p>
+                                <p class="text-sm text-muted-foreground">
+                                    Name
+                                </p>
                                 <p class="font-medium">
                                     {{ subscription.plan.name }}
                                 </p>
@@ -364,7 +379,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 v-if="subscription.cancel_at_period_end"
                                 class="rounded-lg bg-yellow-50 p-3 dark:bg-yellow-900/20"
                             >
-                                <p class="text-sm text-yellow-800 dark:text-yellow-400">
+                                <p
+                                    class="text-sm text-yellow-800 dark:text-yellow-400"
+                                >
                                     Will be canceled at period end
                                 </p>
                             </div>
@@ -378,7 +395,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div v-if="subscription.user">
-                                <p class="text-sm text-muted-foreground">User</p>
+                                <p class="text-sm text-muted-foreground">
+                                    User
+                                </p>
                                 <p class="font-medium">
                                     {{ subscription.user.name }}
                                 </p>
@@ -447,7 +466,16 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <CardTitle>Metadata</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <pre class="text-xs bg-muted p-3 rounded overflow-auto">{{ JSON.stringify(subscription.metadata, null, 2) }}</pre>
+                            <pre
+                                class="overflow-auto rounded bg-muted p-3 text-xs"
+                                >{{
+                                    JSON.stringify(
+                                        subscription.metadata,
+                                        null,
+                                        2,
+                                    )
+                                }}</pre
+                            >
                         </CardContent>
                     </Card>
                 </div>

@@ -9,6 +9,7 @@ use App\Traits\TracksLastLogin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Nejcc\PaymentGateway\Traits\Billable;
 use Spatie\Permission\Traits\HasRoles;
@@ -24,6 +25,20 @@ final class User extends Authenticatable
     protected static function boot(): void
     {
         parent::boot();
+
+        // Auto-generate slug from name when creating
+        self::creating(function (User $user): void {
+            if (empty($user->slug)) {
+                $user->slug = self::generateUniqueSlug($user->name);
+            }
+        });
+
+        // Update slug when name changes
+        self::updating(function (User $user): void {
+            if ($user->isDirty('name')) {
+                $user->slug = self::generateUniqueSlug($user->name, $user->id);
+            }
+        });
 
         // Clean up related data when user is being deleted
         self::deleting(function (User $user): void {
@@ -44,6 +59,7 @@ final class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'slug',
         'email',
         'password',
         'cookie_consent_preferences',
@@ -85,6 +101,40 @@ final class User extends Authenticatable
             'data_processing_consent_given_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    /**
+     * Generate a unique slug from the given name.
+     */
+    private static function generateUniqueSlug(string $name, ?int $excludeId = null): string
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        $query = self::where('slug', $slug);
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        while ($query->exists()) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+            $query = self::where('slug', $slug);
+            if ($excludeId) {
+                $query->where('id', '!=', $excludeId);
+            }
+        }
+
+        return $slug;
     }
 
     /**

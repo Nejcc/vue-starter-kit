@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { BarChart3, Cookie, Settings, Shield, Target } from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -20,8 +22,6 @@ import {
     useCookieConsent,
     type CookieCategory,
 } from '@/composables/useCookieConsent';
-import { BarChart3, Cookie, Settings, Shield, Target } from 'lucide-vue-next';
-import { computed, onMounted, ref } from 'vue';
 
 interface Props {
     cookieConsent?: {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { index, update } from '@/routes/admin/permissions';
 import { Form, Head, Link } from '@inertiajs/vue3';
+import { ArrowLeft } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 import Heading from '@/components/Heading.vue';
@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { index, update } from '@/routes/admin/permissions';
 import { type BreadcrumbItem } from '@/types';
-import { ArrowLeft } from 'lucide-vue-next';
 
 interface Permission {
     id: number;
@@ -64,7 +64,8 @@ const deletePermission = (): void => {
                     Back to Permissions
                 </button>
                 <div class="flex items-center justify-between">
-                    <Heading variant="small"
+                    <Heading
+                        variant="small"
                         title="Edit Permission"
                         description="Update permission details"
                     />
@@ -74,7 +75,7 @@ const deletePermission = (): void => {
                 </div>
 
                 <Form
-                    :action="update.patch(props.permission.id).url"
+                    :action="update.patch(props.permission.name).url"
                     method="patch"
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"

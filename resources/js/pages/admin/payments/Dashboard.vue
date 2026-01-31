@@ -162,9 +162,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <CardTitle class="text-sm font-medium"
                                 >Total Revenue</CardTitle
                             >
-                            <DollarSign
-                                class="h-4 w-4 text-muted-foreground"
-                            />
+                            <DollarSign class="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div class="text-2xl font-bold">
@@ -204,10 +202,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         <CardHeader
                             class="flex flex-row items-center justify-between space-y-0 pb-2"
                         >
-                            <CardTitle class="text-sm font-medium">MRR</CardTitle>
-                            <TrendingUp
-                                class="h-4 w-4 text-muted-foreground"
-                            />
+                            <CardTitle class="text-sm font-medium"
+                                >MRR</CardTitle
+                            >
+                            <TrendingUp class="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div class="text-2xl font-bold">
@@ -226,9 +224,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <CardTitle class="text-sm font-medium"
                                 >Active Subscriptions</CardTitle
                             >
-                            <CreditCard
-                                class="h-4 w-4 text-muted-foreground"
-                            />
+                            <CreditCard class="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div class="text-2xl font-bold">
@@ -316,21 +312,21 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         <CardTitle>Revenue Over Time</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div class="h-64 flex items-end gap-1">
+                        <div class="flex h-64 items-end gap-1">
                             <div
                                 v-for="(item, idx) in revenueChart"
                                 :key="idx"
-                                class="flex-1 flex flex-col items-center gap-1"
+                                class="flex flex-1 flex-col items-center gap-1"
                             >
                                 <div
-                                    class="w-full bg-primary/80 rounded-t transition-all hover:bg-primary"
+                                    class="w-full rounded-t bg-primary/80 transition-all hover:bg-primary"
                                     :style="{
                                         height: `${Math.max(4, (item.total / Math.max(...revenueChart.map((c) => c.total))) * 200)}px`,
                                     }"
                                     :title="`${item.label}: ${item.formatted}`"
                                 />
                                 <span
-                                    class="text-xs text-muted-foreground truncate w-full text-center"
+                                    class="w-full truncate text-center text-xs text-muted-foreground"
                                 >
                                     {{ item.label }}
                                 </span>
@@ -390,7 +386,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                     <!-- Recent Transactions -->
                     <Card>
-                        <CardHeader class="flex flex-row items-center justify-between">
+                        <CardHeader
+                            class="flex flex-row items-center justify-between"
+                        >
                             <CardTitle>Recent Transactions</CardTitle>
                             <Link
                                 href="/admin/payments/transactions"
@@ -402,7 +400,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         <CardContent>
                             <div
                                 v-if="recentTransactions.length === 0"
-                                class="text-center py-6 text-muted-foreground"
+                                class="py-6 text-center text-muted-foreground"
                             >
                                 No transactions yet
                             </div>
@@ -440,7 +438,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <Badge :class="getStatusColor(tx.status)">
+                                        <Badge
+                                            :class="getStatusColor(tx.status)"
+                                        >
                                             {{ tx.status }}
                                         </Badge>
                                         <span class="text-sm font-medium">

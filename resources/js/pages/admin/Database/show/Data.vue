@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { view } from '@/routes/admin/database/connection/show';
 import { Link } from '@inertiajs/vue3';
 import { Database } from 'lucide-vue-next';
+import { view } from '@/routes/admin/database/connection/show';
 import type { Column, Pagination } from './types';
 
 interface Props {

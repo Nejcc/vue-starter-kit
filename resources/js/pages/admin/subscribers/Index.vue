@@ -165,12 +165,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <div class="flex flex-col gap-2 md:flex-row">
                                 <div class="relative">
                                     <Search
-                                        class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                                        class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                                     />
                                     <Input
                                         v-model="search"
                                         placeholder="Search subscribers..."
-                                        class="pl-9 w-64"
+                                        class="w-64 pl-9"
                                     />
                                 </div>
                                 <select
@@ -179,9 +179,13 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     @change="applyFilters"
                                 >
                                     <option value="">All Status</option>
-                                    <option value="subscribed">Subscribed</option>
+                                    <option value="subscribed">
+                                        Subscribed
+                                    </option>
                                     <option value="pending">Pending</option>
-                                    <option value="unsubscribed">Unsubscribed</option>
+                                    <option value="unsubscribed">
+                                        Unsubscribed
+                                    </option>
                                 </select>
                                 <select
                                     v-model="list"
@@ -205,12 +209,36 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <table class="w-full">
                                 <thead>
                                     <tr class="border-b">
-                                        <th class="px-4 py-3 text-left text-sm font-semibold">Email</th>
-                                        <th class="px-4 py-3 text-left text-sm font-semibold">Name</th>
-                                        <th class="px-4 py-3 text-left text-sm font-semibold">Status</th>
-                                        <th class="px-4 py-3 text-left text-sm font-semibold">Lists</th>
-                                        <th class="px-4 py-3 text-left text-sm font-semibold">Subscribed</th>
-                                        <th class="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-sm font-semibold"
+                                        >
+                                            Email
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-sm font-semibold"
+                                        >
+                                            Name
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-sm font-semibold"
+                                        >
+                                            Status
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-sm font-semibold"
+                                        >
+                                            Lists
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-sm font-semibold"
+                                        >
+                                            Subscribed
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-right text-sm font-semibold"
+                                        >
+                                            Actions
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -220,20 +248,31 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         class="border-b"
                                     >
                                         <td class="px-4 py-3">
-                                            <div class="flex items-center gap-2">
-                                                <Mail class="h-4 w-4 text-muted-foreground" />
+                                            <div
+                                                class="flex items-center gap-2"
+                                            >
+                                                <Mail
+                                                    class="h-4 w-4 text-muted-foreground"
+                                                />
                                                 {{ subscriber.email }}
                                             </div>
                                         </td>
                                         <td class="px-4 py-3">
                                             {{
-                                                subscriber.first_name || subscriber.last_name
+                                                subscriber.first_name ||
+                                                subscriber.last_name
                                                     ? `${subscriber.first_name || ''} ${subscriber.last_name || ''}`.trim()
                                                     : '-'
                                             }}
                                         </td>
                                         <td class="px-4 py-3">
-                                            <Badge :class="getStatusColor(subscriber.status)">
+                                            <Badge
+                                                :class="
+                                                    getStatusColor(
+                                                        subscriber.status,
+                                                    )
+                                                "
+                                            >
                                                 {{ subscriber.status }}
                                             </Badge>
                                         </td>
@@ -247,7 +286,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                     {{ l.name }}
                                                 </Badge>
                                                 <span
-                                                    v-if="subscriber.lists.length === 0"
+                                                    v-if="
+                                                        subscriber.lists
+                                                            .length === 0
+                                                    "
                                                     class="text-muted-foreground"
                                                 >
                                                     -
@@ -277,7 +319,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    @click="confirmDelete(subscriber)"
+                                                    @click="
+                                                        confirmDelete(
+                                                            subscriber,
+                                                        )
+                                                    "
                                                 >
                                                     <Trash2
                                                         class="h-4 w-4 text-destructive"
@@ -358,10 +404,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Button
-                        variant="outline"
-                        @click="deleteDialogOpen = false"
-                    >
+                    <Button variant="outline" @click="deleteDialogOpen = false">
                         Cancel
                     </Button>
                     <Button

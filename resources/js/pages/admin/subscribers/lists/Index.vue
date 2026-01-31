@@ -133,12 +133,36 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <table class="w-full">
                                 <thead>
                                     <tr class="border-b">
-                                        <th class="px-4 py-3 text-left text-sm font-semibold">Name</th>
-                                        <th class="px-4 py-3 text-left text-sm font-semibold">Subscribers</th>
-                                        <th class="px-4 py-3 text-left text-sm font-semibold">Active</th>
-                                        <th class="px-4 py-3 text-left text-sm font-semibold">Double Opt-In</th>
-                                        <th class="px-4 py-3 text-left text-sm font-semibold">Public</th>
-                                        <th class="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-sm font-semibold"
+                                        >
+                                            Name
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-sm font-semibold"
+                                        >
+                                            Subscribers
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-sm font-semibold"
+                                        >
+                                            Active
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-sm font-semibold"
+                                        >
+                                            Double Opt-In
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-sm font-semibold"
+                                        >
+                                            Public
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-right text-sm font-semibold"
+                                        >
+                                            Actions
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -148,7 +172,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         class="border-b"
                                     >
                                         <td class="px-4 py-3">
-                                            <div class="flex items-center gap-2">
+                                            <div
+                                                class="flex items-center gap-2"
+                                            >
                                                 <ListIcon
                                                     class="h-4 w-4 text-muted-foreground"
                                                 />
@@ -178,7 +204,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                 "
                                             >
                                                 {{
-                                                    list.double_opt_in ? 'Yes' : 'No'
+                                                    list.double_opt_in
+                                                        ? 'Yes'
+                                                        : 'No'
                                                 }}
                                             </Badge>
                                         </td>
@@ -190,7 +218,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                                         : 'secondary'
                                                 "
                                             >
-                                                {{ list.is_public ? 'Yes' : 'No' }}
+                                                {{
+                                                    list.is_public
+                                                        ? 'Yes'
+                                                        : 'No'
+                                                }}
                                             </Badge>
                                         </td>
                                         <td class="px-4 py-3 text-right">
@@ -334,7 +366,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         <div class="flex items-center gap-2">
                             <Checkbox
                                 id="welcome_email_enabled"
-                                v-model:checked="createForm.welcome_email_enabled"
+                                v-model:checked="
+                                    createForm.welcome_email_enabled
+                                "
                             />
                             <Label for="welcome_email_enabled"
                                 >Send welcome email</Label
@@ -396,10 +430,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Button
-                        variant="outline"
-                        @click="deleteDialogOpen = false"
-                    >
+                    <Button variant="outline" @click="deleteDialogOpen = false">
                         Cancel
                     </Button>
                     <Button

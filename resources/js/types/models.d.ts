@@ -54,3 +54,20 @@ export interface Paginator<T> extends PaginatedResponse<T> {
         active: boolean;
     }>;
 }
+
+/**
+ * Database notification interface.
+ */
+export interface DatabaseNotification {
+    id: string;
+    type: string;
+    data: {
+        title: string;
+        body: string;
+        action_url?: string | null;
+        icon?: string | null;
+    };
+    read_at: string | null;
+    created_at: string;
+    updated_at: string;
+}

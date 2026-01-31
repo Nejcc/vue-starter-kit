@@ -8,13 +8,14 @@ use App\Constants\RoleNames;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
+use App\Models\AuditLog;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
-use Spatie\Permission\Models\Role;
 
 final class UsersController extends Controller
 {
@@ -65,6 +66,7 @@ final class UsersController extends Controller
             'users' => [
                 'data' => $users->map(fn ($user) => [
                     'id' => $user->id,
+                    'slug' => $user->slug,
                     'name' => $user->name,
                     'email' => $user->email,
                     'email_verified_at' => $user->email_verified_at?->toIso8601String(),
@@ -124,6 +126,12 @@ final class UsersController extends Controller
             $user->assignRole($request->validated()['roles']);
         }
 
+        AuditLog::log('user.created', $user, null, [
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name')->toArray(),
+        ]);
+
         return redirect()->route('admin.users.index')->with('status', 'User created successfully.');
     }
 
@@ -142,6 +150,7 @@ final class UsersController extends Controller
         return Inertia::render('admin/Users/Edit', [
             'user' => [
                 'id' => $user->id,
+                'slug' => $user->slug,
                 'name' => $user->name,
                 'email' => $user->email,
                 'email_verified_at' => $user->email_verified_at?->toIso8601String(),
@@ -163,6 +172,12 @@ final class UsersController extends Controller
     {
         $this->authorizeAdmin();
 
+        $oldValues = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name')->toArray(),
+        ];
+
         $data = [
             'name' => $request->validated()['name'],
             'email' => $request->validated()['email'],
@@ -178,6 +193,14 @@ final class UsersController extends Controller
         if ($request->has('roles')) {
             $user->syncRoles($request->validated()['roles'] ?? []);
         }
+
+        $user->refresh();
+
+        AuditLog::log('user.updated', $user, $oldValues, [
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name')->toArray(),
+        ]);
 
         return redirect()->route('admin.users.index')->with('status', 'User updated successfully.');
     }
@@ -196,6 +219,11 @@ final class UsersController extends Controller
         if ($user->id === auth()->id()) {
             return redirect()->route('admin.users.index')->with('error', 'You cannot delete your own account.');
         }
+
+        AuditLog::log('user.deleted', $user, [
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
 
         $user->delete();
 

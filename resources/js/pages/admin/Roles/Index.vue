@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { create, destroy, edit, index } from '@/routes/admin/roles';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { ref } from 'vue';
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { create, destroy, edit, index } from '@/routes/admin/roles';
 import { type BreadcrumbItem } from '@/types';
 
 const page = usePage();
@@ -42,10 +42,9 @@ const props = defineProps<RolesPageProps>();
 
 const searchQuery = ref(props.filters?.search ?? '');
 const showDeleteDialog = ref(false);
-const roleToDelete = ref<{ id: number; name: string } | null>(null);
+const roleToDelete = ref<{ name: string } | null>(null);
 
 const deleteRole = (
-    roleId: number,
     roleName: string,
     isSuperAdmin: boolean,
 ): void => {
@@ -56,13 +55,13 @@ const deleteRole = (
         return;
     }
 
-    roleToDelete.value = { id: roleId, name: roleName };
+    roleToDelete.value = { name: roleName };
     showDeleteDialog.value = true;
 };
 
 const confirmDelete = (): void => {
     if (roleToDelete.value) {
-        router.delete(destroy(roleToDelete.value.id).url);
+        router.delete(destroy(roleToDelete.value.name).url);
         showDeleteDialog.value = false;
         roleToDelete.value = null;
     }
@@ -106,7 +105,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <Heading variant="small"
+                    <Heading
+                        variant="small"
                         title="Roles"
                         description="Manage application roles"
                     />
@@ -234,7 +234,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             <div class="flex items-center gap-2">
                                 <Link
                                     v-if="!role.is_super_admin"
-                                    :href="edit(role.id).url"
+                                    :href="edit(role.name).url"
                                     class="text-sm text-primary hover:underline"
                                 >
                                     Edit
@@ -251,7 +251,6 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     :disabled="role.is_super_admin"
                                     @click="
                                         deleteRole(
-                                            role.id,
                                             role.name,
                                             role.is_super_admin ?? false,
                                         )

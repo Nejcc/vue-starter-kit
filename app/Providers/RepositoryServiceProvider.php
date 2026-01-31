@@ -17,7 +17,6 @@ final class RepositoryServiceProvider extends ServiceProvider
      */
     public array $bindings = [
         UserRepositoryInterface::class => UserRepository::class,
-        \App\Contracts\Repositories\SettingsRepositoryInterface::class => \App\Repositories\SettingRepository::class,
         // Add more repository bindings here as needed
     ];
 

@@ -185,21 +185,21 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         <CardTitle>Monthly Growth</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div class="h-48 flex items-end gap-2">
+                        <div class="flex h-48 items-end gap-2">
                             <div
                                 v-for="(count, month) in monthlyGrowth"
                                 :key="month"
-                                class="flex-1 flex flex-col items-center gap-1"
+                                class="flex flex-1 flex-col items-center gap-1"
                             >
                                 <div
-                                    class="w-full bg-primary/80 rounded-t transition-all hover:bg-primary"
+                                    class="w-full rounded-t bg-primary/80 transition-all hover:bg-primary"
                                     :style="{
                                         height: `${Math.max(8, (count / Math.max(...Object.values(monthlyGrowth))) * 160)}px`,
                                     }"
                                     :title="`${month}: ${count} subscribers`"
                                 />
                                 <span
-                                    class="text-xs text-muted-foreground truncate w-full text-center"
+                                    class="w-full truncate text-center text-xs text-muted-foreground"
                                 >
                                     {{ month }}
                                 </span>
@@ -250,7 +250,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                     <!-- Top Lists -->
                     <Card>
-                        <CardHeader class="flex flex-row items-center justify-between">
+                        <CardHeader
+                            class="flex flex-row items-center justify-between"
+                        >
                             <CardTitle>Top Lists</CardTitle>
                             <Link
                                 href="/admin/subscribers/lists"
@@ -262,7 +264,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         <CardContent>
                             <div
                                 v-if="topLists.length === 0"
-                                class="text-center py-6 text-muted-foreground"
+                                class="py-6 text-center text-muted-foreground"
                             >
                                 No lists yet
                             </div>
@@ -306,7 +308,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                 <!-- Recent Subscribers -->
                 <Card>
-                    <CardHeader class="flex flex-row items-center justify-between">
+                    <CardHeader
+                        class="flex flex-row items-center justify-between"
+                    >
                         <CardTitle>Recent Subscribers</CardTitle>
                         <Link
                             href="/admin/subscribers/subscribers"
@@ -318,7 +322,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     <CardContent>
                         <div
                             v-if="recentSubscribers.length === 0"
-                            class="text-center py-6 text-muted-foreground"
+                            class="py-6 text-center text-muted-foreground"
                         >
                             No subscribers yet
                         </div>
@@ -338,7 +342,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         <p class="text-sm font-medium">
                                             {{ sub.email }}
                                         </p>
-                                        <p class="text-xs text-muted-foreground">
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                        >
                                             {{
                                                 sub.first_name || sub.last_name
                                                     ? `${sub.first_name || ''} ${sub.last_name || ''}`.trim()
@@ -351,9 +357,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     <Badge :class="getStatusColor(sub.status)">
                                         {{ sub.status }}
                                     </Badge>
-                                    <span
-                                        class="text-xs text-muted-foreground"
-                                    >
+                                    <span class="text-xs text-muted-foreground">
                                         {{
                                             new Date(
                                                 sub.created_at,

@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-vue-next';
+import {
+    BookOpen,
+    Folder,
+    LayoutGrid,
+    Menu,
+    Monitor,
+    Moon,
+    Search,
+    Sun,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import NotificationDropdown from '@/components/NotificationDropdown.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,11 +42,13 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import UserMenuContent from '@/components/UserMenuContent.vue';
+import { useAppearance } from '@/composables/useAppearance';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
 import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
+import type { Appearance } from '@/types/ui';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
@@ -73,6 +85,30 @@ const rightNavItems: NavItem[] = [
         icon: BookOpen,
     },
 ];
+
+const { appearance, updateAppearance } = useAppearance();
+
+const appearanceCycle: Record<Appearance, Appearance> = {
+    light: 'dark',
+    dark: 'system',
+    system: 'light',
+};
+
+const appearanceIcon = computed(() => {
+    if (appearance.value === 'light') return Sun;
+    if (appearance.value === 'dark') return Moon;
+    return Monitor;
+});
+
+const appearanceLabel = computed(() => {
+    if (appearance.value === 'light') return 'Light mode';
+    if (appearance.value === 'dark') return 'Dark mode';
+    return 'System theme';
+});
+
+function cycleAppearance() {
+    updateAppearance(appearanceCycle[appearance.value]);
+}
 </script>
 
 <template>
@@ -236,7 +272,33 @@ const rightNavItems: NavItem[] = [
                                 </TooltipProvider>
                             </template>
                         </div>
+
+                        <TooltipProvider :delay-duration="0">
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        class="group h-9 w-9 cursor-pointer"
+                                        @click="cycleAppearance"
+                                    >
+                                        <span class="sr-only">{{
+                                            appearanceLabel
+                                        }}</span>
+                                        <component
+                                            :is="appearanceIcon"
+                                            class="size-5 opacity-80 group-hover:opacity-100"
+                                        />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{{ appearanceLabel }}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
+
+                    <NotificationDropdown />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger :as-child="true">

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin;
 
 use App\Http\Requests\AbstractFormRequest;
+use App\Models\Role;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
 
 final class UpdateRoleRequest extends AbstractFormRequest
 {

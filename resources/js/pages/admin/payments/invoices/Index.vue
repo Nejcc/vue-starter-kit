@@ -194,9 +194,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                 <!-- Filters -->
                 <div class="flex flex-wrap items-center gap-4">
-                    <div class="relative flex-1 min-w-[200px]">
+                    <div class="relative min-w-[200px] flex-1">
                         <Search
-                            class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                            class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                         />
                         <Input
                             v-model="searchQuery"
@@ -294,7 +294,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         ({{ invoice.formatted_amount_due }} due)
                                     </span>
                                 </p>
-                                <div class="flex items-center gap-4 text-sm text-muted-foreground">
+                                <div
+                                    class="flex items-center gap-4 text-sm text-muted-foreground"
+                                >
                                     <span v-if="invoice.billing_name">
                                         {{ invoice.billing_name }}
                                     </span>
@@ -305,7 +307,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         User: {{ invoice.user.name }}
                                     </span>
                                 </div>
-                                <div class="flex items-center gap-4 text-xs text-muted-foreground">
+                                <div
+                                    class="flex items-center gap-4 text-xs text-muted-foreground"
+                                >
                                     <span>
                                         Issued:
                                         {{

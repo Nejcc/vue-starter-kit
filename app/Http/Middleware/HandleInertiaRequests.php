@@ -67,8 +67,14 @@ final class HandleInertiaRequests extends Middleware
                     'email' => $impersonator->email,
                 ] : null,
             ],
+            'auth_layout' => class_exists(\LaravelPlus\GlobalSettings\Models\Setting::class)
+                ? \LaravelPlus\GlobalSettings\Models\Setting::get('auth_layout', 'simple')
+                : 'simple',
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'modules' => $this->getInstalledModules(),
+            'notifications' => [
+                'unreadCount' => $user ? $user->unreadNotifications()->count() : 0,
+            ],
         ];
     }
 
@@ -80,6 +86,7 @@ final class HandleInertiaRequests extends Middleware
     private function getInstalledModules(): array
     {
         return [
+            'globalSettings' => Route::has('admin.settings.index'),
             'payments' => Route::has('admin.payments.dashboard'),
             'subscribers' => Route::has('admin.subscribers.index'),
             'horizon' => Route::has('horizon.index'),
