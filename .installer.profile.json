@@ -1,8 +1,0 @@
-{
-    "mode": "dev",
-    "database": "sqlite",
-    "fresh": false,
-    "officialPackages": [],
-    "laravelPlusPackages": [],
-    "thirdPartyPackages": []
-}
