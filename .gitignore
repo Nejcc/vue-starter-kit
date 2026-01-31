@@ -29,3 +29,14 @@ yarn-error.log
 /.vscode
 /.zed
 /.junie
+/.claude
+/.boost
+/.agents
+/.codex
+/.opencode
+AGENTS.md
+GEMINI.md
+CLAUDE.local.md
+CODEX.md
+OPENCODE.md
+COPILOT.md
