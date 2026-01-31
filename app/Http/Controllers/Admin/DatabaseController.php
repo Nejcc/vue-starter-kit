@@ -223,6 +223,17 @@ final class DatabaseController extends Controller
                         ]
                     );
 
+                    $maskedColumns = config('security.database_browser.masked_columns', []);
+                    $data = array_map(function (array $row) use ($maskedColumns): array {
+                        foreach ($row as $column => $value) {
+                            if ($value !== null && in_array($column, $maskedColumns, true)) {
+                                $row[$column] = str_repeat("\u{2022}", 8);
+                            }
+                        }
+
+                        return $row;
+                    }, $data);
+
                     $tableInfo['data'] = $data;
                     $tableInfo['pagination'] = [
                         'current_page' => $paginator->currentPage(),

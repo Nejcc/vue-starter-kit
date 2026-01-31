@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { decodePaginationLabel } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 
 interface User {
@@ -372,8 +373,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 size="sm"
                                 :disabled="!link.url"
                                 @click="link.url && router.get(link.url)"
-                                v-html="link.label"
-                            />
+                            >
+                                {{ decodePaginationLabel(link.label) }}
+                            </Button>
                         </div>
                     </div>
                 </div>
