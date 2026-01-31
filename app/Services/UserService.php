@@ -101,10 +101,11 @@ final class UserService extends AbstractService implements UserServiceInterface
             // Update the user
             $this->getRepository()->updateUser($user->id, $validated);
 
-            // Reset email verification if email changed
+            // Reset email verification and send new verification email if email changed
             if ($originalEmail !== $validated['email']) {
                 $user->email_verified_at = null;
                 $user->save();
+                $user->sendEmailVerificationNotification();
             }
 
             // Refresh the user to get updated data

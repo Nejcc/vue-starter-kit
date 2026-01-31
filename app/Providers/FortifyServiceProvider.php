@@ -112,6 +112,10 @@ final class FortifyServiceProvider extends ServiceProvider
         RateLimiter::for('register', fn (Request $request) => Limit::perMinute(
             (int) config('security.rate_limiting.registration', 5)
         )->by($request->ip()));
+
+        RateLimiter::for('impersonate', fn (Request $request) => Limit::perMinute(
+            (int) config('security.rate_limiting.impersonation', 5)
+        )->by(auth()->id() ?? $request->ip()));
     }
 
     /**

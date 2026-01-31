@@ -20,8 +20,7 @@ final class ImpersonateController extends Controller
     ) {
         $this->middleware('auth');
 
-        // Rate limit impersonation: 5 attempts per minute
-        $this->middleware('throttle:5,1')->only('store');
+        $this->middleware('throttle:impersonate')->only('store');
     }
 
     /**

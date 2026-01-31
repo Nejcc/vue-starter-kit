@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Constants\RoleNames;
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -426,6 +427,12 @@ final class DatabaseController extends Controller
         if ($view !== null && !in_array($view, $validViews, true)) {
             $view = null;
         }
+
+        AuditLog::log('database.viewed', null, null, [
+            'connection' => $connection,
+            'table' => $table,
+            'view' => $view ?? 'structure',
+        ]);
 
         return Inertia::render('admin/Database/Show', [
             'table' => $tableInfo,

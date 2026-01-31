@@ -32,6 +32,26 @@ final class CookieConsentController extends Controller
     }
 
     /**
+     * Sanitize decoded cookie preferences to only include valid category keys with boolean values.
+     *
+     * @param  array<string, mixed>  $preferences
+     * @return array<string, bool>
+     */
+    private function sanitizePreferences(array $preferences): array
+    {
+        $validKeys = array_keys(config('cookie.categories', []));
+
+        $sanitized = [];
+        foreach ($validKeys as $key) {
+            if (array_key_exists($key, $preferences)) {
+                $sanitized[$key] = (bool) $preferences[$key];
+            }
+        }
+
+        return $sanitized;
+    }
+
+    /**
      * Store guest cookie consent preferences in both session and browser cookie.
      */
     private function storeGuestPreferences(Request $request, array $preferences): void
@@ -64,7 +84,8 @@ final class CookieConsentController extends Controller
         if (empty($preferences)) {
             $cookieValue = $request->cookie($this->getCookieName());
             if ($cookieValue) {
-                $preferences = json_decode($cookieValue, true) ?? [];
+                $decoded = json_decode($cookieValue, true) ?? [];
+                $preferences = $this->sanitizePreferences($decoded);
                 // Restore to session
                 if (!empty($preferences)) {
                     $request->session()->put(
