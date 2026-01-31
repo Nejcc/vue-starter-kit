@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use LaravelPlus\GlobalSettings\Models\Setting;
 use Tests\TestCase;
 
 final class CookieConsentTest extends TestCase

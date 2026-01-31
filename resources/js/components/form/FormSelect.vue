@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { HTMLAttributes } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Label } from '@/components/ui/label';
 import {
@@ -8,7 +9,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import type { HTMLAttributes } from 'vue';
 
 interface SelectOption {
     value: string;

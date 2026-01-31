@@ -41,12 +41,12 @@
 </template>
 
 <script setup lang="ts">
-import { Input } from '@/components/ui/input';
-import UserCard from '@/components/UserCard.vue';
 import { Head, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { Search } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { Input } from '@/components/ui/input';
+import UserCard from '@/components/UserCard.vue';
 
 interface User {
     id: number;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
 import type { Component } from 'vue';
+import { Button } from '@/components/ui/button';
 
 interface Props {
     icon?: Component;

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import connection from '@/routes/admin/database/connection';
-import { view } from '@/routes/admin/database/connection/show';
-import { index as databasesIndex } from '@/routes/admin/databases';
 import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Database, List, Search, Settings, Table2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 import FormErrors from '@/components/FormErrors.vue';
@@ -10,8 +8,10 @@ import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import connection from '@/routes/admin/database/connection';
+import { view } from '@/routes/admin/database/connection/show';
+import { index as databasesIndex } from '@/routes/admin/databases';
 import { type BreadcrumbItem } from '@/types';
-import { Database, List, Search, Settings, Table2 } from 'lucide-vue-next';
 
 const page = usePage();
 
@@ -78,7 +78,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <Heading variant="small"
+                    <Heading
+                        variant="small"
                         title="Database Tables"
                         :description="`${props.driver.toUpperCase()} - ${props.currentConnection}`"
                     />

@@ -1,3 +1,4 @@
+import type { DatabaseNotification, PaginatedResponse } from './models';
 import type { AppPageProps } from './index';
 
 /**
@@ -119,4 +120,13 @@ export type AppearancePageProps = AppPageProps;
 export interface RegistrationPageProps extends AppPageProps {
     registrationEnabled: boolean;
     status?: string;
+}
+
+/**
+ * Notifications page props.
+ */
+export interface NotificationsPageProps extends AppPageProps {
+    notifications: PaginatedResponse<DatabaseNotification>;
+    filter: string;
+    unreadCount: number;
 }

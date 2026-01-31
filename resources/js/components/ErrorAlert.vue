@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { AlertTriangle, XCircle } from 'lucide-vue-next';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, XCircle } from 'lucide-vue-next';
 
 interface Props {
     title?: string;

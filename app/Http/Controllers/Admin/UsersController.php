@@ -7,13 +7,15 @@ namespace App\Http\Controllers\Admin;
 use App\Constants\RoleNames;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\UpdateUserRequest;
+use App\Models\AuditLog;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
-use Spatie\Permission\Models\Role;
 
 final class UsersController extends Controller
 {
@@ -64,6 +66,7 @@ final class UsersController extends Controller
             'users' => [
                 'data' => $users->map(fn ($user) => [
                     'id' => $user->id,
+                    'slug' => $user->slug,
                     'name' => $user->name,
                     'email' => $user->email,
                     'email_verified_at' => $user->email_verified_at?->toIso8601String(),
@@ -123,6 +126,107 @@ final class UsersController extends Controller
             $user->assignRole($request->validated()['roles']);
         }
 
+        AuditLog::log('user.created', $user, null, [
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name')->toArray(),
+        ]);
+
         return redirect()->route('admin.users.index')->with('status', 'User created successfully.');
+    }
+
+    /**
+     * Show the form for editing the specified user.
+     *
+     * @param  User  $user  The user to edit
+     * @return Response The Inertia response with edit form
+     */
+    public function edit(User $user): Response
+    {
+        $this->authorizeAdmin();
+
+        $roles = Role::all()->pluck('name');
+
+        return Inertia::render('admin/Users/Edit', [
+            'user' => [
+                'id' => $user->id,
+                'slug' => $user->slug,
+                'name' => $user->name,
+                'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at?->toIso8601String(),
+                'roles' => $user->roles->pluck('name')->toArray(),
+                'created_at' => $user->created_at->toIso8601String(),
+            ],
+            'roles' => $roles,
+        ]);
+    }
+
+    /**
+     * Update the specified user in storage.
+     *
+     * @param  UpdateUserRequest  $request  The validated request
+     * @param  User  $user  The user to update
+     * @return RedirectResponse Redirect to users index page
+     */
+    public function update(UpdateUserRequest $request, User $user): RedirectResponse
+    {
+        $this->authorizeAdmin();
+
+        $oldValues = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name')->toArray(),
+        ];
+
+        $data = [
+            'name' => $request->validated()['name'],
+            'email' => $request->validated()['email'],
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->validated()['password']);
+        }
+
+        $user->update($data);
+
+        // Sync roles
+        if ($request->has('roles')) {
+            $user->syncRoles($request->validated()['roles'] ?? []);
+        }
+
+        $user->refresh();
+
+        AuditLog::log('user.updated', $user, $oldValues, [
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name')->toArray(),
+        ]);
+
+        return redirect()->route('admin.users.index')->with('status', 'User updated successfully.');
+    }
+
+    /**
+     * Remove the specified user from storage.
+     *
+     * @param  User  $user  The user to delete
+     * @return RedirectResponse Redirect to users index page
+     */
+    public function destroy(User $user): RedirectResponse
+    {
+        $this->authorizeAdmin();
+
+        // Prevent deleting yourself
+        if ($user->id === auth()->id()) {
+            return redirect()->route('admin.users.index')->with('error', 'You cannot delete your own account.');
+        }
+
+        AuditLog::log('user.deleted', $user, [
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
+
+        $user->delete();
+
+        return redirect()->route('admin.users.index')->with('status', 'User deleted successfully.');
     }
 }

@@ -6,18 +6,19 @@
         "cursor",
         "gemini",
         "opencode",
-        "phpstorm"
+        "junie"
     ],
-    "editors": [
-        "claude_code",
-        "codex",
-        "cursor",
-        "gemini",
-        "opencode",
-        "phpstorm",
-        "vscode"
-    ],
-    "guidelines": [
+    "guidelines": true,
+    "herd_mcp": false,
+    "mcp": true,
+    "packages": [
         "laravel/fortify"
+    ],
+    "sail": false,
+    "skills": [
+        "wayfinder-development",
+        "inertia-vue-development",
+        "tailwindcss-development",
+        "developing-with-fortify"
     ]
 }

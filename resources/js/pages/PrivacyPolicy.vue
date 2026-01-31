@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import PublicLayout from '@/layouts/PublicLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
+import PublicLayout from '@/layouts/PublicLayout.vue';
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { dashboard, login, register } from '@/routes';
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { dashboard, login, register } from '@/routes';
 
 const page = usePage();
 const isAuthenticated = computed(() => !!page.props.auth?.user);
@@ -9,10 +9,8 @@ const canRegister = computed(() => page.props.canRegister ?? true);
 </script>
 
 <template>
-    <header
-        class="mb-4 w-full max-w-sm text-sm sm:mb-6 sm:max-w-2xl md:max-w-4xl lg:max-w-6xl"
-    >
-        <nav class="flex items-center justify-between gap-2 sm:gap-4">
+    <header class="w-full">
+        <nav class="flex items-center justify-between gap-4">
             <Link
                 href="/"
                 class="text-lg font-semibold text-[#1b1b18] sm:text-xl dark:text-[#EDEDEC]"
@@ -20,11 +18,11 @@ const canRegister = computed(() => page.props.canRegister ?? true);
             >
                 LaravelPlus
             </Link>
-            <div class="flex items-center gap-2 sm:gap-4">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <Link
                     v-if="isAuthenticated"
                     :href="dashboard()"
-                    class="inline-block rounded-sm border border-[#19140035] px-3 py-1 text-xs leading-normal text-[#1b1b18] hover:border-[#1915014a] sm:px-5 sm:py-1.5 sm:text-sm dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                    class="inline-flex items-center justify-center rounded-lg border border-[#e3e3e0] px-4 py-2 text-sm font-medium text-[#1b1b18] transition hover:border-[#19140035] hover:bg-[#f5f5f4] sm:px-5 dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] dark:hover:bg-[#1a1a19]"
                     prefetch
                 >
                     Dashboard
@@ -32,7 +30,7 @@ const canRegister = computed(() => page.props.canRegister ?? true);
                 <template v-else>
                     <Link
                         :href="login()"
-                        class="inline-block rounded-sm border border-transparent px-3 py-1 text-xs leading-normal text-[#1b1b18] hover:border-[#19140035] sm:px-5 sm:py-1.5 sm:text-sm dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                        class="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-[#1b1b18] transition hover:bg-[#f5f5f4] sm:px-5 dark:text-[#EDEDEC] dark:hover:bg-[#1a1a19]"
                         prefetch
                     >
                         Log in
@@ -40,7 +38,7 @@ const canRegister = computed(() => page.props.canRegister ?? true);
                     <Link
                         v-if="canRegister"
                         :href="register()"
-                        class="inline-block rounded-sm border border-[#19140035] px-3 py-1 text-xs leading-normal text-[#1b1b18] hover:border-[#1915014a] sm:px-5 sm:py-1.5 sm:text-sm dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                        class="inline-flex items-center justify-center rounded-lg border border-[#e3e3e0] px-4 py-2 text-sm font-medium text-[#1b1b18] transition hover:border-[#19140035] hover:bg-[#f5f5f4] sm:px-5 dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] dark:hover:bg-[#1a1a19]"
                         prefetch
                     >
                         Register

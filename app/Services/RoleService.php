@@ -1,0 +1,167 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\Constants\RoleNames;
+use App\Contracts\Services\RoleServiceInterface;
+use App\Models\AuditLog;
+use App\Models\Permission;
+use App\Models\Role;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
+
+/**
+ * Role service implementation.
+ *
+ * Provides business logic for role management including creation, updates,
+ * and deletion with super-admin protection.
+ */
+final class RoleService implements RoleServiceInterface
+{
+    /**
+     * Get all roles with permissions and optional search.
+     *
+     * @return Collection<int, array<string, mixed>>
+     */
+    public function getAll(?string $search = null): Collection
+    {
+        $query = Role::with('permissions');
+
+        if ($search) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        return $query->latest()->get()->map(fn ($role) => [
+            'id' => $role->id,
+            'name' => $role->name,
+            'is_super_admin' => $role->name === RoleNames::SUPER_ADMIN,
+            'permissions' => $role->permissions->pluck('name'),
+            'users_count' => $role->users()->count(),
+            'created_at' => $role->created_at,
+        ]);
+    }
+
+    /**
+     * Create a new role with optional permissions.
+     *
+     * @param  array<string, mixed>  $data
+     *
+     * @throws InvalidArgumentException If trying to create a super-admin role
+     */
+    public function create(array $data): Role
+    {
+        if ($data['name'] === RoleNames::SUPER_ADMIN) {
+            throw new InvalidArgumentException('The super-admin role cannot be created. It is a system role.');
+        }
+
+        return DB::transaction(function () use ($data): Role {
+            $role = Role::create(['name' => $data['name']]);
+
+            if (!empty($data['permissions']) && is_array($data['permissions'])) {
+                $role->givePermissionTo($data['permissions']);
+            }
+
+            AuditLog::log('role.created', $role, null, [
+                'name' => $role->name,
+                'permissions' => $role->permissions->pluck('name')->toArray(),
+            ]);
+
+            return $role;
+        });
+    }
+
+    /**
+     * Update a role with permissions.
+     *
+     * @param  array<string, mixed>  $data
+     *
+     * @throws InvalidArgumentException If renaming to/from super-admin
+     */
+    public function update(Role $role, array $data): Role
+    {
+        if ($role->name === RoleNames::SUPER_ADMIN && $data['name'] !== RoleNames::SUPER_ADMIN) {
+            throw new InvalidArgumentException('The super-admin role name cannot be changed.');
+        }
+
+        if ($role->name !== RoleNames::SUPER_ADMIN && $data['name'] === RoleNames::SUPER_ADMIN) {
+            throw new InvalidArgumentException('The super-admin role name cannot be used. It is a system role.');
+        }
+
+        $oldValues = [
+            'name' => $role->name,
+            'permissions' => $role->permissions->pluck('name')->toArray(),
+        ];
+
+        return DB::transaction(function () use ($role, $data, $oldValues): Role {
+            $role->update(['name' => $data['name']]);
+
+            if (isset($data['permissions']) && is_array($data['permissions'])) {
+                $role->syncPermissions($data['permissions']);
+            } else {
+                $role->syncPermissions([]);
+            }
+
+            $role->refresh();
+
+            AuditLog::log('role.updated', $role, $oldValues, [
+                'name' => $role->name,
+                'permissions' => $role->permissions->pluck('name')->toArray(),
+            ]);
+
+            return $role;
+        });
+    }
+
+    /**
+     * Delete a role.
+     *
+     * @throws InvalidArgumentException If trying to delete super-admin or role with assigned users
+     */
+    public function delete(Role $role): bool
+    {
+        if ($role->name === RoleNames::SUPER_ADMIN) {
+            throw new InvalidArgumentException('The super-admin role cannot be deleted. It is a system role with all permissions.');
+        }
+
+        $usersCount = $role->users()->count();
+        if ($usersCount > 0) {
+            throw new InvalidArgumentException(
+                "Cannot delete role \"{$role->name}\" because it is assigned to {$usersCount} user(s). Please remove all user assignments before deleting this role."
+            );
+        }
+
+        AuditLog::log('role.deleted', $role, [
+            'name' => $role->name,
+        ]);
+
+        return (bool) $role->delete();
+    }
+
+    /**
+     * Get formatted role data for editing.
+     *
+     * @return array<string, mixed>
+     */
+    public function getForEdit(Role $role): array
+    {
+        return [
+            'id' => $role->id,
+            'name' => $role->name,
+            'is_super_admin' => $role->name === RoleNames::SUPER_ADMIN,
+            'permissions' => $role->permissions->pluck('name'),
+        ];
+    }
+
+    /**
+     * Get all available permissions.
+     *
+     * @return Collection<int, string>
+     */
+    public function getAllPermissions(): Collection
+    {
+        return Permission::all()->pluck('name');
+    }
+}

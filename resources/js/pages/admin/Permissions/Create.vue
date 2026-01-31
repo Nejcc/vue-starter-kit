@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { index, store } from '@/routes/admin/permissions';
 import { Form, Head, Link } from '@inertiajs/vue3';
 
 import Heading from '@/components/Heading.vue';
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { index, store } from '@/routes/admin/permissions';
 import { type BreadcrumbItem } from '@/types';
 
 const breadcrumbItems: BreadcrumbItem[] = [
@@ -32,7 +32,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
-                <Heading variant="small"
+                <Heading
+                    variant="small"
                     title="Create New Permission"
                     description="Add a new permission to the system"
                 />

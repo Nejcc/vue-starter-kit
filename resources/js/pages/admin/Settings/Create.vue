@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { index, store } from '@/routes/admin/settings';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -18,7 +17,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
     },
     {
         title: 'Settings',
-        href: index().url,
+        href: '/admin/settings',
     },
     {
         title: 'Create',
@@ -35,13 +34,14 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
-                <Heading variant="small"
+                <Heading
+                    variant="small"
                     title="Create New Setting"
                     description="Add a new application setting"
                 />
 
                 <Form
-                    :action="store().url"
+                    action="/admin/settings"
                     method="post"
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"

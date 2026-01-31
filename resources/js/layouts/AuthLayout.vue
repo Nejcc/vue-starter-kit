@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import AuthLayout from '@/layouts/auth/AuthSimpleLayout.vue';
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import AuthSimpleLayout from '@/layouts/auth/AuthSimpleLayout.vue';
+import AuthSplitLayout from '@/layouts/auth/AuthSplitLayout.vue';
 
 defineProps<{
-    title?: string;
-    description?: string;
     cookieConsent?: any;
 }>();
+
+const page = usePage();
+const layoutComponent = computed(() =>
+    page.props.auth_layout === 'split' ? AuthSplitLayout : AuthSimpleLayout,
+);
 </script>
 
 <template>
-    <AuthLayout
-        :title="title"
-        :description="description"
-        :cookie-consent="cookieConsent"
-    >
+    <component :is="layoutComponent" :cookie-consent="cookieConsent">
         <slot />
-    </AuthLayout>
+    </component>
 </template>

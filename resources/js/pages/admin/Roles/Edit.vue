@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { destroy, index, update } from '@/routes/admin/roles';
 import { Form, Head, Link, router } from '@inertiajs/vue3';
+import { ArrowLeft } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 import Heading from '@/components/Heading.vue';
@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { destroy, index, update } from '@/routes/admin/roles';
 import { type BreadcrumbItem } from '@/types';
-import { ArrowLeft } from 'lucide-vue-next';
 
 interface Role {
     id: number;
@@ -59,7 +59,7 @@ const deleteRole = (): void => {
             `Are you sure you want to delete the role "${props.role.name}"?`,
         )
     ) {
-        router.delete(destroy(props.role.id).url);
+        router.delete(destroy(props.role.name).url);
     }
 };
 </script>
@@ -79,7 +79,8 @@ const deleteRole = (): void => {
                 </button>
                 <div class="flex items-center justify-between">
                     <div>
-                        <Heading variant="small"
+                        <Heading
+                            variant="small"
                             title="Edit Role"
                             description="Update role details"
                         />
@@ -107,7 +108,7 @@ const deleteRole = (): void => {
                 </div>
 
                 <Form
-                    :action="update.patch(role.id).url"
+                    :action="update.patch(role.name).url"
                     method="patch"
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"

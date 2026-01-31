@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Admin;
 
 use App\Constants\RoleNames;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 final class UsersControllerTest extends TestCase
@@ -361,5 +361,314 @@ final class UsersControllerTest extends TestCase
         $newUser = User::where('email', 'newuser@example.com')->first();
         $this->assertTrue($newUser->hasRole(RoleNames::USER));
         $this->assertTrue($newUser->hasRole(RoleNames::ADMIN));
+    }
+
+    // ========================================
+    // EDIT TESTS
+    // ========================================
+
+    /**
+     * Test that guests cannot access user edit form.
+     */
+    public function test_guests_cannot_access_user_edit_form(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->get(route('admin.users.edit', $user));
+
+        $response->assertRedirect(route('login'));
+    }
+
+    /**
+     * Test that regular users cannot access user edit form.
+     */
+    public function test_regular_users_cannot_access_user_edit_form(): void
+    {
+        $user = User::factory()->create();
+        $userRole = Role::create(['name' => RoleNames::USER]);
+        $user->assignRole($userRole);
+
+        $targetUser = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('admin.users.edit', $targetUser));
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * Test that super-admin can access user edit form.
+     */
+    public function test_super_admin_can_access_user_edit_form(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create(['name' => 'Target User']);
+
+        $response = $this->actingAs($admin)->get(route('admin.users.edit', $targetUser));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('admin/Users/Edit')
+            ->where('user.name', 'Target User')
+            ->has('roles')
+        );
+    }
+
+    // ========================================
+    // UPDATE TESTS
+    // ========================================
+
+    /**
+     * Test that guests cannot update users.
+     */
+    public function test_guests_cannot_update_users(): void
+    {
+        $user = User::factory()->create(['name' => 'Original Name']);
+
+        $response = $this->patch(route('admin.users.update', $user), [
+            'name' => 'Updated Name',
+            'email' => $user->email,
+        ]);
+
+        $response->assertRedirect(route('login'));
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'name' => 'Original Name']);
+    }
+
+    /**
+     * Test that regular users cannot update users.
+     */
+    public function test_regular_users_cannot_update_users(): void
+    {
+        $user = User::factory()->create();
+        $userRole = Role::create(['name' => RoleNames::USER]);
+        $user->assignRole($userRole);
+
+        $targetUser = User::factory()->create(['name' => 'Original Name']);
+
+        $response = $this->actingAs($user)->patch(route('admin.users.update', $targetUser), [
+            'name' => 'Updated Name',
+            'email' => $targetUser->email,
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('users', ['id' => $targetUser->id, 'name' => 'Original Name']);
+    }
+
+    /**
+     * Test that super-admin can update users.
+     */
+    public function test_super_admin_can_update_users(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create(['name' => 'Original Name']);
+
+        $response = $this->actingAs($admin)->patch(route('admin.users.update', $targetUser), [
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $response->assertSessionHas('status', 'User updated successfully.');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $targetUser->id,
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
+        ]);
+    }
+
+    /**
+     * Test that password is only updated when provided.
+     */
+    public function test_password_only_updated_when_provided(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create();
+        $originalPassword = $targetUser->password;
+
+        $response = $this->actingAs($admin)->patch(route('admin.users.update', $targetUser), [
+            'name' => 'Updated Name',
+            'email' => $targetUser->email,
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+
+        $targetUser->refresh();
+        $this->assertEquals($originalPassword, $targetUser->password);
+    }
+
+    /**
+     * Test that password can be updated.
+     */
+    public function test_password_can_be_updated(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create();
+        $originalPassword = $targetUser->password;
+
+        $response = $this->actingAs($admin)->patch(route('admin.users.update', $targetUser), [
+            'name' => $targetUser->name,
+            'email' => $targetUser->email,
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+
+        $targetUser->refresh();
+        $this->assertNotEquals($originalPassword, $targetUser->password);
+    }
+
+    /**
+     * Test that user roles can be updated.
+     */
+    public function test_user_roles_can_be_updated(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $userRole = Role::create(['name' => RoleNames::USER]);
+        $adminRole = Role::create(['name' => RoleNames::ADMIN]);
+
+        $targetUser = User::factory()->create();
+        $targetUser->assignRole(RoleNames::USER);
+
+        $response = $this->actingAs($admin)->patch(route('admin.users.update', $targetUser), [
+            'name' => $targetUser->name,
+            'email' => $targetUser->email,
+            'roles' => [RoleNames::ADMIN],
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+
+        $targetUser->refresh();
+        $this->assertFalse($targetUser->hasRole(RoleNames::USER));
+        $this->assertTrue($targetUser->hasRole(RoleNames::ADMIN));
+    }
+
+    /**
+     * Test that update validates unique email.
+     */
+    public function test_update_validates_unique_email(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $existingUser = User::factory()->create(['email' => 'existing@example.com']);
+        $targetUser = User::factory()->create(['email' => 'original@example.com']);
+
+        $response = $this->actingAs($admin)->patch(route('admin.users.update', $targetUser), [
+            'name' => $targetUser->name,
+            'email' => 'existing@example.com',
+        ]);
+
+        $response->assertSessionHasErrors(['email']);
+    }
+
+    /**
+     * Test that update allows same email.
+     */
+    public function test_update_allows_same_email(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create(['email' => 'test@example.com']);
+
+        $response = $this->actingAs($admin)->patch(route('admin.users.update', $targetUser), [
+            'name' => 'Updated Name',
+            'email' => 'test@example.com',
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $this->assertDatabaseHas('users', [
+            'id' => $targetUser->id,
+            'name' => 'Updated Name',
+            'email' => 'test@example.com',
+        ]);
+    }
+
+    // ========================================
+    // DELETE TESTS
+    // ========================================
+
+    /**
+     * Test that guests cannot delete users.
+     */
+    public function test_guests_cannot_delete_users(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->delete(route('admin.users.destroy', $user));
+
+        $response->assertRedirect(route('login'));
+        $this->assertDatabaseHas('users', ['id' => $user->id]);
+    }
+
+    /**
+     * Test that regular users cannot delete users.
+     */
+    public function test_regular_users_cannot_delete_users(): void
+    {
+        $user = User::factory()->create();
+        $userRole = Role::create(['name' => RoleNames::USER]);
+        $user->assignRole($userRole);
+
+        $targetUser = User::factory()->create();
+
+        $response = $this->actingAs($user)->delete(route('admin.users.destroy', $targetUser));
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('users', ['id' => $targetUser->id]);
+    }
+
+    /**
+     * Test that super-admin can delete users.
+     */
+    public function test_super_admin_can_delete_users(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create();
+
+        $response = $this->actingAs($admin)->delete(route('admin.users.destroy', $targetUser));
+
+        $response->assertRedirect(route('admin.users.index'));
+        $response->assertSessionHas('status', 'User deleted successfully.');
+
+        $this->assertDatabaseMissing('users', ['id' => $targetUser->id]);
+    }
+
+    /**
+     * Test that users cannot delete themselves.
+     */
+    public function test_users_cannot_delete_themselves(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $response = $this->actingAs($admin)->delete(route('admin.users.destroy', $admin));
+
+        $response->assertRedirect(route('admin.users.index'));
+        $response->assertSessionHas('error', 'You cannot delete your own account.');
+
+        $this->assertDatabaseHas('users', ['id' => $admin->id]);
     }
 }

@@ -6,6 +6,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Constants\RoleNames;
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -45,6 +49,28 @@ final class AdminController extends Controller
     {
         $this->authorizeAdmin();
 
-        return Inertia::render('admin/Dashboard');
+        $stats = [
+            'totalUsers' => User::query()->count(),
+            'verifiedUsers' => User::query()->whereNotNull('email_verified_at')->count(),
+            'totalRoles' => Role::query()->count(),
+            'totalPermissions' => Permission::query()->count(),
+        ];
+
+        $recentUsers = User::query()
+            ->latest()
+            ->limit(5)
+            ->get(['id', 'name', 'email', 'created_at']);
+
+        $recentActivity = AuditLog::query()
+            ->with('user:id,name,email')
+            ->latest()
+            ->limit(10)
+            ->get(['id', 'user_id', 'event', 'auditable_type', 'auditable_id', 'created_at']);
+
+        return Inertia::render('admin/Dashboard', [
+            'stats' => $stats,
+            'recentUsers' => $recentUsers,
+            'recentActivity' => $recentActivity,
+        ]);
     }
 }

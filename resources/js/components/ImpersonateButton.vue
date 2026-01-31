@@ -17,14 +17,14 @@
 </template>
 
 <script setup lang="ts">
+import { usePage } from '@inertiajs/vue3';
+import { UserRound } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { usePage } from '@inertiajs/vue3';
-import { UserRound } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
 import ImpersonateModal from './ImpersonateModal.vue';
 
 interface User {

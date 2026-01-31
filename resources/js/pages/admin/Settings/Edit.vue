@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { destroy, index, update } from '@/routes/admin/settings';
 import { Form, Head, Link, router } from '@inertiajs/vue3';
+import { ArrowLeft } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 import Heading from '@/components/Heading.vue';
@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { ArrowLeft } from 'lucide-vue-next';
 
 interface Setting {
     id: number;
@@ -36,7 +35,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
     },
     {
         title: 'Settings',
-        href: index().url,
+        href: '/admin/settings',
     },
     {
         title: 'Edit',
@@ -75,7 +74,7 @@ const deleteSetting = (): void => {
             `Are you sure you want to delete the setting "${props.setting.key}"?`,
         )
     ) {
-        router.delete(destroy(props.setting.id).url);
+        router.delete(`/admin/settings/${props.setting.key}`);
     }
 };
 </script>
@@ -95,7 +94,8 @@ const deleteSetting = (): void => {
                 </button>
                 <div class="flex items-center justify-between">
                     <div>
-                        <Heading variant="small"
+                        <Heading
+                            variant="small"
                             title="Edit Setting"
                             description="Update setting details"
                         />
@@ -125,8 +125,8 @@ const deleteSetting = (): void => {
                 </div>
 
                 <Form
-                    :action="update.patch(setting.id).url"
-                    method="patch"
+                    :action="`/admin/settings/${setting.key}`"
+                    method="put"
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                     :data="formData"
@@ -266,7 +266,7 @@ const deleteSetting = (): void => {
                             Update Setting
                         </Button>
                         <Link
-                            :href="index().url"
+                            href="/admin/settings"
                             class="text-sm text-muted-foreground hover:underline"
                         >
                             Cancel

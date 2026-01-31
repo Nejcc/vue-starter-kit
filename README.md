@@ -6,127 +6,121 @@
 [![Inertia](https://img.shields.io/badge/Inertia-2.x-9553E9.svg)](https://inertiajs.com)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A modern, production-ready starter kit for building Laravel applications with Vue 3 frontend using Inertia.js. This kit provides a robust foundation with TypeScript, Tailwind CSS, and shadcn-vue components.
+A modern, production-ready starter kit for building Laravel applications with Vue 3 frontend using Inertia.js. Ships with authentication, admin panel, payment processing, email subscriptions, GDPR compliance, and more.
 
-## 🚀 Features
+## Features
 
-- **Laravel 12** with PHP 8.4+ support
+### Frontend Stack
 - **Vue 3** with Composition API and TypeScript
-- **Inertia.js 2** for seamless SPA experience
-- **Tailwind CSS 4** for utility-first styling
-- **shadcn-vue** component library with Reka UI
-- **Laravel Fortify** for authentication
+- **Inertia.js v2** for seamless SPA experience with deferred props, prefetching, and polling
+- **Tailwind CSS v4** with custom breakpoints (xs/sm/md/lg)
+- **shadcn-vue** component library built on Reka UI
+- **Vite** with hot module replacement and code splitting
+- **VueUse** composition utilities
+- **Lucide Vue** icon library
 - **Server-Side Rendering (SSR)** support
-- **Repository Pattern** implementation
-- **ESLint & Prettier** for code quality
-- **Vite** for lightning-fast development
+- **Dark mode** with appearance settings
 
-## 📝 What's Changed from Base Laravel
+### Authentication & Security (Laravel Fortify)
+- Login with email/password and "remember me"
+- User registration (toggleable via global settings)
+- Email verification flow
+- Password reset functionality
+- Two-factor authentication (TOTP) with QR codes and recovery codes
+- Password confirmation for sensitive operations
+- Session management with last login tracking
+- Rate limiting on authentication endpoints
 
-This starter kit extends the base Laravel installation with the following additions and modifications:
+### Role-Based Access Control (Spatie Permission)
+- Three built-in roles: super-admin, admin, user
+- Granular permission management with grouping
+- Role-permission association
+- Super-admin auto-granted all permissions via Gate
+- Middleware-based route protection
 
-### 🎨 Frontend Stack
-- **Inertia.js v2** - Complete SPA setup with Vue 3 adapter
-- **Vue 3** with Composition API and TypeScript support
-- **Tailwind CSS v4** - Modern utility-first CSS framework
-- **shadcn-vue** - Beautiful component library built on Reka UI
-- **Vite** - Modern build tool replacing Laravel Mix
-- **TypeScript** - Full type safety for frontend code
-- **VueUse** - Essential Vue composition utilities
-- **Lucide Vue** - Modern icon library
+### Admin Panel
+- **Dashboard** with user stats, role/permission counts, recent activity
+- **User Management** — CRUD with role assignment, search, pagination, slug generation
+- **Role Management** — Create, edit, delete roles with permission assignment
+- **Permission Management** — Granular permission control with grouping
+- **Settings Management** — Dynamic key-value settings with field types and role-based access
+- **Database Browser** — View tables, columns, indexes, foreign keys, and data across multiple database engines
+- **Audit Log Viewer** — Search and filter audit trail by event, user, or IP address
+- **Impersonation** — Login as other users for debugging (super-admin/admin only) with audit logging
 
-### 🔐 Authentication & Security
-- **Laravel Fortify** - Headless authentication backend
-- **Two-Factor Authentication (2FA)** - QR code-based 2FA with recovery codes
-- **Email Verification** - Built-in email verification flow
-- **Password Reset** - Complete password reset functionality
-- **Cookie Consent** - GDPR-compliant cookie consent system
+### Payment Gateway (Multi-Provider)
+- **Providers**: Stripe, PayPal, Coinbase Commerce (crypto), bank transfer, cash on delivery
+- **Subscriptions**: Plans with trial periods, cancellation, grace periods, monthly/yearly billing
+- **Invoices**: Automatic generation, PDF export (DomPDF/Browsershot), line items, multiple states
+- **Refunds**: Full and partial refund processing with tracking
+- **Webhooks**: Automatic handling for Stripe, PayPal, and Coinbase
+- **Email Notifications**: Payment receipts, failure alerts, subscription confirmations, trial reminders
+- **Admin Panel**: Payment dashboard, customer/invoice/plan/subscription/transaction management
+- **Artisan Commands**: `payment-gateway:install`, `payment-gateway:sync-plans`, `payment-gateway:trial-reminders`, `payment-gateway:cleanup-subscriptions`
 
-### 🏛️ Architecture Patterns
-- **Repository Pattern** - `AbstractRepository` with built-in caching
-- **Service Pattern** - `AbstractService` with transaction support
-- **Action Pattern** - Single-responsibility action classes
-- **Contract Interfaces** - Type-safe interfaces for all layers
-- **Facades** - Application-specific facades for easy access
+### Email Subscriptions & Newsletters
+- Subscriber management with search and bulk operations
+- Subscription list creation and organization
+- **Multi-provider support**: Brevo, Mailchimp, HubSpot, ConvertKit
+- Admin panel with subscriber dashboard, listing, and list management
 
-### 📁 Directory Structure
-- `app/Actions/` - Business logic actions (User, Fortify)
-- `app/Contracts/` - Interface definitions
-- `app/Facades/` - Application facades
-- `app/Repositories/` - Data access layer
-- `app/Services/` - Business logic layer
-- `resources/js/pages/` - Inertia page components
-- `resources/js/components/` - Reusable Vue components (PublicHeader, PublicFooter, etc.)
-- `resources/js/composables/` - Vue composition functions
-- `resources/js/layouts/` - Layout components (PublicLayout, AuthLayout, etc.)
-- `resources/js/types/` - TypeScript type definitions (pages, models, forms)
+### Global Settings
+- Key-value settings store with typed fields (input, checkbox, multioptions)
+- Role-based access control (system, user, plugin)
+- Admin CRUD with search and bulk update
+- Facade access: `GlobalSettings::get()`, `GlobalSettings::set()`
+- Audit log integration
 
-### 🛠️ Development Tools
-- **Laravel Pint** - PHP code style fixer
-- **Laravel Pail** - Real-time log viewer
-- **Laravel Debugbar** - Development debugging toolbar
-- **ESLint** - JavaScript/TypeScript linting
-- **Prettier** - Code formatting
-- **TypeScript ESLint** - TypeScript-specific linting rules
-- **Concurrently** - Run multiple dev processes simultaneously
+### Notifications System
+- Database-backed notifications with UUID primary keys
+- Read/unread status with filtering
+- Mark single or all as read
+- Delete individual notifications
+- Unread count and recent notifications dropdown
 
-### 🚀 Development Experience
-- **Automated Setup Script** - `composer run setup` for one-command installation
-- **Concurrent Dev Server** - `composer run dev` runs server, queue, logs, and Vite together
-- **SSR Support** - Server-side rendering for improved performance
-- **Hot Module Replacement** - Instant frontend updates during development
-- **TypeScript Support** - Full type checking and IntelliSense
-- **Link Prefetching** - Automatic prefetching for faster navigation
-- **Mobile-First Design** - Responsive design starting from mobile screens
-- **Code Splitting** - Optimized bundle sizes with manual chunks
+### GDPR & Cookie Consent
+- Granular cookie consent by category (essential, analytics, marketing, custom)
+- Accept all / reject all / selective preferences
+- Guest storage via session + browser cookies, authenticated via database
+- GDPR mode with data processing consent during registration
+- Consent audit logging with IP tracking
+- Cookie and privacy policy pages
+- Configurable cookie lifetime (365 days default)
 
-### 🧪 Testing
-- **PHPUnit** - Comprehensive test suite
-- **Feature Tests** - Full HTTP endpoint testing
-- **Unit Tests** - Individual class and method testing
-- **GitHub Actions CI** - Automated testing on push/PR
+### Audit Logging
+- Polymorphic audit trail tracking user, event, old/new values, IP, and user agent
+- Tracked events: user CRUD, role/permission changes, impersonation, settings changes, payment transactions, consent changes
+- Admin viewer with search, filtering, and pagination
 
-### 📦 Additional Packages
-- **Laravel Wayfinder** - Route organization and type-safe route generation
-- **Laravel Boost** - Enhanced development tools (MCP server)
-- **Laravel Sail** - Docker development environment
-- **Laravel Updater** - Application update system
+### User Settings Pages
+- Profile editing (name, email)
+- Password management with throttling
+- Two-factor authentication setup/teardown
+- Appearance/theme preferences
+- Cookie consent preferences
+- Account deletion with password confirmation
 
-### 🎯 Pre-built Features
-- **Dashboard** - Starter dashboard page
-- **User Settings** - Profile, password, and 2FA management pages
-- **Authentication Pages** - Login, register, password reset, email verification
-- **Cookie Preferences** - User-configurable cookie consent
-- **Appearance Settings** - Theme switching (light/dark mode)
-- **Privacy Policy** - GDPR-compliant privacy policy page
-- **Cookie Policy** - Comprehensive cookie policy page
-- **Public Layout Components** - Reusable header and footer components
+## Architecture
 
-### 🔧 Configuration
-- **Fortify Configuration** - Pre-configured authentication features
-- **Inertia Configuration** - SSR and shared data setup
-- **Tailwind v4 Configuration** - Modern CSS setup with custom breakpoints
-  - **xs**: < 768px (phones)
-  - **sm**: >= 768px (tablets)
-  - **md**: >= 992px (small laptops)
-  - **lg**: >= 1200px (laptops and desktops)
-- **TypeScript Configuration** - Strict type checking
-- **ESLint Configuration** - Vue 3 + TypeScript rules
-- **Prettier Configuration** - Consistent code formatting
-- **Vite Build Optimization** - Code splitting and chunk optimization
+### Backend Layer Flow
+```
+Controllers -> Services -> Repositories -> Models
+     |
+  Actions (single-responsibility operations)
+```
 
-### 📝 Code Quality
-- **Strict TypeScript** - Type safety across frontend
-- **PHP Type Hints** - Full type declarations in PHP 8.4
-- **PHPDoc Blocks** - Comprehensive documentation for all classes and methods
-- **Code Formatting** - Automated with Pint and Prettier
-- **Linting** - ESLint for frontend, Pint for backend
-- **Reusable Components** - DRY principle with shared components (PublicHeader, PublicFooter)
-- **Type Definitions** - Complete TypeScript types for pages, models, and forms
+- **Repositories** (`app/Repositories/`) — Extend `AbstractRepository` with built-in caching (3600s TTL), CRUD, and query building
+- **Services** (`app/Services/`) — Extend `AbstractService` with transaction support, bound via contracts
+- **Actions** (`app/Actions/`) — Single-responsibility classes implementing `ActionInterface`, organized by domain
 
-## 📋 Prerequisites
+### Frontend Structure
+- **Pages** (`resources/js/pages/`) — 57+ Inertia page components organized by feature
+- **Layouts** (`resources/js/layouts/`) — AppLayout, AuthLayout, PublicLayout, AdminLayout with sidebar/header/card/split variants
+- **Components** (`resources/js/components/`) — shadcn-vue UI components
+- **Wayfinder** (`resources/js/actions/`) — Auto-generated TypeScript route functions
+- **Types** (`resources/js/types/`) — TypeScript interfaces for page props, models, forms
 
-Before you begin, ensure you have the following installed:
+## Prerequisites
 
 - **PHP 8.4+** with required extensions
 - **Composer** (latest version)
@@ -134,302 +128,158 @@ Before you begin, ensure you have the following installed:
 - **SQLite** (default) or MySQL/PostgreSQL
 - **Git**
 
-## 🛠️ Installation
+## Installation
 
 ### Quick Start
 
-The fastest way to get started is using the setup script:
-
 ```bash
-# Clone the repository
 git clone <repository-url> your-project-name
 cd your-project-name
-
-# Run the automated setup script
 composer run setup
 ```
 
-This script will:
-- Install PHP dependencies
-- Copy `.env.example` to `.env` if it doesn't exist
-- Generate application key
-- Run migrations
-- Install Node.js dependencies
-- Build frontend assets
+The setup script installs PHP and Node dependencies, copies `.env.example`, generates the app key, runs migrations, and builds frontend assets.
 
 ### Manual Installation
 
-If you prefer to set up manually:
-
 ```bash
-# Clone the repository
-git clone <repository-url> your-project-name
-cd your-project-name
-
-# Install PHP dependencies
 composer install
-
-# Install Node.js dependencies
 npm install
-
-# Setup environment
 cp .env.example .env
 php artisan key:generate
-
-# Create database (SQLite)
 touch database/database.sqlite
-
-# Run migrations
 php artisan migrate
-
-# Build assets
 npm run build
 ```
-
-### Development Setup
-
-For development with hot reloading:
-
-```bash
-# Start all development services
-composer run dev
-```
-
-This command runs:
-- Laravel development server
-- Queue worker
-- Log viewer (Pail)
-- Vite dev server with hot reload
-
-### SSR Development
-
-For Server-Side Rendering development:
-
-```bash
-# Build SSR assets and start development
-composer run dev:ssr
-```
-
-## 🏗️ Project Structure
-
-```
-├── app/
-│   ├── Actions/          # Business logic actions (User, Fortify)
-│   ├── Contracts/        # Interfaces (Repository, Service, Action)
-│   ├── Facades/          # Application facades
-│   ├── Http/
-│   │   ├── Controllers/  # Application controllers
-│   │   ├── Middleware/   # Custom middleware
-│   │   └── Requests/     # Form request validation
-│   ├── Models/           # Eloquent models
-│   ├── Providers/        # Service providers
-│   ├── Repositories/     # Data access layer (Repository Pattern)
-│   └── Services/         # Business logic layer (Service Pattern)
-├── resources/
-│   ├── js/
-│   │   ├── components/   # Vue components (shadcn-vue)
-│   │   ├── composables/  # Vue composables
-│   │   ├── layouts/      # Inertia layouts
-│   │   ├── pages/        # Inertia pages
-│   │   └── types/        # TypeScript type definitions
-│   └── css/              # Global styles
-├── routes/
-│   ├── web.php           # Web routes
-│   └── settings.php      # Settings routes
-└── tests/                # Feature and unit tests
-```
-
-## 🎯 Available Commands
 
 ### Development
+
 ```bash
-# Start development server with hot reload
-composer run dev
-
-# Start development with SSR
-composer run dev:ssr
-
-# Run tests
-composer run test
+composer run dev        # Starts Laravel server, queue worker, Pail log viewer, and Vite
+composer run dev:ssr    # Same with SSR enabled
 ```
 
-### Frontend
+## Commands
+
+### Testing
 ```bash
-# Start Vite dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Build with SSR
-npm run build:ssr
-
-# Format code
-npm run format
-
-# Lint code
-npm run lint
+php artisan test --compact                                # Run all tests
+php artisan test --compact tests/Feature/ExampleTest.php  # Run single file
+php artisan test --compact --filter=testName              # Run single test
 ```
 
-### Laravel
+### Code Formatting & Linting
 ```bash
-# Run migrations
-php artisan migrate
-
-# Clear caches
-php artisan config:clear
-php artisan cache:clear
-php artisan view:clear
-php artisan route:clear
-
-# Generate application key
-php artisan key:generate
-
-# Format PHP code (Laravel Pint)
-vendor/bin/pint
-
-# Format only changed files
-vendor/bin/pint --dirty
+vendor/bin/pint --dirty   # Format changed PHP files
+vendor/bin/pint           # Format all PHP files
+npm run lint              # ESLint
+npm run format            # Prettier
 ```
 
-## 🏛️ Architecture
-
-This starter kit follows a clean architecture pattern with clear separation of concerns:
-
-### Repository Pattern
-- **AbstractRepository**: Base repository with caching, CRUD operations, and query building
-- **RepositoryInterface**: Contract defining repository methods
-- Repositories handle all database interactions and provide a clean abstraction layer
-
-### Service Pattern
-- **AbstractService**: Base service with transaction support and validation helpers
-- Services contain business logic and orchestrate repository operations
-- Services can be easily tested and swapped without affecting controllers
-
-### Action Pattern
-- Actions encapsulate single, focused business operations
-- Actions are reusable and can be composed to build complex workflows
-- Used for user management, authentication, and other domain operations
-
-### Layer Flow
-```
-Controllers → Services → Repositories → Models
-     ↓
-  Actions (when needed)
+### Frontend Build
+```bash
+npm run build             # Production build
+npm run build:ssr         # SSR build
 ```
 
-## 🎨 Tech Stack
+### Payment Gateway
+```bash
+php artisan payment-gateway:install            # Interactive installer
+php artisan payment-gateway:sync-plans         # Sync plans to provider
+php artisan payment-gateway:trial-reminders    # Send trial ending reminders
+php artisan payment-gateway:cleanup-subscriptions  # Clean expired subscriptions
+```
+
+## Project Structure
+
+```
+app/
+├── Actions/          # Single-responsibility business operations
+├── Contracts/        # Interfaces (Repository, Service, Action)
+├── Facades/          # Application facades
+├── Http/
+│   ├── Controllers/  # Web and admin controllers
+│   ├── Middleware/    # Custom middleware
+│   └── Requests/     # Form request validation
+├── Models/           # Eloquent models
+├── Providers/        # Service providers
+├── Repositories/     # Data access layer (Repository Pattern)
+└── Services/         # Business logic layer (Service Pattern)
+
+packages/
+├── nejcc/payment-gateway/   # Multi-provider payment processing
+└── nejcc/subscribe/         # Email subscription management
+
+resources/js/
+├── components/       # Vue components (shadcn-vue in ui/)
+├── composables/      # Vue composition functions
+├── layouts/          # Layout components (9+ variants)
+├── pages/            # Inertia page components (57+ pages)
+└── types/            # TypeScript type definitions
+
+routes/
+├── web.php           # Main web routes (47+ routes)
+└── settings.php      # User settings routes
+```
+
+## Custom Packages
+
+| Package | Description |
+|---------|-------------|
+| `laravelplus/global-settings` | Key-value settings with admin panel and role-based access |
+| `nejcc/payment-gateway` | Multi-provider payments, subscriptions, invoices, refunds, webhooks |
+| `nejcc/subscribe` | Email subscriptions with Brevo, Mailchimp, HubSpot, ConvertKit support |
+
+## Tech Stack
 
 ### Backend
-- **Laravel 12** - PHP framework
-- **PHP 8.4+** - Programming language
-- **Laravel Fortify** - Authentication scaffolding
-- **Laravel Wayfinder** - Route organization
-- **Inertia.js Laravel** - Server-side adapter
+- Laravel 12, PHP 8.4+, Laravel Fortify, Spatie Permission, Laravel Wayfinder, Laravel Horizon, Inertia.js (server adapter)
 
 ### Frontend
-- **Vue 3** - Progressive JavaScript framework
-- **TypeScript** - Type-safe JavaScript
-- **Inertia.js Vue3** - Client-side adapter
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **shadcn-vue** - Component library
-- **Reka UI** - Headless UI components
-- **Lucide Vue** - Icon library
-- **VueUse** - Vue composition utilities
+- Vue 3, TypeScript, Inertia.js v2 (client adapter), Tailwind CSS 4, shadcn-vue, Reka UI, Lucide Vue, VueUse
 
 ### Development Tools
-- **Vite** - Build tool and dev server
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-- **TypeScript ESLint** - TypeScript linting
-- **Laravel Pint** - PHP code style fixer
-- **Laravel Pail** - Real-time log viewer
-- **Laravel Debugbar** - Development debugging toolbar
+- Vite, ESLint 9, Prettier 3, Laravel Pint, Laravel Pail, Laravel Debugbar, Laravel Boost (MCP), PHPUnit 11
 
-## 🔧 Configuration
+## Testing
+
+PHPUnit with feature and unit tests. Uses in-memory SQLite and model factories.
+
+```bash
+php artisan test --compact              # All tests
+php artisan test --compact --filter=X   # Specific test
+```
+
+GitHub Actions CI runs tests automatically on push and pull request.
+
+## Configuration
 
 ### Environment Variables
-
-Key environment variables to configure:
 
 ```env
 APP_NAME="Your App Name"
 APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://localhost:8000
-
 DB_CONNECTION=sqlite
-DB_DATABASE=database/database.sqlite
-
-MAIL_MAILER=log
 ```
 
-### Tailwind Configuration
+### Tailwind CSS v4 Breakpoints
 
-The project uses Tailwind CSS 4 with custom configuration. Styles are located in `resources/css/app.css`.
+| Breakpoint | Size | Target |
+|------------|------|--------|
+| xs | < 768px | Phones |
+| sm | >= 768px | Tablets |
+| md | >= 992px | Small laptops |
+| lg | >= 1200px | Desktops |
 
-### Component Library
-
-shadcn-vue components are configured in `components.json`. Add new components using:
+### Adding shadcn-vue Components
 
 ```bash
 npx shadcn-vue@latest add [component-name]
 ```
 
-### Repository & Service Pattern
-
-When creating new features, follow the established architecture:
-
-1. **Create Model**: `php artisan make:model ModelName -m`
-2. **Create Repository**: Extend `AbstractRepository` in `app/Repositories/`
-3. **Create Service**: Extend `AbstractService` in `app/Services/`
-4. **Create Actions**: Implement `ActionInterface` in `app/Actions/`
-5. **Create Controller**: Use services in controllers, not repositories directly
-
-Example repository usage:
-```php
-// In a Service
-$user = $this->repository->find($id);
-$users = $this->repository->paginate(15);
-```
-
-Example service usage:
-```php
-// In a Controller
-$user = app(UserService::class)->getUser($id);
-```
-
-## 🧪 Testing
-
-This project uses PHPUnit for testing. All tests are located in the `tests/` directory.
-
-### Running Tests
-
-```bash
-# Run all tests
-composer run test
-
-# Run specific test file
-php artisan test tests/Feature/ExampleTest.php
-
-# Run specific test by name
-php artisan test --filter=TestName
-
-# Run with coverage (if configured)
-php artisan test --coverage
-```
-
-### Test Structure
-- **Feature Tests**: Located in `tests/Feature/` - Test complete features and HTTP endpoints
-- **Unit Tests**: Located in `tests/Unit/` - Test individual classes and methods
-
-### CI/CD
-The project includes a GitHub Actions workflow (`.github/workflows/ci.yml`) that:
-- Runs tests on PHP 8.4
-- Validates composer.json
-- Ensures code quality on every push and pull request
-
-## 📚 Documentation
+## Documentation
 
 - [Laravel Documentation](https://laravel.com/docs)
 - [Vue 3 Documentation](https://vuejs.org/guide/)
@@ -437,9 +287,7 @@ The project includes a GitHub Actions workflow (`.github/workflows/ci.yml`) that
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [shadcn-vue Documentation](https://www.shadcn-vue.com/)
 
-## 🤝 Contributing
-
-Thank you for considering contributing to this starter kit! Please review our contribution guidelines:
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -447,14 +295,6 @@ Thank you for considering contributing to this starter kit! Please review our co
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-## 🙏 Acknowledgments
-
-- [Laravel](https://laravel.com/) for the amazing PHP framework
-- [Vue.js](https://vuejs.org/) for the progressive JavaScript framework
-- [Inertia.js](https://inertiajs.com/) for bridging Laravel and Vue
-- [Tailwind CSS](https://tailwindcss.com/) for the utility-first CSS framework
-- [shadcn-vue](https://www.shadcn-vue.com/) for the beautiful component library

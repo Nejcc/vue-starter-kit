@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Contracts\Repositories\SettingsRepositoryInterface;
 use App\Http\Controllers\CookieConsentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use LaravelPlus\GlobalSettings\Contracts\SettingsRepositoryInterface;
 
 Route::get('/', function () {
     try {
@@ -22,7 +22,7 @@ Route::get('/', function () {
 
 Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-// Quick login for development - only available in local environment
+// Quick login & register for development - only available in local environment
 if (app()->environment('local')) {
     Route::post('quick-login/{userId}', function (int $userId) {
         $user = App\Models\User::find($userId);
@@ -38,6 +38,29 @@ if (app()->environment('local')) {
 
         return redirect()->intended('dashboard');
     })->name('quick-login');
+
+    Route::post('quick-register/{role}', function (string $role) {
+        $allowedRoles = ['super-admin', 'admin', 'user'];
+
+        if (!in_array($role, $allowedRoles, true)) {
+            return back()->withErrors([
+                'role' => "Invalid role: {$role}.",
+            ]);
+        }
+
+        $user = App\Models\User::factory()->create([
+            'name' => ucfirst($role) . ' ' . fake()->firstName(),
+            'email' => $role . '-' . fake()->unique()->numerify('###') . '@example.com',
+            'email_verified_at' => now(),
+        ]);
+
+        $user->assignRole($role);
+
+        Illuminate\Support\Facades\Auth::login($user);
+        \request()->session()->regenerate();
+
+        return redirect()->intended('dashboard');
+    })->name('quick-register');
 }
 
 // Cookie Consent Routes
@@ -64,16 +87,26 @@ Route::middleware(['auth'])->prefix('impersonate')->name('impersonate.')->group(
     Route::delete('/', [App\Http\Controllers\ImpersonateController::class, 'destroy'])->name('destroy');
 });
 
+// Notification routes - accessible to all authenticated users
+Route::middleware(['auth'])->prefix('notifications')->name('notifications.')->group(function (): void {
+    Route::get('/', [App\Http\Controllers\NotificationsController::class, 'index'])->name('index');
+    Route::get('/recent', [App\Http\Controllers\NotificationsController::class, 'recent'])->name('recent');
+    Route::patch('/{id}/read', [App\Http\Controllers\NotificationsController::class, 'markAsRead'])->name('mark-as-read');
+    Route::post('/mark-all-read', [App\Http\Controllers\NotificationsController::class, 'markAllAsRead'])->name('mark-all-read');
+    Route::delete('/{id}', [App\Http\Controllers\NotificationsController::class, 'destroy'])->name('destroy');
+});
+
 require __DIR__.'/settings.php';
 
 // Admin routes - only accessible to super-admin or admin roles
 Route::middleware(['auth', 'role:super-admin,admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', [App\Http\Controllers\Admin\AdminController::class, 'index'])->name('index');
-    Route::resource('settings', App\Http\Controllers\Admin\SettingsController::class)->except(['show']);
-    Route::patch('settings/bulk', [App\Http\Controllers\Admin\SettingsController::class, 'bulkUpdate'])->name('settings.bulk-update');
     Route::get('users', [App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
     Route::get('users/create', [App\Http\Controllers\Admin\UsersController::class, 'create'])->name('users.create');
     Route::post('users', [App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');
+    Route::get('users/{user}/edit', [App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('users.edit');
+    Route::patch('users/{user}', [App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
+    Route::delete('users/{user}', [App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy');
     Route::get('roles', [App\Http\Controllers\Admin\RolesController::class, 'index'])->name('roles.index');
     Route::get('roles/create', [App\Http\Controllers\Admin\RolesController::class, 'create'])->name('roles.create');
     Route::post('roles', [App\Http\Controllers\Admin\RolesController::class, 'store'])->name('roles.store');
@@ -90,4 +123,5 @@ Route::middleware(['auth', 'role:super-admin,admin'])->prefix('admin')->name('ad
     Route::get('database/{connection}/{table}', [App\Http\Controllers\Admin\DatabaseController::class, 'show'])->name('database.connection.show');
     Route::get('database/{connection}/{table}/{view}', [App\Http\Controllers\Admin\DatabaseController::class, 'show'])->name('database.connection.show.view');
     Route::get('databases', [App\Http\Controllers\Admin\DatabaseController::class, 'listConnections'])->name('databases.index');
+    Route::get('audit-logs', [App\Http\Controllers\Admin\AuditLogsController::class, 'index'])->name('audit-logs.index');
 });

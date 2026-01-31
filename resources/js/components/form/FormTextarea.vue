@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import type { HTMLAttributes } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import type { HTMLAttributes } from 'vue';
 
 interface Props {
     id: string;
