@@ -45,7 +45,7 @@ Controllers → Services → Repositories → Models
   Actions (single-responsibility operations)
 ```
 
-- **Repositories** (`app/Repositories/`): Extend `AbstractRepository` which provides caching (3600s TTL), CRUD, and query building. Bound via `RepositoryInterface`.
+- **Repositories** (`app/Repositories/`): Extend `BaseRepository` which provides CRUD and query building. Bound via `RepositoryInterface`.
 - **Services** (`app/Services/`): Extend `AbstractService` with transaction support. Bound via contracts in `app/Contracts/Services/`.
 - **Actions** (`app/Actions/`): Single-responsibility classes implementing `ActionInterface`. Organized by domain (`User/`, `Fortify/`).
 - **Form Requests** (`app/Http/Requests/`): All validation goes in Form Request classes, never inline in controllers.
@@ -139,6 +139,10 @@ This project has domain-specific skills available. You MUST activate the relevan
 - `inertia-vue-development` — Develops Inertia.js v2 Vue client-side applications. Activates when creating Vue pages, forms, or navigation; using &lt;Link&gt;, &lt;Form&gt;, useForm, or router; working with deferred props, prefetching, or polling; or when user mentions Vue with Inertia, Vue pages, Vue forms, or Vue navigation.
 - `tailwindcss-development` — Styles applications using Tailwind CSS v4 utilities. Activates when adding styles, restyling components, working with gradients, spacing, layout, flex, grid, responsive design, dark mode, colors, typography, or borders; or when the user mentions CSS, styling, classes, Tailwind, restyle, hero section, cards, buttons, or any visual/UI changes.
 - `developing-with-fortify` — Laravel Fortify headless authentication backend development. Activate when implementing authentication features including login, registration, password reset, email verification, two-factor authentication (2FA/TOTP), profile updates, headless auth, authentication scaffolding, or auth guards in Laravel applications.
+- `payment-gateway-development` — Activate when working with the nejcc/payment-gateway package — using the Payment facade, Billable trait, creating payment drivers, managing transactions, subscriptions, plans, invoices, refunds, webhooks, or building admin pages under admin/payments.
+- `subscribe-development` — Activate when working with the nejcc/subscribe package — using the Subscribe facade, managing subscribers, subscription lists, email providers, double opt-in flows, or building admin pages under admin/subscribers.
+- `global-settings-development` — Activate when working with the laravelplus/global-settings package — using the GlobalSettings facade, Setting model, SettingRole enum, managing application settings, or building admin pages under admin/settings.
+- `laravelplus-starter-kit` — Activate when working on the core starter kit application — adding controllers, services, repositories, actions, models, admin pages, settings pages, middleware, Inertia pages, Vue components, composables, or modifying the architecture, navigation, shared props, or authentication flow.
 
 ## Conventions
 

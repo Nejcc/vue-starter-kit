@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nejcc\PaymentGateway;
 
+use App\Support\AdminNavigation;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Nejcc\PaymentGateway\Console\Commands\CleanupExpiredSubscriptionsCommand;
@@ -59,6 +60,7 @@ final class PaymentGatewayServiceProvider extends ServiceProvider
         $this->registerPublishing();
         $this->registerResources();
         $this->registerCommands();
+        $this->registerAdminNavigation();
     }
 
     /**
@@ -93,6 +95,14 @@ final class PaymentGatewayServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/views' => resource_path('views/vendor/payment-gateway'),
         ], 'payment-gateway-views');
+
+        $this->publishes([
+            __DIR__.'/../skills/payment-gateway-development' => base_path('.claude/skills/payment-gateway-development'),
+        ], 'payment-gateway-skills');
+
+        $this->publishes([
+            __DIR__.'/../skills/payment-gateway-development' => base_path('.github/skills/payment-gateway-development'),
+        ], 'payment-gateway-skills-github');
     }
 
     /**
@@ -123,6 +133,25 @@ final class PaymentGatewayServiceProvider extends ServiceProvider
                 CleanupExpiredSubscriptionsCommand::class,
             ]);
         }
+    }
+
+    /**
+     * Register admin sidebar navigation items.
+     */
+    protected function registerAdminNavigation(): void
+    {
+        $this->callAfterResolving(AdminNavigation::class, function (AdminNavigation $nav): void {
+            $prefix = config('payment-gateway.admin.prefix', 'admin/payments');
+
+            $nav->register('payments', 'Payments', 'CreditCard', [
+                ['title' => 'Dashboard', 'href' => "/{$prefix}", 'icon' => 'LayoutDashboard'],
+                ['title' => 'Transactions', 'href' => "/{$prefix}/transactions", 'icon' => 'ArrowLeftRight'],
+                ['title' => 'Subscriptions', 'href' => "/{$prefix}/subscriptions", 'icon' => 'RefreshCw'],
+                ['title' => 'Customers', 'href' => "/{$prefix}/customers", 'icon' => 'Users'],
+                ['title' => 'Plans', 'href' => "/{$prefix}/plans", 'icon' => 'ListChecks'],
+                ['title' => 'Invoices', 'href' => "/{$prefix}/invoices", 'icon' => 'FileText'],
+            ], 10);
+        });
     }
 
     /**

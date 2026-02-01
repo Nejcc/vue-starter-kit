@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nejcc\Subscribe;
 
+use App\Support\AdminNavigation;
 use Illuminate\Support\ServiceProvider;
 
 final class SubscribeServiceProvider extends ServiceProvider
@@ -38,5 +39,31 @@ final class SubscribeServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/views' => resource_path('views/vendor/subscribe'),
         ], 'subscribe-views');
+
+        $this->publishes([
+            __DIR__.'/../skills/subscribe-development' => base_path('.claude/skills/subscribe-development'),
+        ], 'subscribe-skills');
+
+        $this->publishes([
+            __DIR__.'/../skills/subscribe-development' => base_path('.github/skills/subscribe-development'),
+        ], 'subscribe-skills-github');
+
+        $this->registerAdminNavigation();
+    }
+
+    /**
+     * Register admin sidebar navigation items.
+     */
+    protected function registerAdminNavigation(): void
+    {
+        $this->callAfterResolving(AdminNavigation::class, function (AdminNavigation $nav): void {
+            $prefix = config('subscribe.admin.prefix', 'admin/subscribers');
+
+            $nav->register('subscribers', 'Subscribers', 'Mail', [
+                ['title' => 'Dashboard', 'href' => "/{$prefix}", 'icon' => 'LayoutDashboard'],
+                ['title' => 'Subscribers', 'href' => "/{$prefix}/subscribers", 'icon' => 'UserCheck'],
+                ['title' => 'Lists', 'href' => "/{$prefix}/lists", 'icon' => 'List'],
+            ], 20);
+        });
     }
 }

@@ -19,6 +19,10 @@
         "wayfinder-development",
         "inertia-vue-development",
         "tailwindcss-development",
-        "developing-with-fortify"
+        "developing-with-fortify",
+        "payment-gateway-development",
+        "subscribe-development",
+        "global-settings-development",
+        "laravelplus-starter-kit"
     ]
 }
