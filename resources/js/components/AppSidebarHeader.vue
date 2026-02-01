@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Bell, Monitor, Moon, Sun } from 'lucide-vue-next';
+import { Monitor, Moon, Sun } from 'lucide-vue-next';
 import { computed } from 'vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import LocaleSwitcher from '@/components/LocaleSwitcher.vue';
 import NotificationDropdown from '@/components/NotificationDropdown.vue';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -61,6 +62,7 @@ function cycleAppearance() {
         </div>
         <div class="ml-auto flex items-center gap-1">
             <NotificationDropdown />
+            <LocaleSwitcher />
             <TooltipProvider :delay-duration="0">
                 <Tooltip>
                     <TooltipTrigger>

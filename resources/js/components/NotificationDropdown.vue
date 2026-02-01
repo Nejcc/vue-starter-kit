@@ -2,6 +2,12 @@
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { Bell, Check, CheckCheck, ExternalLink } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import {
+    index,
+    markAllAsRead as markAllAsReadAction,
+    markAsRead as markAsReadAction,
+    recent,
+} from '@/actions/App/Http/Controllers/NotificationsController';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -29,7 +35,7 @@ async function fetchRecent() {
     if (loaded.value || loading.value) return;
     loading.value = true;
     try {
-        const response = await fetch(route('notifications.recent'), {
+        const response = await fetch(recent.url(), {
             headers: { Accept: 'application/json' },
         });
         const data = await response.json();
@@ -49,7 +55,7 @@ function handleOpen(open: boolean) {
 
 function markAsRead(id: string) {
     router.patch(
-        route('notifications.mark-as-read', { id }),
+        markAsReadAction.url(id),
         {},
         {
             preserveScroll: true,
@@ -63,7 +69,7 @@ function markAsRead(id: string) {
 
 function markAllAsRead() {
     router.post(
-        route('notifications.mark-all-read'),
+        markAllAsReadAction.url(),
         {},
         {
             preserveScroll: true,
@@ -75,8 +81,6 @@ function markAllAsRead() {
         },
     );
 }
-
-
 </script>
 
 <template>
@@ -192,7 +196,7 @@ function markAllAsRead() {
 
             <div class="border-t px-3 py-2 text-center">
                 <Link
-                    :href="route('notifications.index')"
+                    :href="index.url()"
                     class="text-xs font-medium text-primary hover:underline"
                 >
                     View all notifications

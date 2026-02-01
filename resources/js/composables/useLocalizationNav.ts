@@ -1,4 +1,4 @@
-import { Globe, Languages, LayoutDashboard } from 'lucide-vue-next';
+import { Globe, Languages, LayoutDashboard, Settings } from 'lucide-vue-next';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { NavItem } from '@/types';
 
@@ -15,6 +15,7 @@ export function useLocalizationNav(): ModuleNav {
         items: [
             { title: 'Languages', href: '/admin/localizations/languages', icon: Languages },
             { title: 'Translations', href: '/admin/localizations/translations', icon: LayoutDashboard },
+            { title: 'Settings', href: '/admin/localizations/settings', icon: Settings },
         ],
     };
 }
