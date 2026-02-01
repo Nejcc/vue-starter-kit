@@ -5,8 +5,11 @@ import { ArrowLeft, CreditCard, Receipt } from 'lucide-vue-next';
 import Heading from '@/components/Heading.vue';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { usePaymentNav } from '@/composables/usePaymentNav';
+import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
+
+const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = usePaymentNav();
 
 interface Transaction {
     id: number;
@@ -117,7 +120,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <AdminLayout :breadcrumbs="breadcrumbItems">
+    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
         <Head :title="`Customer: ${customer.name || customer.email}`" />
 
         <div class="container mx-auto py-8">
@@ -470,5 +473,5 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 </div>
             </div>
         </div>
-    </AdminLayout>
+    </ModuleLayout>
 </template>

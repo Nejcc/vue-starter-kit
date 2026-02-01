@@ -6,10 +6,14 @@ namespace App\Services;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Contracts\Services\UserServiceInterface;
+use App\Models\AuditLog;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use InvalidArgumentException;
 
 /**
  * User service implementation.
@@ -230,12 +234,12 @@ final class UserService extends AbstractService implements UserServiceInterface
      *
      * @param  string  $search  The search query
      * @param  int  $limit  Maximum number of results
-     * @return \Illuminate\Database\Eloquent\Collection<int, User> Collection of matching users
+     * @return Collection<int, User> Collection of matching users
      *
      * @example
      * $users = $service->search('john');
      */
-    public function search(string $search, int $limit = 50): \Illuminate\Database\Eloquent\Collection
+    public function search(string $search, int $limit = 50): Collection
     {
         return $this->getRepository()->search($search, $limit);
     }
@@ -244,13 +248,131 @@ final class UserService extends AbstractService implements UserServiceInterface
      * Get all users for impersonation (excluding current user).
      *
      * @param  int  $excludeUserId  The user ID to exclude
-     * @return \Illuminate\Database\Eloquent\Collection<int, User> Collection of users
+     * @return Collection<int, User> Collection of users
      *
      * @example
      * $users = $service->getAllForImpersonation(1);
      */
-    public function getAllForImpersonation(int $excludeUserId): \Illuminate\Database\Eloquent\Collection
+    public function getAllForImpersonation(int $excludeUserId): Collection
     {
         return $this->getRepository()->getAllForImpersonation($excludeUserId);
+    }
+
+    public function getAdminPaginated(?string $search, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->getRepository()->searchPaginated($search, $perPage);
+    }
+
+    /**
+     * Create a user from admin panel with role assignment.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function adminCreate(array $data): User
+    {
+        return $this->transaction(function () use ($data): User {
+            $user = $this->getRepository()->createUser([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+            ]);
+
+            if (!empty($data['roles']) && is_array($data['roles'])) {
+                $user->assignRole($data['roles']);
+            }
+
+            AuditLog::log('user.created', $user, null, [
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->pluck('name')->toArray(),
+            ]);
+
+            return $user;
+        });
+    }
+
+    /**
+     * Update a user from admin panel with role sync.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function adminUpdate(int $userId, array $data): User
+    {
+        $user = $this->getRepository()->findById($userId);
+
+        if (!$user) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException('User not found.');
+        }
+
+        $oldValues = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name')->toArray(),
+        ];
+
+        return $this->transaction(function () use ($user, $data, $oldValues): User {
+            $updateData = [
+                'name' => $data['name'],
+                'email' => $data['email'],
+            ];
+
+            if (!empty($data['password'])) {
+                $updateData['password'] = Hash::make($data['password']);
+            }
+
+            $this->getRepository()->updateUser($user->id, $updateData);
+
+            if (array_key_exists('roles', $data)) {
+                $user->syncRoles($data['roles'] ?? []);
+            }
+
+            $user->refresh();
+
+            AuditLog::log('user.updated', $user, $oldValues, [
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->pluck('name')->toArray(),
+            ]);
+
+            return $user;
+        });
+    }
+
+    /**
+     * Delete a user from admin panel.
+     */
+    public function adminDelete(int $userId): bool
+    {
+        $user = $this->getRepository()->findById($userId);
+
+        if (!$user) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException('User not found.');
+        }
+
+        if ($user->id === Auth::id()) {
+            throw new InvalidArgumentException('You cannot delete your own account.');
+        }
+
+        AuditLog::log('user.deleted', $user, [
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
+
+        return $this->getRepository()->deleteUser($user->id);
+    }
+
+    public function getTotalCount(): int
+    {
+        return $this->getRepository()->countAll();
+    }
+
+    public function getVerifiedCount(): int
+    {
+        return $this->getRepository()->countVerified();
+    }
+
+    public function getRecentUsers(int $limit = 5): Collection
+    {
+        return $this->getRepository()->getRecent($limit);
     }
 }

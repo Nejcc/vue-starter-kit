@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const page = usePage();
+const appName = computed(() => page.props.name ?? 'Laravel');
 </script>
 
 <template>
@@ -11,7 +15,7 @@ import { Link } from '@inertiajs/vue3';
         >
             <div class="text-center lg:text-left">
                 <p class="text-[10px] sm:text-xs">
-                    © {{ new Date().getFullYear() }} LaravelPlus. All rights
+                    © {{ new Date().getFullYear() }} {{ appName }}. All rights
                     reserved.
                 </p>
             </div>

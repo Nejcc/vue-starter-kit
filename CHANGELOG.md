@@ -298,7 +298,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vite build optimizations with code splitting and manual chunks
 - Comprehensive TypeScript type definitions for pages, models, and forms
 - Comprehensive PHPDoc blocks for all repository, service, and action classes
-- Unit tests for `AbstractRepository` and `AbstractService`
+- Unit tests for `BaseRepository` and `AbstractService`
 - Unit tests for all User actions (DeleteUser, UpdateUserPassword, UpdateUserProfile)
 - Integration tests for Repository-Service-Controller flow
 - Enhanced unit tests for `UserRepository` and `UserService` with edge cases
@@ -342,7 +342,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - shadcn-vue component library with Reka UI
 - Laravel Fortify for authentication
 - Server-Side Rendering (SSR) support
-- Repository Pattern with `AbstractRepository` and caching
+- Repository Pattern with `BaseRepository`
 - Service Pattern with `AbstractService` and transaction support
 - Action Pattern for single-responsibility operations
 - Two-Factor Authentication (2FA) with QR codes and recovery codes

@@ -41,4 +41,19 @@ interface RoleServiceInterface
      * @return array<string, mixed>
      */
     public function getForEdit(Role $role): array;
+
+    /**
+     * Get all permission names.
+     */
+    public function getAllPermissions(): Collection;
+
+    /**
+     * Get all role names.
+     */
+    public function getAllRoleNames(): Collection;
+
+    /**
+     * Get total number of roles.
+     */
+    public function getTotalCount(): int;
 }

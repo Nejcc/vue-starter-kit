@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import { dashboard, login, register } from '@/routes';
 
 const page = usePage();
+const appName = computed(() => page.props.name ?? 'Laravel');
 const isAuthenticated = computed(() => !!page.props.auth?.user);
 const canRegister = computed(() => page.props.canRegister ?? true);
 </script>
@@ -16,7 +17,7 @@ const canRegister = computed(() => page.props.canRegister ?? true);
                 class="text-lg font-semibold text-[#1b1b18] sm:text-xl dark:text-[#EDEDEC]"
                 prefetch
             >
-                LaravelPlus
+                {{ appName }}
             </Link>
             <div class="flex items-center gap-2 sm:gap-3">
                 <Link

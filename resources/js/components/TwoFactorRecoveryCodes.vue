@@ -9,7 +9,7 @@ import {
     RefreshCw,
 } from 'lucide-vue-next';
 import { nextTick, onMounted, ref, useTemplateRef } from 'vue';
-import AlertError from '@/components/AlertError.vue';
+import AlertMessage from '@/components/AlertMessage.vue';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -125,7 +125,7 @@ onMounted(async () => {
                 ]"
             >
                 <div v-if="errors?.length" class="mt-6">
-                    <AlertError :errors="errors" />
+                    <AlertMessage :messages="errors" title="Something went wrong." />
                 </div>
                 <div v-else class="mt-3 space-y-3">
                     <div

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
-import { Bell, Check, CheckCheck, ExternalLink, Trash2 } from 'lucide-vue-next';
+import { Bell, Check, CheckCheck, ExternalLink } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,9 +14,11 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useDateFormat } from '@/composables/useDateFormat';
 import type { DatabaseNotification } from '@/types';
 
 const page = usePage();
+const { formatTimeAgo } = useDateFormat();
 const unreadCount = computed(() => page.props.notifications?.unreadCount ?? 0);
 
 const recentNotifications = ref<DatabaseNotification[]>([]);
@@ -74,17 +76,7 @@ function markAllAsRead() {
     );
 }
 
-function formatTimeAgo(dateStr: string): string {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-    return date.toLocaleDateString();
-}
 </script>
 
 <template>

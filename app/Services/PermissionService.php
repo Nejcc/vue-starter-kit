@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\Repositories\PermissionRepositoryInterface;
 use App\Contracts\Services\PermissionServiceInterface;
 use App\Models\AuditLog;
 use App\Models\Permission;
@@ -15,8 +16,13 @@ use Illuminate\Support\Collection;
  * Provides business logic for permission management including creation,
  * updates, search, and grouping.
  */
-final class PermissionService implements PermissionServiceInterface
+final class PermissionService extends AbstractService implements PermissionServiceInterface
 {
+    public function __construct(PermissionRepositoryInterface $repository)
+    {
+        parent::__construct($repository);
+    }
+
     /**
      * Get all permissions with roles and optional search.
      *
@@ -24,16 +30,7 @@ final class PermissionService implements PermissionServiceInterface
      */
     public function getAll(?string $search = null): Collection
     {
-        $query = Permission::with('roles');
-
-        if ($search) {
-            $query->where(function ($q) use ($search): void {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('group_name', 'like', "%{$search}%");
-            });
-        }
-
-        return $query->latest()->get()->map(fn ($permission) => [
+        return $this->getRepository()->getAllWithRoles($search)->map(fn ($permission) => [
             'id' => $permission->id,
             'name' => $permission->name,
             'group_name' => $permission->group_name,
@@ -62,7 +59,7 @@ final class PermissionService implements PermissionServiceInterface
      */
     public function create(array $data): Permission
     {
-        $permission = Permission::create([
+        $permission = $this->getRepository()->create([
             'name' => $data['name'],
             'group_name' => $data['group_name'] ?? null,
         ]);
@@ -87,10 +84,12 @@ final class PermissionService implements PermissionServiceInterface
             'group_name' => $permission->group_name,
         ];
 
-        $permission->update([
+        $this->getRepository()->update($permission->id, [
             'name' => $data['name'],
             'group_name' => $data['group_name'] ?? null,
         ]);
+
+        $permission->refresh();
 
         AuditLog::log('permission.updated', $permission, $oldValues, [
             'name' => $permission->name,
@@ -112,5 +111,13 @@ final class PermissionService implements PermissionServiceInterface
             'name' => $permission->name,
             'group_name' => $permission->group_name,
         ];
+    }
+
+    /**
+     * Get total number of permissions.
+     */
+    public function getTotalCount(): int
+    {
+        return $this->getRepository()->all()->count();
     }
 }

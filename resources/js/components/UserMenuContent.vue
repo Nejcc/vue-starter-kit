@@ -9,6 +9,7 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import UserInfo from '@/components/UserInfo.vue';
+import { useUserPermissions } from '@/composables/useUserPermissions';
 import { logout } from '@/routes';
 import { index as adminIndex } from '@/routes/admin';
 import { edit } from '@/routes/profile';
@@ -19,20 +20,11 @@ type Props = {
     user: User;
 };
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
-const isAdmin = computed(() => {
-    const roles = props.user.roles ?? [];
-    return roles.includes('admin') || roles.includes('super-admin');
-});
+const { isAdmin, isSuperAdmin, hasPermission } = useUserPermissions();
 
-const canImpersonate = computed(() => {
-    const roles = props.user.roles ?? [];
-    const permissions = props.user.permissions ?? [];
-
-    // Check if user is super-admin or has impersonate permission
-    return roles.includes('super-admin') || permissions.includes('impersonate');
-});
+const canImpersonate = computed(() => isSuperAdmin.value || hasPermission('impersonate'));
 
 const isModalOpen = ref(false);
 const users = ref<

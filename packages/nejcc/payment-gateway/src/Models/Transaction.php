@@ -228,7 +228,7 @@ final class Transaction extends Model
      * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function scopeStatus($query, PaymentStatus|string $status)
+    public function scopeStatus(\Illuminate\Database\Eloquent\Builder $query, PaymentStatus|string $status): \Illuminate\Database\Eloquent\Builder
     {
         $value = $status instanceof PaymentStatus ? $status->value : $status;
 
@@ -241,7 +241,7 @@ final class Transaction extends Model
      * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function scopeSuccessful($query)
+    public function scopeSuccessful(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', PaymentStatus::Succeeded->value);
     }
@@ -252,7 +252,7 @@ final class Transaction extends Model
      * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function scopeDriver($query, string $driver)
+    public function scopeDriver(\Illuminate\Database\Eloquent\Builder $query, string $driver): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('driver', $driver);
     }

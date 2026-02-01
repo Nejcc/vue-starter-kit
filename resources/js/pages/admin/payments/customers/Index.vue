@@ -10,9 +10,12 @@ import SearchEmptyState from '@/components/SearchEmptyState.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { usePaymentNav } from '@/composables/usePaymentNav';
+import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { decodePaginationLabel } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
+
+const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = usePaymentNav();
 
 interface User {
     id: number;
@@ -86,7 +89,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <AdminLayout :breadcrumbs="breadcrumbItems">
+    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
         <Head title="Customers" />
 
         <div class="container mx-auto py-8">
@@ -234,5 +237,5 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 </div>
             </div>
         </div>
-    </AdminLayout>
+    </ModuleLayout>
 </template>

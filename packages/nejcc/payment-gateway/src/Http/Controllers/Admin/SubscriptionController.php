@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Nejcc\PaymentGateway\Enums\SubscriptionStatus;
 use Nejcc\PaymentGateway\Facades\Payment;
+use Nejcc\PaymentGateway\Http\Requests\Admin\CancelSubscriptionRequest;
 use Nejcc\PaymentGateway\Models\Subscription;
 
 final class SubscriptionController extends Controller
@@ -143,11 +144,8 @@ final class SubscriptionController extends Controller
         ]);
     }
 
-    public function cancel(Request $request, Subscription $subscription): RedirectResponse
+    public function cancel(CancelSubscriptionRequest $request, Subscription $subscription): RedirectResponse
     {
-        $request->validate([
-            'immediately' => ['nullable', 'boolean'],
-        ]);
 
         if (! $subscription->isActive()) {
             return back()->with('error', 'Cannot cancel a subscription that is not active.');

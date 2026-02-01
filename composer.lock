@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "02d0a0dd4dc01bb573f073d2dc0ff655",
+    "content-hash": "7fc1655bd694114b0bae5aae9d69d33b",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1846,7 +1846,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/laravelplus/global-settings",
-                "reference": "ca53ef78fe4ffdcda265c532c187862f16bbe5b0"
+                "reference": "1c523dbabfae07309a6893bc716ca1548a8bd203"
             },
             "require": {
                 "illuminate/database": "^12.0",
@@ -1894,6 +1894,133 @@
                 "global-settings",
                 "laravel",
                 "settings"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "laravelplus/localization",
+            "version": "dev-dev",
+            "dist": {
+                "type": "path",
+                "url": "packages/laravelplus/localization",
+                "reference": "3e923ae1c5320bc74643677181c5e1764b731a66"
+            },
+            "require": {
+                "illuminate/database": "^12.0",
+                "illuminate/http": "^12.0",
+                "illuminate/support": "^12.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelPlus\\Localization\\LocalizationServiceProvider"
+                    ],
+                    "aliases": {
+                        "Localization": "LaravelPlus\\Localization\\Facades\\Localization"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelPlus\\Localization\\": "src/",
+                    "LaravelPlus\\Localization\\Database\\Factories\\": "database/factories/",
+                    "LaravelPlus\\Localization\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LaravelPlus\\Localization\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "LaravelPlus",
+                    "email": "info@laravelplus.com"
+                }
+            ],
+            "description": "Multi-language localization package for Laravel with database-driven translations, content translation traits, and admin UI.",
+            "keywords": [
+                "i18n",
+                "laravel",
+                "localization",
+                "multi-language",
+                "translations"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "laravelplus/tenants",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "packages/laravelplus/tenants",
+                "reference": "3477d031418c98156f390c8bde55865b21f09f3b"
+            },
+            "require": {
+                "illuminate/database": "^12.0",
+                "illuminate/http": "^12.0",
+                "illuminate/mail": "^12.0",
+                "illuminate/notifications": "^12.0",
+                "illuminate/support": "^12.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelPlus\\Tenants\\TenantsServiceProvider"
+                    ],
+                    "aliases": {
+                        "Organization": "LaravelPlus\\Tenants\\Facades\\Organization"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelPlus\\Tenants\\": "src/",
+                    "LaravelPlus\\Tenants\\Database\\Factories\\": "database/factories/",
+                    "LaravelPlus\\Tenants\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LaravelPlus\\Tenants\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "LaravelPlus",
+                    "email": "info@laravelplus.com"
+                }
+            ],
+            "description": "Multi-tenancy organization management package for Laravel.",
+            "keywords": [
+                "laravel",
+                "multi-tenancy",
+                "organizations",
+                "tenants"
             ],
             "transport-options": {
                 "symlink": true,
@@ -9607,6 +9734,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "laravelplus/global-settings": 20,
+        "laravelplus/localization": 20,
+        "laravelplus/tenants": 20,
         "nejcc/payment-gateway": 20,
         "nejcc/subscribe": 20
     },

@@ -4,29 +4,28 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\Repositories\AuditLogRepositoryInterface;
+use App\Contracts\Repositories\PermissionRepositoryInterface;
+use App\Contracts\Repositories\RoleRepositoryInterface;
 use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Repositories\AuditLogRepository;
+use App\Repositories\PermissionRepository;
+use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
 final class RepositoryServiceProvider extends ServiceProvider
 {
-    /**
-     * Repository bindings (new instance each time).
-     *
-     * @var array<class-string, class-string>
-     */
+    /** @var array<class-string, class-string> */
     public array $bindings = [
         UserRepositoryInterface::class => UserRepository::class,
-        // Add more repository bindings here as needed
+        RoleRepositoryInterface::class => RoleRepository::class,
+        PermissionRepositoryInterface::class => PermissionRepository::class,
+        AuditLogRepositoryInterface::class => AuditLogRepository::class,
     ];
 
-    /**
-     * Repository singletons (shared instance).
-     *
-     * @var array<class-string, class-string>
-     */
+    /** @var array<class-string, class-string> */
     public array $singletons = [
-        // Add repository singletons here as needed
-        // Example: SomeRepositoryInterface::class => SomeRepository::class,
+        //
     ];
 }

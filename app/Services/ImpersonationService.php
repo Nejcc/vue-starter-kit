@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\Services\ImpersonationServiceInterface;
+use App\Contracts\Services\UserServiceInterface;
 use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,13 +17,13 @@ use Illuminate\Support\Facades\Auth;
  * Provides business logic for user impersonation functionality.
  * Handles session management, authorization, and audit logging.
  */
-final class ImpersonationService
+final class ImpersonationService implements ImpersonationServiceInterface
 {
     /**
      * Create a new impersonation service instance.
      */
     public function __construct(
-        private UserService $userService
+        private readonly UserServiceInterface $userService
     ) {}
 
     /**

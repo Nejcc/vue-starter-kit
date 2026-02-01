@@ -25,10 +25,6 @@ defineProps<{
 }>();
 
 const { isCurrentUrl } = useCurrentUrl();
-
-function isGroupActive(group: NavGroup): boolean {
-    return group.items.some((item) => isCurrentUrl(item.href));
-}
 </script>
 
 <template>
@@ -39,7 +35,7 @@ function isGroupActive(group: NavGroup): boolean {
                 v-for="group in groups"
                 :key="group.title"
                 as-child
-                :default-open="isGroupActive(group)"
+                :default-open="true"
             >
                 <SidebarMenuItem>
                     <CollapsibleTrigger as-child>
@@ -53,19 +49,105 @@ function isGroupActive(group: NavGroup): boolean {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                         <SidebarMenuSub>
-                            <SidebarMenuSubItem
+                            <template
                                 v-for="item in group.items"
                                 :key="item.title"
                             >
-                                <SidebarMenuSubButton
-                                    as-child
-                                    :is-active="isCurrentUrl(item.href)"
+                                <!-- Item with children: nested collapsible -->
+                                <SidebarMenuSubItem
+                                    v-if="item.children?.length"
                                 >
-                                    <Link :href="item.href" prefetch>
+                                    <Collapsible as-child :default-open="false">
+                                        <div>
+                                            <CollapsibleTrigger as-child>
+                                                <SidebarMenuSubButton
+                                                    class="cursor-pointer"
+                                                >
+                                                    <component
+                                                        :is="item.icon"
+                                                        v-if="item.icon"
+                                                        class="size-4 shrink-0"
+                                                    />
+                                                    <span>{{
+                                                        item.title
+                                                    }}</span>
+                                                    <ChevronRight
+                                                        class="ml-auto size-3 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+                                                    />
+                                                </SidebarMenuSubButton>
+                                            </CollapsibleTrigger>
+                                            <CollapsibleContent>
+                                                <SidebarMenuSub>
+                                                    <SidebarMenuSubItem
+                                                        v-for="child in item.children"
+                                                        :key="child.title"
+                                                    >
+                                                        <SidebarMenuSubButton
+                                                            as-child
+                                                            :is-active="
+                                                                isCurrentUrl(
+                                                                    child.href,
+                                                                )
+                                                            "
+                                                        >
+                                                            <Link
+                                                                :href="
+                                                                    child.href
+                                                                "
+                                                                prefetch
+                                                            >
+                                                                <component
+                                                                    :is="
+                                                                        child.icon
+                                                                    "
+                                                                    v-if="
+                                                                        child.icon
+                                                                    "
+                                                                    class="size-4 shrink-0"
+                                                                />
+                                                                <span>{{
+                                                                    child.title
+                                                                }}</span>
+                                                            </Link>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                </SidebarMenuSub>
+                                            </CollapsibleContent>
+                                        </div>
+                                    </Collapsible>
+                                </SidebarMenuSubItem>
+
+                                <!-- Disabled item: muted text, no link -->
+                                <SidebarMenuSubItem v-else-if="item.disabled">
+                                    <SidebarMenuSubButton
+                                        class="pointer-events-none opacity-40"
+                                    >
+                                        <component
+                                            :is="item.icon"
+                                            v-if="item.icon"
+                                            class="size-4 shrink-0"
+                                        />
                                         <span>{{ item.title }}</span>
-                                    </Link>
-                                </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
+                                    </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+
+                                <!-- Regular item: simple link -->
+                                <SidebarMenuSubItem v-else>
+                                    <SidebarMenuSubButton
+                                        as-child
+                                        :is-active="isCurrentUrl(item.href)"
+                                    >
+                                        <Link :href="item.href" prefetch>
+                                            <component
+                                                :is="item.icon"
+                                                v-if="item.icon"
+                                                class="size-4 shrink-0"
+                                            />
+                                            <span>{{ item.title }}</span>
+                                        </Link>
+                                    </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                            </template>
                         </SidebarMenuSub>
                     </CollapsibleContent>
                 </SidebarMenuItem>

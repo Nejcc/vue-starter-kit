@@ -8,10 +8,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Nejcc\PaymentGateway\Facades\Payment;
+use Nejcc\PaymentGateway\Http\Requests\Admin\StorePlanRequest;
+use Nejcc\PaymentGateway\Http\Requests\Admin\SyncPlanRequest;
+use Nejcc\PaymentGateway\Http\Requests\Admin\UpdatePlanRequest;
 use Nejcc\PaymentGateway\Models\Plan;
 
 final class PlanController extends Controller
@@ -79,24 +81,9 @@ final class PlanController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StorePlanRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', Rule::unique('payment_plans', 'slug')],
-            'description' => ['nullable', 'string', 'max:1000'],
-            'amount' => ['required', 'integer', 'min:0'],
-            'currency' => ['required', 'string', 'size:3'],
-            'interval' => ['required', 'string', Rule::in(['day', 'week', 'month', 'year'])],
-            'interval_count' => ['required', 'integer', 'min:1', 'max:365'],
-            'trial_days' => ['nullable', 'integer', 'min:0', 'max:365'],
-            'features' => ['nullable', 'array'],
-            'limits' => ['nullable', 'array'],
-            'is_active' => ['boolean'],
-            'is_public' => ['boolean'],
-            'is_featured' => ['boolean'],
-            'sort_order' => ['nullable', 'integer', 'min:0'],
-        ]);
+        $validated = $request->validated();
 
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['name']);
@@ -140,24 +127,9 @@ final class PlanController extends Controller
         ]);
     }
 
-    public function update(Request $request, Plan $plan): RedirectResponse
+    public function update(UpdatePlanRequest $request, Plan $plan): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', Rule::unique('payment_plans', 'slug')->ignore($plan->id)],
-            'description' => ['nullable', 'string', 'max:1000'],
-            'amount' => ['required', 'integer', 'min:0'],
-            'currency' => ['required', 'string', 'size:3'],
-            'interval' => ['required', 'string', Rule::in(['day', 'week', 'month', 'year'])],
-            'interval_count' => ['required', 'integer', 'min:1', 'max:365'],
-            'trial_days' => ['nullable', 'integer', 'min:0', 'max:365'],
-            'features' => ['nullable', 'array'],
-            'limits' => ['nullable', 'array'],
-            'is_active' => ['boolean'],
-            'is_public' => ['boolean'],
-            'is_featured' => ['boolean'],
-            'sort_order' => ['nullable', 'integer', 'min:0'],
-        ]);
+        $validated = $request->validated();
 
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['name']);
@@ -199,13 +171,9 @@ final class PlanController extends Controller
             ->with('success', 'Plan deleted successfully.');
     }
 
-    public function sync(Request $request, Plan $plan): RedirectResponse
+    public function sync(SyncPlanRequest $request, Plan $plan): RedirectResponse
     {
-        $request->validate([
-            'driver' => ['required', 'string', Rule::in(['stripe', 'paypal'])],
-        ]);
-
-        $driver = $request->get('driver');
+        $driver = $request->validated('driver');
 
         try {
             $gateway = Payment::driver($driver);

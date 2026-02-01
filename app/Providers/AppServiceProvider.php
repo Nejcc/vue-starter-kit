@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\Services\AuditLogServiceInterface;
+use App\Contracts\Services\ImpersonationServiceInterface;
 use App\Contracts\Services\NotificationServiceInterface;
 use App\Contracts\Services\PermissionServiceInterface;
 use App\Contracts\Services\RoleServiceInterface;
 use App\Contracts\Services\UserServiceInterface;
 use App\Listeners\UpdateLastLoginAt;
+use App\Services\AuditLogService;
+use App\Services\ImpersonationService;
 use App\Services\NotificationService;
 use App\Services\PermissionService;
 use App\Services\RoleService;
 use App\Services\UserService;
+use App\Support\AdminNavigation;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Date;
@@ -28,11 +33,15 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(AdminNavigation::class);
+
         // Service bindings
         $this->app->bind(UserServiceInterface::class, UserService::class);
         $this->app->bind(RoleServiceInterface::class, RoleService::class);
         $this->app->bind(PermissionServiceInterface::class, PermissionService::class);
         $this->app->bind(NotificationServiceInterface::class, NotificationService::class);
+        $this->app->bind(AuditLogServiceInterface::class, AuditLogService::class);
+        $this->app->bind(ImpersonationServiceInterface::class, ImpersonationService::class);
     }
 
     /**

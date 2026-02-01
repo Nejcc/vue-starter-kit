@@ -20,7 +20,7 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 // Quick login & register for development - only available in local environment
 if (config('security.dev_routes.enabled') && app()->environment('local')) {
@@ -92,7 +92,7 @@ Route::get('/about', [App\Http\Controllers\AboutController::class, 'index'])->na
 // Impersonation routes - only accessible to super-admin or admin roles
 Route::middleware(['auth'])->prefix('impersonate')->name('impersonate.')->group(function (): void {
     Route::get('/', [App\Http\Controllers\ImpersonateController::class, 'index'])->middleware('role:super-admin,admin')->name('index');
-    Route::post('/', [App\Http\Controllers\ImpersonateController::class, 'store'])->middleware('role:super-admin,admin')->name('store');
+    Route::post('/', [App\Http\Controllers\ImpersonateController::class, 'store'])->middleware(['role:super-admin,admin', 'throttle:impersonate'])->name('store');
     // Stop impersonation doesn't require admin role (anyone being impersonated should be able to stop)
     Route::delete('/', [App\Http\Controllers\ImpersonateController::class, 'destroy'])->name('destroy');
 });
@@ -134,4 +134,5 @@ Route::middleware(['auth', 'role:super-admin,admin'])->prefix('admin')->name('ad
     Route::get('database/{connection}/{table}/{view}', [App\Http\Controllers\Admin\DatabaseController::class, 'show'])->name('database.connection.show.view');
     Route::get('databases', [App\Http\Controllers\Admin\DatabaseController::class, 'listConnections'])->name('databases.index');
     Route::get('audit-logs', [App\Http\Controllers\Admin\AuditLogsController::class, 'index'])->name('audit-logs.index');
+    Route::get('modules', [App\Http\Controllers\Admin\ModulesController::class, 'index'])->name('modules.index');
 });

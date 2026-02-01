@@ -20,7 +20,7 @@ final class PermissionServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new PermissionService();
+        $this->service = app(PermissionService::class);
     }
 
     public function test_get_all_returns_permissions_with_metadata(): void

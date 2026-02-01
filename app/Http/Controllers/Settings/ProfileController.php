@@ -32,9 +32,7 @@ final class ProfileController extends Controller
     public function __construct(
         private readonly UpdateUserProfileAction $updateUserProfileAction,
         private readonly DeleteUserAction $deleteUserAction
-    ) {
-        $this->middleware('auth');
-    }
+    ) {}
 
     /**
      * Show the user's profile settings page.

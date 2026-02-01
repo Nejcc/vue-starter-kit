@@ -79,7 +79,7 @@ This is a **generic Laravel starter kit** designed to be cloned and customized f
    - Default user: Check `database/seeders/UserSeeder.php`
 
 4. **Key Files to Understand First**:
-   - `app/Repositories/AbstractRepository.php` - Repository pattern
+   - `app/Repositories/BaseRepository.php` - Repository pattern
    - `app/Services/AbstractService.php` - Service pattern
    - `app/Http/Controllers/DashboardController.php` - Simple controller example
    - `resources/js/pages/Dashboard.vue` - Simple page example
@@ -99,11 +99,9 @@ This starter kit follows a clean architecture pattern with clear separation of c
 
 **Location**: `app/Repositories/`
 
-- **AbstractRepository**: Base repository with caching, CRUD operations, and query building
-- **BaseRepository**: Extends AbstractRepository (if needed for additional base functionality)
+- **BaseRepository**: Base repository with CRUD operations and query building
 - **RepositoryInterface**: Contract defining repository methods
 - Repositories handle all database interactions and provide a clean abstraction layer
-- Built-in caching with automatic invalidation on write operations
 
 **Flow**: Controllers → Services → Repositories → Models
 
@@ -1246,8 +1244,7 @@ final class PostServiceTest extends TestCase
 
 5. **Repository** (`app/Repositories/UserRepository.php`)
    - Extends `BaseRepository`
-   - Calls `AbstractRepository::create()`
-   - Clears cache automatically
+   - Calls `BaseRepository::create()`
 
 6. **Model** (`app/Models/User.php`)
    - Eloquent creates record
@@ -1416,15 +1413,10 @@ This section documents every important file in the codebase, organized by catego
 - All repositories must implement this interface
 - Provides type-safe contract for data access layer
 
-**`app/Repositories/AbstractRepository.php`**
-- Base repository implementation with caching
-- Provides: `find()`, `findOrFail()`, `create()`, `update()`, `delete()`, `all()`, `paginate()`
-- Automatic cache invalidation on write operations
-- Cache TTL: 3600 seconds (1 hour) by default
-
 **`app/Repositories/BaseRepository.php`**
-- Extends AbstractRepository (if additional base functionality is needed)
-- Check this file for any base repository extensions
+- Base repository implementation providing CRUD operations
+- Provides: `find()`, `findOrFail()`, `findBy()`, `findAllBy()`, `create()`, `update()`, `delete()`, `all()`, `paginate()`, `query()`
+- All concrete repositories extend this class
 
 **`app/Contracts/Actions/ActionInterface.php`**
 - Base action contract for single-purpose operations
@@ -2162,7 +2154,7 @@ Feature tests for HTTP endpoints and complete user flows:
 - `DeleteUserActionTest.php` - User deletion action
 
 **Repository Tests** (`tests/Unit/Repositories/`):
-- `AbstractRepositoryTest.php` - Base repository functionality (caching, CRUD)
+- `AbstractRepositoryTest.php` - Base repository functionality (CRUD)
 - `UserRepositoryTest.php` - User repository specific methods
 
 **Service Tests** (`tests/Unit/Services/`):
@@ -2463,7 +2455,7 @@ When adding a new feature, follow this workflow:
 
 4. **Create Repository**
    - Create in `app/Repositories/`
-   - Extend `BaseRepository` or `AbstractRepository`
+   - Extend `BaseRepository`
    - Implement your interface
    - Register in `RepositoryServiceProvider`
 
@@ -2802,7 +2794,7 @@ This starter kit includes the following comprehensive features out of the box:
 
 ### Key Files
 
-- **Core Repository**: `app/Repositories/AbstractRepository.php`
+- **Core Repository**: `app/Repositories/BaseRepository.php`
 - **Core Service**: `app/Services/AbstractService.php`
 - **Service Provider**: `app/Providers/RepositoryServiceProvider.php`
 - **Bootstrap**: `bootstrap/app.php`

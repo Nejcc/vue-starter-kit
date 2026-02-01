@@ -221,7 +221,7 @@ final class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function scopeActive($query)
+    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->whereIn('status', [
             SubscriptionStatus::Active->value,
@@ -235,7 +235,7 @@ final class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function scopePlan($query, string $planId)
+    public function scopePlan(\Illuminate\Database\Eloquent\Builder $query, string $planId): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('plan_id', $planId);
     }
@@ -246,7 +246,7 @@ final class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function scopeExpiringSoon($query, int $days = 7)
+    public function scopeExpiringSoon(\Illuminate\Database\Eloquent\Builder $query, int $days = 7): \Illuminate\Database\Eloquent\Builder
     {
         return $query->whereBetween('current_period_end', [now(), now()->addDays($days)]);
     }

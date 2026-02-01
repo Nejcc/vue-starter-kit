@@ -6,8 +6,11 @@ import Heading from '@/components/Heading.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { usePaymentNav } from '@/composables/usePaymentNav';
+import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
+
+const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = usePaymentNav();
 
 interface LineItem {
     description: string;
@@ -118,7 +121,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <AdminLayout :breadcrumbs="breadcrumbItems">
+    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
         <Head :title="`Invoice ${invoice.number}`" />
 
         <div class="container mx-auto py-8">
@@ -522,5 +525,5 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 </div>
             </div>
         </div>
-    </AdminLayout>
+    </ModuleLayout>
 </template>

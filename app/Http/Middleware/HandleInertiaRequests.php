@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Support\AdminNavigation;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -72,9 +73,38 @@ final class HandleInertiaRequests extends Middleware
                 : 'simple',
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'modules' => $this->getInstalledModules(),
+            'moduleNavigation' => app(AdminNavigation::class)->groups(),
             'notifications' => [
                 'unreadCount' => $user ? $user->unreadNotifications()->count() : 0,
             ],
+            'currentOrganization' => $user && method_exists($user, 'currentOrganization')
+                ? $user->currentOrganization()
+                : null,
+            'organizations' => $user && method_exists($user, 'organizations')
+                ? $user->organizations()->select('organizations.id', 'organizations.name', 'organizations.slug', 'organizations.is_personal')->get()
+                : [],
+            'localization' => fn () => $this->getLocalizationData(),
+        ];
+    }
+
+    /**
+     * Get localization data for the frontend.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function getLocalizationData(): ?array
+    {
+        if (!class_exists(\LaravelPlus\Localization\Services\LocaleService::class)) {
+            return null;
+        }
+
+        $localeService = app(\LaravelPlus\Localization\Services\LocaleService::class);
+
+        return [
+            'locale' => app()->getLocale(),
+            'fallbackLocale' => config('app.fallback_locale'),
+            'translations' => $localeService->getTranslationsForCurrentLocale(),
+            'availableLocales' => $localeService->getActiveLanguages(),
         ];
     }
 
@@ -90,6 +120,8 @@ final class HandleInertiaRequests extends Middleware
             'payments' => Route::has('admin.payments.dashboard'),
             'subscribers' => Route::has('admin.subscribers.index'),
             'horizon' => Route::has('horizon.index'),
+            'organizations' => Route::has('admin.organizations.index'),
+            'localizations' => Route::has('admin.localizations.languages.index'),
         ];
     }
 }

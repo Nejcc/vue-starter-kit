@@ -56,6 +56,64 @@ export interface Paginator<T> extends PaginatedResponse<T> {
 }
 
 /**
+ * Organization model interface.
+ */
+export interface Organization {
+    id: number;
+    uuid: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    owner_id: number | null;
+    is_personal: boolean;
+    logo_path: string | null;
+    metadata: Record<string, unknown> | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    owner?: User;
+    members?: OrganizationMember[];
+    members_count?: number;
+}
+
+/**
+ * Organization member (pivot) interface.
+ */
+export interface OrganizationMember {
+    id: number;
+    organization_id: number;
+    user_id: number;
+    role: string;
+    joined_at: string;
+    created_at: string;
+    updated_at: string;
+    user?: User;
+    pivot?: {
+        role: string;
+        joined_at: string;
+    };
+}
+
+/**
+ * Organization invitation interface.
+ */
+export interface OrganizationInvitation {
+    id: number;
+    uuid: string;
+    organization_id: number;
+    email: string;
+    role: string;
+    token: string;
+    invited_by: number | null;
+    accepted_at: string | null;
+    declined_at: string | null;
+    expires_at: string;
+    created_at: string;
+    updated_at: string;
+    organization?: Organization;
+}
+
+/**
  * Database notification interface.
  */
 export interface DatabaseNotification {

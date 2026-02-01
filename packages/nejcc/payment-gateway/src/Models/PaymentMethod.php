@@ -138,7 +138,7 @@ final class PaymentMethod extends Model
      * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function scopeDriver($query, string $driver)
+    public function scopeDriver(\Illuminate\Database\Eloquent\Builder $query, string $driver): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('driver', $driver);
     }
@@ -149,7 +149,7 @@ final class PaymentMethod extends Model
      * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function scopeDefault($query)
+    public function scopeDefault(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_default', true);
     }

@@ -23,7 +23,7 @@ final class RoleServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new RoleService();
+        $this->service = app(RoleService::class);
     }
 
     public function test_get_all_returns_roles_with_metadata(): void

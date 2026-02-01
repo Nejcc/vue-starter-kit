@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
 
+import FormField from '@/components/FormField.vue';
 import Heading from '@/components/Heading.vue';
-import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { index, store } from '@/routes/admin/permissions';
 import { type BreadcrumbItem } from '@/types';
@@ -44,8 +43,13 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
-                    <div class="grid gap-2">
-                        <Label for="name">Permission Name</Label>
+                    <FormField
+                        label="Permission Name"
+                        id="name"
+                        :error="errors.name"
+                        description="Use lowercase with spaces (e.g., edit posts, delete users)"
+                        required
+                    >
                         <Input
                             id="name"
                             name="name"
@@ -53,27 +57,21 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             required
                             placeholder="e.g., edit posts, delete users"
                         />
-                        <InputError :message="errors.name" />
-                        <p class="text-sm text-muted-foreground">
-                            Use lowercase with spaces (e.g., edit posts, delete
-                            users)
-                        </p>
-                    </div>
+                    </FormField>
 
-                    <div class="grid gap-2">
-                        <Label for="group_name">Group Name</Label>
+                    <FormField
+                        label="Group Name"
+                        id="group_name"
+                        :error="errors.group_name"
+                        description="Optional: Group permissions together (e.g., &quot;users&quot; for view users, create users, etc.)"
+                    >
                         <Input
                             id="group_name"
                             name="group_name"
                             type="text"
                             placeholder="e.g., users, posts, settings"
                         />
-                        <InputError :message="errors.group_name" />
-                        <p class="text-sm text-muted-foreground">
-                            Optional: Group permissions together (e.g., "users"
-                            for view users, create users, etc.)
-                        </p>
-                    </div>
+                    </FormField>
 
                     <div class="flex items-center gap-4">
                         <Button :disabled="processing" type="submit">

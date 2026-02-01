@@ -43,4 +43,9 @@ interface PermissionServiceInterface
      * @return array<string, mixed>
      */
     public function getForEdit(Permission $permission): array;
+
+    /**
+     * Get total number of permissions.
+     */
+    public function getTotalCount(): int;
 }

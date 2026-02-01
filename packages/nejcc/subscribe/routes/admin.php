@@ -8,7 +8,7 @@ use Nejcc\Subscribe\Http\Controllers\Admin\ListController;
 use Nejcc\Subscribe\Http\Controllers\Admin\SubscriberController;
 
 Route::prefix(config('subscribe.admin.prefix', 'admin/subscribers'))
-    ->middleware(config('subscribe.admin.middleware', ['web', 'auth']))
+    ->middleware(config('subscribe.admin.middleware', ['web', 'auth', 'role:super-admin,admin']))
     ->name('admin.subscribers.')
     ->group(function (): void {
         Route::get('/', [DashboardController::class, 'index'])->name('index');

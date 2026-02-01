@@ -2,11 +2,11 @@
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
+import CheckboxGroup from '@/components/CheckboxGroup.vue';
+import FormField from '@/components/FormField.vue';
 import Heading from '@/components/Heading.vue';
-import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { index, store } from '@/routes/admin/roles';
 import { type BreadcrumbItem } from '@/types';
@@ -53,8 +53,13 @@ const selectedPermissions = ref<string[]>([]);
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
-                    <div class="grid gap-2">
-                        <Label for="name">Role Name</Label>
+                    <FormField
+                        label="Role Name"
+                        id="name"
+                        :error="errors.name"
+                        description="Use lowercase with hyphens (e.g., content-editor)"
+                        required
+                    >
                         <Input
                             id="name"
                             name="name"
@@ -62,40 +67,16 @@ const selectedPermissions = ref<string[]>([]);
                             required
                             placeholder="e.g., editor, moderator"
                         />
-                        <InputError :message="errors.name" />
-                        <p class="text-sm text-muted-foreground">
-                            Use lowercase with hyphens (e.g., content-editor)
-                        </p>
-                    </div>
+                    </FormField>
 
-                    <div v-if="permissions.length > 0" class="grid gap-2">
-                        <Label>Permissions</Label>
-                        <div
-                            class="max-h-60 space-y-2 overflow-y-auto rounded-md border p-4"
-                        >
-                            <div
-                                v-for="permission in permissions"
-                                :key="permission"
-                                class="flex items-center space-x-2"
-                            >
-                                <input
-                                    :id="`permission-${permission}`"
-                                    v-model="selectedPermissions"
-                                    type="checkbox"
-                                    :value="permission"
-                                    name="permissions[]"
-                                    class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                                />
-                                <Label
-                                    :for="`permission-${permission}`"
-                                    class="text-sm font-medium"
-                                >
-                                    {{ permission }}
-                                </Label>
-                            </div>
-                        </div>
-                        <InputError :message="errors.permissions" />
-                    </div>
+                    <CheckboxGroup
+                        v-if="permissions.length > 0"
+                        v-model="selectedPermissions"
+                        :options="permissions"
+                        name="permissions"
+                        label="Permissions"
+                        :error="errors.permissions"
+                    />
 
                     <div
                         v-else

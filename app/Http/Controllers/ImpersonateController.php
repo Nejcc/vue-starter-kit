@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Services\ImpersonationService;
+use App\Contracts\Services\ImpersonationServiceInterface;
+use App\Http\Requests\ImpersonateStoreRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class ImpersonateController extends Controller
 {
@@ -16,17 +20,13 @@ final class ImpersonateController extends Controller
      * Create a new impersonate controller instance.
      */
     public function __construct(
-        protected ImpersonationService $impersonationService
-    ) {
-        $this->middleware('auth');
-
-        $this->middleware('throttle:impersonate')->only('store');
-    }
+        private readonly ImpersonationServiceInterface $impersonationService
+    ) {}
 
     /**
      * Display a listing of users for impersonation.
      */
-    public function index(Request $request): Response|\Illuminate\Http\JsonResponse
+    public function index(Request $request): Response|JsonResponse
     {
         $this->authorizeImpersonate();
 
@@ -61,13 +61,9 @@ final class ImpersonateController extends Controller
     /**
      * Impersonate a user.
      */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+    public function store(ImpersonateStoreRequest $request): RedirectResponse|SymfonyResponse
     {
         $this->authorizeImpersonate();
-
-        $request->validate([
-            'user_id' => ['required', 'integer', 'exists:users,id'],
-        ]);
 
         $result = $this->impersonationService->startImpersonation(
             Auth::user(),
@@ -86,7 +82,7 @@ final class ImpersonateController extends Controller
     /**
      * Stop impersonating and return to original user.
      */
-    public function destroy(Request $request): \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+    public function destroy(Request $request): RedirectResponse|SymfonyResponse
     {
         $result = $this->impersonationService->stopImpersonation($request);
 
