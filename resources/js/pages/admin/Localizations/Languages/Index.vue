@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Globe, Plus, Zap } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 import DataCard from '@/components/DataCard.vue';
@@ -17,9 +18,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useLocalizationNav } from '@/composables/useLocalizationNav';
 import { useSearch } from '@/composables/useSearch';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
-import { useLocalizationNav } from '@/composables/useLocalizationNav';
 import { type BreadcrumbItem, type PaginatedResponse } from '@/types';
 
 const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useLocalizationNav();
@@ -40,6 +41,7 @@ interface Language {
 
 interface LanguagesPageProps {
     languages: PaginatedResponse<Language>;
+    fallbackLocale: string;
     status?: string;
     filters?: {
         search?: string;
@@ -79,6 +81,10 @@ const setDefault = (language: Language): void => {
     router.post(`/admin/localizations/languages/${language.id}/set-default`);
 };
 
+const seedCommon = (): void => {
+    router.post('/admin/localizations/languages/seed-common');
+};
+
 const breadcrumbItems: BreadcrumbItem[] = [
     { title: 'Admin', href: '#' },
     { title: 'Localization', href: '#' },
@@ -98,12 +104,31 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         title="Languages"
                         description="Manage available languages"
                     />
-                    <Link
-                        href="/admin/localizations/languages/create"
-                        class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                    >
-                        Add Language
-                    </Link>
+                    <div class="flex items-center gap-2">
+                        <Button
+                            v-if="languages.data.length === 0"
+                            variant="outline"
+                            @click="seedCommon"
+                        >
+                            <Zap class="mr-2 h-4 w-4" />
+                            Quick Setup
+                        </Button>
+                        <Link href="/admin/localizations/languages/create">
+                            <Button>
+                                <Plus class="mr-2 h-4 w-4" />
+                                Add Language
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- Fallback locale info -->
+                <div class="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400">
+                    <Globe class="h-4 w-4 shrink-0" />
+                    <span>
+                        Fallback locale: <strong>{{ fallbackLocale }}</strong>
+                        <span class="text-blue-600 dark:text-blue-500"> &mdash; used when a translation is missing in the active language.</span>
+                    </span>
                 </div>
 
                 <div
@@ -142,6 +167,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 v-if="language.is_default"
                                 label="Default"
                                 variant="success"
+                            />
+                            <StatusBadge
+                                v-if="language.code === fallbackLocale && !language.is_default"
+                                label="Fallback"
+                                variant="purple"
                             />
                             <StatusBadge
                                 v-if="!language.is_active"
@@ -190,7 +220,21 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 </div>
 
                 <div
-                    v-if="languages.data.length === 0"
+                    v-if="languages.data.length === 0 && !filters?.search"
+                    class="rounded-lg border p-8 text-center"
+                >
+                    <div class="mx-auto flex flex-col items-center gap-3">
+                        <Globe class="h-10 w-10 text-muted-foreground" />
+                        <p class="text-muted-foreground">No languages configured yet.</p>
+                        <Button variant="outline" @click="seedCommon">
+                            <Zap class="mr-2 h-4 w-4" />
+                            Add Common Languages
+                        </Button>
+                    </div>
+                </div>
+
+                <div
+                    v-else-if="languages.data.length === 0 && filters?.search"
                     class="rounded-lg border p-8 text-center"
                 >
                     <p class="text-muted-foreground">No languages found.</p>

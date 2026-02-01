@@ -1,4 +1,4 @@
-import { Building2, LayoutDashboard, Plus } from 'lucide-vue-next';
+import { Building2, LayoutDashboard, Plus, Settings } from 'lucide-vue-next';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { NavItem } from '@/types';
 
@@ -15,6 +15,7 @@ export function useOrganizationNav(): ModuleNav {
         items: [
             { title: 'All Organizations', href: '/admin/organizations', icon: LayoutDashboard },
             { title: 'Create', href: '/admin/organizations/create', icon: Plus },
+            { title: 'Settings', href: '/admin/organizations/settings', icon: Settings },
         ],
     };
 }

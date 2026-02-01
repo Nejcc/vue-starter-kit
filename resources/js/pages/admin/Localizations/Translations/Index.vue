@@ -17,9 +17,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useLocalizationNav } from '@/composables/useLocalizationNav';
 import { useSearch } from '@/composables/useSearch';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
-import { useLocalizationNav } from '@/composables/useLocalizationNav';
 import { type BreadcrumbItem, type PaginatedResponse } from '@/types';
 
 const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useLocalizationNav();

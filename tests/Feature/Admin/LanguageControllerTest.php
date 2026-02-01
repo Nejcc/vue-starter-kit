@@ -194,6 +194,43 @@ final class LanguageControllerTest extends TestCase
         $this->assertDatabaseHas('languages', ['id' => $english->id, 'is_default' => false]);
     }
 
+    public function test_seed_common_creates_languages(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->post('/admin/localizations/languages/seed-common');
+
+        $response->assertRedirect('/admin/localizations/languages');
+        $response->assertSessionHas('status', 'Common languages have been added.');
+
+        $this->assertDatabaseHas('languages', ['code' => 'en', 'is_default' => true]);
+        $this->assertDatabaseHas('languages', ['code' => 'de']);
+        $this->assertDatabaseHas('languages', ['code' => 'fr']);
+        $this->assertDatabaseHas('languages', ['code' => 'ar', 'direction' => 'rtl']);
+    }
+
+    public function test_seed_common_is_idempotent(): void
+    {
+        $this->actingAs($this->admin)
+            ->post('/admin/localizations/languages/seed-common');
+
+        $countBefore = Language::count();
+
+        $this->actingAs($this->admin)
+            ->post('/admin/localizations/languages/seed-common');
+
+        $this->assertEquals($countBefore, Language::count());
+    }
+
+    public function test_index_includes_fallback_locale(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->get('/admin/localizations/languages');
+
+        $response->assertInertia(fn ($page) => $page
+            ->has('fallbackLocale')
+        );
+    }
+
     public function test_unauthenticated_user_cannot_access_languages(): void
     {
         $response = $this->get('/admin/localizations/languages');

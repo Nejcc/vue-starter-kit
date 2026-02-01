@@ -30,7 +30,7 @@ final class SubscribeServiceProvider extends ServiceProvider
 
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 
-        if (config('subscribe.admin.enabled', true)) {
+        if ($this->isAdminEnabled()) {
             $this->loadRoutesFrom(__DIR__.'/../routes/admin.php');
         }
 
@@ -49,6 +49,26 @@ final class SubscribeServiceProvider extends ServiceProvider
         ], 'subscribe-skills-github');
 
         $this->registerAdminNavigation();
+    }
+
+    /**
+     * Check if admin routes should be enabled via DB setting or config fallback.
+     */
+    private function isAdminEnabled(): bool
+    {
+        if (class_exists(\LaravelPlus\GlobalSettings\Models\Setting::class)) {
+            try {
+                $dbValue = \LaravelPlus\GlobalSettings\Models\Setting::get('package.subscribers.enabled');
+
+                if ($dbValue !== null) {
+                    return in_array($dbValue, ['1', 'true', true, 1], true);
+                }
+            } catch (\Throwable) {
+                // Table may not exist yet during migrations
+            }
+        }
+
+        return (bool) config('subscribe.admin.enabled', true);
     }
 
     /**

@@ -134,6 +134,9 @@ final class OrganizationRepositoryTest extends TestCase
     public function test_for_user_returns_user_organizations(): void
     {
         $user = User::factory()->create();
+        // User now has an auto-created personal org from HasOrganizations trait
+        $personalOrgCount = $user->organizations()->count();
+
         $org1 = Organization::factory()->create();
         $org2 = Organization::factory()->create();
         $orgOther = Organization::factory()->create();
@@ -143,7 +146,7 @@ final class OrganizationRepositoryTest extends TestCase
 
         $result = $this->repository->forUser($user->id);
 
-        $this->assertCount(2, $result);
+        $this->assertCount($personalOrgCount + 2, $result);
         $this->assertTrue($result->contains('id', $org1->id));
         $this->assertTrue($result->contains('id', $org2->id));
         $this->assertFalse($result->contains('id', $orgOther->id));
@@ -152,21 +155,27 @@ final class OrganizationRepositoryTest extends TestCase
     public function test_personal_for_user_returns_personal_org(): void
     {
         $user = User::factory()->create();
+        // User now has an auto-created personal org from HasOrganizations trait
+        $autoPersonal = $user->personalOrganization();
         Organization::factory()->withOwner($user->id)->create(['is_personal' => false]);
-        $personal = Organization::factory()->personal()->withOwner($user->id)->create();
 
         $result = $this->repository->personalForUser($user->id);
 
         $this->assertNotNull($result);
-        $this->assertEquals($personal->id, $result->id);
+        $this->assertNotNull($autoPersonal);
+        $this->assertEquals($autoPersonal->id, $result->id);
+        $this->assertTrue($result->is_personal);
     }
 
-    public function test_personal_for_user_returns_null_when_none(): void
+    public function test_personal_for_user_returns_auto_created_org(): void
     {
         $user = User::factory()->create();
+        // HasOrganizations trait auto-creates a personal org
 
         $result = $this->repository->personalForUser($user->id);
 
-        $this->assertNull($result);
+        $this->assertNotNull($result);
+        $this->assertTrue($result->is_personal);
+        $this->assertEquals($user->id, $result->owner_id);
     }
 }

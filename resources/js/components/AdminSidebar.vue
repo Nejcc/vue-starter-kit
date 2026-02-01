@@ -36,6 +36,7 @@ import { dashboard } from '@/routes';
 import { index as auditLogsIndex } from '@/routes/admin/audit-logs';
 import { index as databaseIndex } from '@/routes/admin/database';
 import { index as modulesIndex } from '@/routes/admin/modules';
+import { index as packagesIndex } from '@/routes/admin/packages';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as usersIndex } from '@/routes/admin/users';
@@ -88,6 +89,11 @@ const navGroups = computed<NavGroup[]>(() => {
                     title: 'Audit Logs',
                     href: auditLogsIndex().url,
                     icon: ClipboardList,
+                },
+                {
+                    title: 'Packages',
+                    href: packagesIndex().url,
+                    icon: Package,
                 },
             ],
         },
@@ -164,7 +170,7 @@ const navGroups = computed<NavGroup[]>(() => {
     if (modules.value?.organizations) {
         moduleItems.push({
             title: 'Organizations',
-            href: '/admin/organizations',
+            href: moduleHref('organization', '/admin/organizations'),
             icon: Building2,
         });
     } else {

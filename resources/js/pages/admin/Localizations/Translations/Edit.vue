@@ -8,8 +8,8 @@ import Heading from '@/components/Heading.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { useLocalizationNav } from '@/composables/useLocalizationNav';
+import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 
 const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useLocalizationNav();

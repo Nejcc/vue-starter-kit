@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings, Shield, UserRound } from 'lucide-vue-next';
+import { KeyRound, LogOut, Settings, Shield, ShieldCheck, UserRound } from 'lucide-vue-next';
 import { computed, nextTick, ref } from 'vue';
 import {
     DropdownMenuGroup,
@@ -13,6 +13,8 @@ import { useUserPermissions } from '@/composables/useUserPermissions';
 import { logout } from '@/routes';
 import { index as adminIndex } from '@/routes/admin';
 import { edit } from '@/routes/profile';
+import { show as twoFactorShow } from '@/routes/two-factor';
+import { edit as passwordEdit } from '@/routes/user-password';
 import type { User } from '@/types';
 import ImpersonateModal from './ImpersonateModal.vue';
 
@@ -78,7 +80,19 @@ const handleLogout = () => {
         <DropdownMenuItem :as-child="true">
             <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
                 <Settings class="mr-2 h-4 w-4" />
-                Settings
+                Profile
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true">
+            <Link class="block w-full cursor-pointer" :href="passwordEdit()" prefetch>
+                <KeyRound class="mr-2 h-4 w-4" />
+                Password
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true">
+            <Link class="block w-full cursor-pointer" :href="twoFactorShow()" prefetch>
+                <ShieldCheck class="mr-2 h-4 w-4" />
+                Security
             </Link>
         </DropdownMenuItem>
         <DropdownMenuItem v-if="isAdmin" :as-child="true">

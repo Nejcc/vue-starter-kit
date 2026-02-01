@@ -22,8 +22,8 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { useSettingsNav } from '@/composables/useSettingsNav';
+import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 
 const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useSettingsNav();

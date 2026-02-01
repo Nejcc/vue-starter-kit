@@ -135,4 +135,6 @@ Route::middleware(['auth', 'role:super-admin,admin'])->prefix('admin')->name('ad
     Route::get('databases', [App\Http\Controllers\Admin\DatabaseController::class, 'listConnections'])->name('databases.index');
     Route::get('audit-logs', [App\Http\Controllers\Admin\AuditLogsController::class, 'index'])->name('audit-logs.index');
     Route::get('modules', [App\Http\Controllers\Admin\ModulesController::class, 'index'])->name('modules.index');
+    Route::get('packages', [App\Http\Controllers\Admin\PackagesController::class, 'index'])->name('packages.index');
+    Route::patch('packages/{key}', [App\Http\Controllers\Admin\PackagesController::class, 'update'])->name('packages.update');
 });

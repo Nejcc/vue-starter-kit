@@ -115,7 +115,7 @@ final class PaymentGatewayServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'payment-gateway');
 
         // Load admin routes if enabled
-        if (config('payment-gateway.admin.enabled', true)) {
+        if ($this->isAdminEnabled()) {
             $this->loadRoutesFrom(__DIR__.'/../routes/admin.php');
         }
     }
@@ -152,6 +152,26 @@ final class PaymentGatewayServiceProvider extends ServiceProvider
                 ['title' => 'Invoices', 'href' => "/{$prefix}/invoices", 'icon' => 'FileText'],
             ], 10);
         });
+    }
+
+    /**
+     * Check if admin routes should be enabled via DB setting or config fallback.
+     */
+    private function isAdminEnabled(): bool
+    {
+        if (class_exists(\LaravelPlus\GlobalSettings\Models\Setting::class)) {
+            try {
+                $dbValue = \LaravelPlus\GlobalSettings\Models\Setting::get('package.payments.enabled');
+
+                if ($dbValue !== null) {
+                    return in_array($dbValue, ['1', 'true', true, 1], true);
+                }
+            } catch (\Throwable) {
+                // Table may not exist yet during migrations
+            }
+        }
+
+        return (bool) config('payment-gateway.admin.enabled', true);
     }
 
     /**
