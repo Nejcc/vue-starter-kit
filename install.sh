@@ -264,6 +264,16 @@ if [ -f database/database.sqlite ]; then
   chmod 664 database/database.sqlite || true
 fi
 
+info "Initializing git submodules"
+git submodule sync --quiet
+git submodule update --init --recursive
+if [ $? -eq 0 ]; then
+  success "Git submodules initialized successfully"
+else
+  error "Failed to initialize git submodules"
+  exit 1
+fi
+
 info "Installing PHP dependencies (composer install)"
 if [ "$CLEAN_DEPS" -eq 1 ] && [ -d vendor ]; then
   echo "  ${DIM}Removing existing vendor directory${RESET}"
