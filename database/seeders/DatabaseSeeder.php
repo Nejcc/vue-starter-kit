@@ -26,6 +26,14 @@ final class DatabaseSeeder extends Seeder
             $seeders[] = \LaravelPlus\GlobalSettings\Database\Seeders\SettingsSeeder::class;
         }
 
+        if (class_exists(\LaravelPlus\Localization\Database\Seeders\LanguageSeeder::class)) {
+            $seeders[] = \LaravelPlus\Localization\Database\Seeders\LanguageSeeder::class;
+        }
+
+        if (class_exists(\LaravelPlus\Subscribe\Models\SubscriptionList::class)) {
+            $seeders[] = SubscriptionListSeeder::class;
+        }
+
         $seeders[] = UserSeeder::class;
 
         $this->call($seeders);
