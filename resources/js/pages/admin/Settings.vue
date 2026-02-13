@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { useDebounceFn } from '@vueuse/core';
-import { Pencil, Save, Settings2 } from 'lucide-vue-next';
-import { ref, reactive, computed } from 'vue';
+import { Pencil, Settings2 } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 import Heading from '@/components/Heading.vue';
+import Pagination from '@/components/Pagination.vue';
+import SearchInput from '@/components/SearchInput.vue';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -22,9 +23,10 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useSearch } from '@/composables/useSearch';
 import { useSettingsNav } from '@/composables/useSettingsNav';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type PaginatedResponse } from '@/types';
 
 const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useSettingsNav();
 
@@ -37,10 +39,18 @@ interface Setting {
     label: string;
     description: string | null;
     role: 'system' | 'user' | 'plugin';
+    group: string | null;
+}
+
+interface GroupOption {
+    value: string;
+    label: string;
 }
 
 interface AdminSettingsPageProps {
-    settings: Setting[];
+    settings: PaginatedResponse<Setting>;
+    groups: GroupOption[];
+    currentGroup?: GroupOption;
     status?: string;
     filters?: {
         search?: string;
@@ -49,31 +59,32 @@ interface AdminSettingsPageProps {
 
 const props = defineProps<AdminSettingsPageProps>();
 
-const searchQuery = ref(props.filters?.search ?? '');
-const isSaving = ref(false);
+const pageTitle = props.currentGroup
+    ? `${props.currentGroup.label} Settings`
+    : 'Application Settings';
 
-// Track modified values for bulk update
-const modifiedValues = reactive<Record<string, string | null>>({});
+const pageDescription = props.currentGroup
+    ? `Manage ${props.currentGroup.label.toLowerCase()} settings`
+    : 'Manage all application settings';
 
-// Initialize with current values
-props.settings.forEach((setting) => {
-    modifiedValues[setting.key] = setting.value;
+const searchUrl = props.currentGroup
+    ? `/admin/settings/group/${props.currentGroup.value}`
+    : '/admin/settings';
+
+const { searchQuery, handleSearch, clearSearch } = useSearch({
+    url: searchUrl,
 });
+searchQuery.value = props.filters?.search ?? '';
 
-const hasChanges = computed(() => {
-    return props.settings.some(
-        (setting) => modifiedValues[setting.key] !== setting.value,
-    );
-});
-
-// Modal state
+// Modal state for inline edit
 const editModalOpen = ref(false);
 const editingSetting = ref<Setting | null>(null);
 const editFormValue = ref<string | null>('');
+const isSavingModal = ref(false);
 
 const openEditModal = (setting: Setting): void => {
     editingSetting.value = setting;
-    editFormValue.value = modifiedValues[setting.key];
+    editFormValue.value = setting.value;
     editModalOpen.value = true;
 };
 
@@ -85,35 +96,26 @@ const closeEditModal = (): void => {
 const saveEditModal = (): void => {
     if (!editingSetting.value) return;
 
-    // Apply value change to inline tracking
-    modifiedValues[editingSetting.value.key] = editFormValue.value;
-    closeEditModal();
-};
-
-const debouncedSearch = useDebounceFn((query: string) => {
-    router.get(
-        '/admin/settings',
-        { search: query || null },
+    isSavingModal.value = true;
+    router.patch(
+        '/admin/settings/bulk',
+        { settings: { [editingSetting.value.key]: editFormValue.value } },
         {
-            preserveState: true,
             preserveScroll: true,
+            onFinish: () => {
+                isSavingModal.value = false;
+                closeEditModal();
+            },
         },
     );
-}, 300);
-
-const handleSearch = (): void => {
-    debouncedSearch(searchQuery.value);
 };
 
 const breadcrumbItems: BreadcrumbItem[] = [
-    {
-        title: 'Admin',
-        href: '#',
-    },
-    {
-        title: 'Settings',
-        href: '/admin/settings',
-    },
+    { title: 'Admin', href: '#' },
+    { title: 'Settings', href: '/admin/settings' },
+    ...(props.currentGroup
+        ? [{ title: props.currentGroup.label, href: '#' }]
+        : []),
 ];
 
 const getOptions = (setting: Setting): string[] => {
@@ -131,45 +133,22 @@ const getOptions = (setting: Setting): string[] => {
         .filter(Boolean);
 };
 
-const isChecked = (key: string): boolean => {
-    return modifiedValues[key] === '1' || modifiedValues[key] === 'true';
+const isChecked = (value: string | null): boolean => {
+    return value === '1' || value === 'true';
 };
 
-const saveChanges = (): void => {
-    const changes: Record<string, string | null> = {};
-    props.settings.forEach((setting) => {
-        if (modifiedValues[setting.key] !== setting.value) {
-            changes[setting.key] = modifiedValues[setting.key];
-        }
-    });
-
-    if (Object.keys(changes).length === 0) return;
-
-    isSaving.value = true;
-    router.patch(
-        '/admin/settings/bulk',
-        { settings: changes },
-        {
-            preserveScroll: true,
-            onFinish: () => {
-                isSaving.value = false;
-            },
-        },
-    );
+const truncateValue = (value: string | null, maxLength = 40): string => {
+    if (!value) return 'N/A';
+    return value.length > maxLength ? value.substring(0, maxLength) + '...' : value;
 };
 
-const deleteSetting = (
-    settingKey: string,
-    role: string,
-): void => {
+const deleteSetting = (settingKey: string, role: string): void => {
     if (role === 'system') {
         alert('System settings cannot be deleted.');
         return;
     }
 
-    if (
-        confirm(`Are you sure you want to delete the setting "${settingKey}"?`)
-    ) {
+    if (confirm(`Are you sure you want to delete the setting "${settingKey}"?`)) {
         router.delete(`/admin/settings/${settingKey}`);
     }
 };
@@ -177,33 +156,22 @@ const deleteSetting = (
 
 <template>
     <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
-        <Head title="Admin Settings" />
+        <Head :title="pageTitle" />
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
                     <Heading
                         variant="small"
-                        title="Application Settings"
-                        description="Manage all application settings"
+                        :title="pageTitle"
+                        :description="pageDescription"
                     />
-                    <div class="flex items-center gap-2">
-                        <Button
-                            v-if="hasChanges"
-                            @click="saveChanges"
-                            :disabled="isSaving"
-                            class="gap-2"
-                        >
-                            <Save class="h-4 w-4" />
-                            {{ isSaving ? 'Saving...' : 'Save Changes' }}
-                        </Button>
-                        <Link
-                            href="/admin/settings/create"
-                            class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                        >
-                            Create New Setting
-                        </Link>
-                    </div>
+                    <Link
+                        href="/admin/settings/create"
+                        class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                    >
+                        Create New Setting
+                    </Link>
                 </div>
 
                 <div
@@ -213,64 +181,72 @@ const deleteSetting = (
                     {{ status }}
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <div class="flex-1">
-                        <Input
-                            v-model="searchQuery"
-                            type="text"
-                            placeholder="Search settings by key, label, description, or value..."
-                            class="w-full"
-                            @input="handleSearch"
-                        />
-                    </div>
-                    <Button
-                        v-if="filters?.search"
-                        variant="outline"
-                        @click="
-                            router.get(
-                                '/admin/settings',
-                                {},
-                                { preserveState: false },
-                            )
-                        "
-                    >
-                        Clear
-                    </Button>
-                </div>
+                <SearchInput
+                    v-model="searchQuery"
+                    placeholder="Search settings by key, label, description, or value..."
+                    :show-clear="!!filters?.search"
+                    @search="handleSearch"
+                    @clear="clearSearch"
+                />
 
-                <div class="space-y-4">
-                    <div
-                        v-for="setting in settings"
-                        :key="setting.id"
-                        class="rounded-lg border p-4"
-                        :class="{
-                            'border-primary/30 bg-primary/5':
-                                modifiedValues[setting.key] !== setting.value,
-                        }"
-                    >
-                        <div class="flex items-start justify-between gap-4">
-                            <div class="flex-1 space-y-2">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-base font-medium">
-                                        {{ setting.label }}
-                                    </h3>
-                                    <span class="text-xs text-muted-foreground"
-                                        >({{ setting.key }})</span
+                <div class="overflow-x-auto rounded-lg border">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b bg-muted/50">
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Label</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Key</th>
+                                <th v-if="!currentGroup" class="px-4 py-3 text-left text-sm font-semibold">Group</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Value</th>
+                                <th class="px-4 py-3 text-center text-sm font-semibold">Role</th>
+                                <th class="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="setting in settings.data" :key="setting.id" class="border-b last:border-b-0">
+                                <td class="px-4 py-3 font-medium">
+                                    {{ setting.label }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <code class="rounded bg-muted px-1.5 py-0.5 text-xs">{{ setting.key }}</code>
+                                </td>
+                                <td v-if="!currentGroup" class="px-4 py-3 text-sm text-muted-foreground">
+                                    <Link
+                                        v-if="setting.group"
+                                        :href="`/admin/settings/group/${setting.group}`"
+                                        class="capitalize hover:underline"
                                     >
+                                        {{ setting.group }}
+                                    </Link>
+                                    <span v-else>&mdash;</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span
+                                        v-if="setting.field_type === 'checkbox'"
+                                        :class="[
+                                            'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+                                            isChecked(setting.value)
+                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                                                : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+                                        ]"
+                                    >
+                                        {{ isChecked(setting.value) ? 'Enabled' : 'Disabled' }}
+                                    </span>
+                                    <span v-else class="text-sm text-foreground">
+                                        {{ truncateValue(setting.value) }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger as-child>
                                                 <span
                                                     :class="{
                                                         'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400':
-                                                            setting.role ===
-                                                            'system',
+                                                            setting.role === 'system',
                                                         'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400':
-                                                            setting.role ===
-                                                            'user',
+                                                            setting.role === 'user',
                                                         'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400':
-                                                            setting.role ===
-                                                            'plugin',
+                                                            setting.role === 'plugin',
                                                     }"
                                                     class="cursor-help rounded-full px-2 py-0.5 text-xs font-medium capitalize"
                                                 >
@@ -278,194 +254,76 @@ const deleteSetting = (
                                                 </span>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p
-                                                    v-if="
-                                                        setting.role ===
-                                                        'system'
-                                                    "
-                                                >
-                                                    Core application settings
-                                                    (cannot be deleted)
-                                                </p>
-                                                <p
-                                                    v-else-if="
-                                                        setting.role === 'user'
-                                                    "
-                                                >
-                                                    User-configurable settings
-                                                </p>
-                                                <p v-else>
-                                                    Plugin-specific settings
-                                                </p>
+                                                <p v-if="setting.role === 'system'">Core application settings (cannot be deleted)</p>
+                                                <p v-else-if="setting.role === 'user'">User-configurable settings</p>
+                                                <p v-else>Plugin-specific settings</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
-                                </div>
-                                <p
-                                    v-if="setting.description"
-                                    class="text-sm text-muted-foreground"
-                                >
-                                    {{ setting.description }}
-                                </p>
-
-                                <!-- Current value display -->
-                                <div class="pt-1">
-                                    <span
-                                        v-if="setting.field_type === 'checkbox'"
-                                        :class="[
-                                            'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                                            isChecked(setting.key)
-                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                                                : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-                                        ]"
-                                    >
-                                        {{ isChecked(setting.key) ? 'Enabled' : 'Disabled' }}
-                                    </span>
-                                    <span
-                                        v-else
-                                        class="text-sm text-foreground"
-                                    >
-                                        {{ modifiedValues[setting.key] ?? 'N/A' }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger as-child>
-                                            <button
-                                                type="button"
-                                                @click="openEditModal(setting)"
-                                                class="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                                            >
-                                                <Pencil class="h-4 w-4" />
-                                                Edit
-                                            </button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>
-                                                Edit label, description, and
-                                                value
-                                            </p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger as-child>
-                                            <Link
-                                                :href="`/admin/settings/${setting.key}/edit`"
-                                                class="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                                            >
-                                                <Settings2 class="h-4 w-4" />
-                                                Configure
-                                            </Link>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>
-                                                Edit key, label, field type,
-                                                role, and other configuration
-                                            </p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger as-child>
-                                            <button
-                                                type="button"
-                                                :disabled="
-                                                    setting.role === 'system'
-                                                "
-                                                @click="
-                                                    deleteSetting(
-                                                        setting.key,
-                                                        setting.role,
-                                                    )
-                                                "
-                                                :class="{
-                                                    'text-sm text-destructive hover:underline':
-                                                        setting.role !==
-                                                        'system',
-                                                    'cursor-not-allowed text-sm text-muted-foreground':
-                                                        setting.role ===
-                                                        'system',
-                                                }"
-                                            >
-                                                Delete
-                                            </button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p v-if="setting.role === 'system'">
-                                                System settings cannot be
-                                                deleted
-                                            </p>
-                                            <p v-else>
-                                                Permanently remove this setting
-                                            </p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            </div>
-                        </div>
-                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger as-child>
+                                                    <button
+                                                        type="button"
+                                                        @click="openEditModal(setting)"
+                                                        class="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                                                    >
+                                                        <Pencil class="h-3.5 w-3.5" />
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Quick edit value</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger as-child>
+                                                    <Link
+                                                        :href="`/admin/settings/${setting.key}/edit`"
+                                                        class="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                                                    >
+                                                        <Settings2 class="h-3.5 w-3.5" />
+                                                    </Link>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Configure setting</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                        <button
+                                            type="button"
+                                            :disabled="setting.role === 'system'"
+                                            @click="deleteSetting(setting.key, setting.role)"
+                                            :class="{
+                                                'text-xs text-destructive hover:underline': setting.role !== 'system',
+                                                'cursor-not-allowed text-xs text-muted-foreground/50': setting.role === 'system',
+                                            }"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="settings.data.length === 0">
+                                <td :colspan="currentGroup ? 5 : 6" class="px-4 py-8 text-center text-muted-foreground">
+                                    No settings found.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <!-- Floating save bar -->
-                <Transition
-                    enter-active-class="transition ease-out duration-200"
-                    enter-from-class="translate-y-4 opacity-0"
-                    enter-to-class="translate-y-0 opacity-100"
-                    leave-active-class="transition ease-in duration-150"
-                    leave-from-class="translate-y-0 opacity-100"
-                    leave-to-class="translate-y-4 opacity-0"
-                >
-                    <div
-                        v-if="hasChanges"
-                        class="fixed right-0 bottom-0 left-0 z-50 border-t bg-background/95 px-6 py-3 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/60"
-                    >
-                        <div
-                            class="container mx-auto flex items-center justify-between"
-                        >
-                            <p class="text-sm text-muted-foreground">
-                                You have unsaved changes
-                            </p>
-                            <div class="flex items-center gap-3">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    @click="
-                                        settings.forEach(
-                                            (s) =>
-                                                (modifiedValues[s.key] =
-                                                    s.value),
-                                        )
-                                    "
-                                >
-                                    Discard
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    @click="saveChanges"
-                                    :disabled="isSaving"
-                                    class="gap-2"
-                                >
-                                    <Save class="h-4 w-4" />
-                                    {{ isSaving ? 'Saving...' : 'Save Changes' }}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Transition>
+                <Pagination :pagination="settings" />
             </div>
         </div>
 
         <!-- Edit Setting Modal -->
         <Dialog v-model:open="editModalOpen">
-            <DialogContent
-                v-if="editingSetting"
-                class="sm:max-w-lg"
-            >
+            <DialogContent v-if="editingSetting" class="sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>{{ editingSetting.label }}</DialogTitle>
                     <DialogDescription>
@@ -480,9 +338,7 @@ const deleteSetting = (
 
                 <div class="space-y-4 py-4">
                     <div class="flex items-center gap-2 text-xs text-muted-foreground">
-                        <code class="rounded bg-muted px-1.5 py-0.5">{{
-                            editingSetting.key
-                        }}</code>
+                        <code class="rounded bg-muted px-1.5 py-0.5">{{ editingSetting.key }}</code>
                         <span
                             :class="{
                                 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400':
@@ -510,49 +366,34 @@ const deleteSetting = (
                                 type="button"
                                 @click="
                                     editFormValue =
-                                        editFormValue === '1' ||
-                                        editFormValue === 'true'
-                                            ? '0'
-                                            : '1'
+                                        editFormValue === '1' || editFormValue === 'true' ? '0' : '1'
                                 "
                                 :class="[
                                     'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none',
-                                    editFormValue === '1' ||
-                                    editFormValue === 'true'
+                                    editFormValue === '1' || editFormValue === 'true'
                                         ? 'bg-primary'
                                         : 'bg-muted',
                                 ]"
                                 role="switch"
-                                :aria-checked="
-                                    editFormValue === '1' ||
-                                    editFormValue === 'true'
-                                "
+                                :aria-checked="editFormValue === '1' || editFormValue === 'true'"
                             >
                                 <span
                                     :class="[
                                         'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                                        editFormValue === '1' ||
-                                        editFormValue === 'true'
+                                        editFormValue === '1' || editFormValue === 'true'
                                             ? 'translate-x-5'
                                             : 'translate-x-0',
                                     ]"
                                 />
                             </button>
                             <span class="text-sm">
-                                {{
-                                    editFormValue === '1' ||
-                                    editFormValue === 'true'
-                                        ? 'Enabled'
-                                        : 'Disabled'
-                                }}
+                                {{ editFormValue === '1' || editFormValue === 'true' ? 'Enabled' : 'Disabled' }}
                             </span>
                         </div>
 
                         <!-- Multi-options select in modal -->
                         <select
-                            v-else-if="
-                                editingSetting.field_type === 'multioptions'
-                            "
+                            v-else-if="editingSetting.field_type === 'multioptions'"
                             v-model="editFormValue"
                             class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
                         >
@@ -580,7 +421,9 @@ const deleteSetting = (
                     <Button variant="outline" @click="closeEditModal">
                         Cancel
                     </Button>
-                    <Button @click="saveEditModal"> Apply </Button>
+                    <Button @click="saveEditModal" :disabled="isSavingModal">
+                        {{ isSavingModal ? 'Saving...' : 'Save' }}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
