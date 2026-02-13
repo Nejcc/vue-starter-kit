@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "357a433384d6c06a6c8f1e4998209bf1",
+    "content-hash": "8b046ad2380b5642b4b0795f2d6be681",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1841,132 +1841,6 @@
             "time": "2026-01-12T19:57:57+00:00"
         },
         {
-            "name": "laravelplus/global-settings",
-            "version": "dev-203eb2947271c274b42d5afd09425fc7c5fc6e59",
-            "dist": {
-                "type": "path",
-                "url": "packages/laravelplus/global-settings",
-                "reference": "2cef294bbecd153dab3511066a97babad53c757a"
-            },
-            "require": {
-                "illuminate/database": "^12.0",
-                "illuminate/http": "^12.0",
-                "illuminate/support": "^12.0",
-                "php": "^8.4"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^9.0",
-                "phpunit/phpunit": "^11.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "LaravelPlus\\GlobalSettings\\GlobalSettingsServiceProvider"
-                    ],
-                    "aliases": {
-                        "GlobalSettings": "LaravelPlus\\GlobalSettings\\Facades\\GlobalSettings"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "LaravelPlus\\GlobalSettings\\": "src/"
-                },
-                "classmap": [
-                    "database/seeders"
-                ]
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "LaravelPlus\\GlobalSettings\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "LaravelPlus",
-                    "email": "info@laravelplus.com"
-                }
-            ],
-            "description": "A global settings management package for Laravel with admin panel support.",
-            "keywords": [
-                "admin",
-                "global-settings",
-                "laravel",
-                "settings"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "laravelplus/localization",
-            "version": "dev-60c2cf7376920eaf5108675f46abde0eef12de78",
-            "dist": {
-                "type": "path",
-                "url": "packages/laravelplus/localization",
-                "reference": "3e923ae1c5320bc74643677181c5e1764b731a66"
-            },
-            "require": {
-                "illuminate/database": "^12.0",
-                "illuminate/http": "^12.0",
-                "illuminate/support": "^12.0",
-                "php": "^8.4"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^9.0",
-                "phpunit/phpunit": "^11.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "LaravelPlus\\Localization\\LocalizationServiceProvider"
-                    ],
-                    "aliases": {
-                        "Localization": "LaravelPlus\\Localization\\Facades\\Localization"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "LaravelPlus\\Localization\\": "src/",
-                    "LaravelPlus\\Localization\\Database\\Factories\\": "database/factories/",
-                    "LaravelPlus\\Localization\\Database\\Seeders\\": "database/seeders/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "LaravelPlus\\Localization\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "LaravelPlus",
-                    "email": "info@laravelplus.com"
-                }
-            ],
-            "description": "Multi-language localization package for Laravel with database-driven translations, content translation traits, and admin UI.",
-            "keywords": [
-                "i18n",
-                "laravel",
-                "localization",
-                "multi-language",
-                "translations"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
             "name": "league/commonmark",
             "version": "2.8.0",
             "source": {
@@ -2627,130 +2501,6 @@
                 }
             ],
             "time": "2026-01-02T08:56:05+00:00"
-        },
-        {
-            "name": "nejcc/payment-gateway",
-            "version": "dev-b7f9350f32fae783270ad0e6e856e7f8c85c1f9b",
-            "dist": {
-                "type": "path",
-                "url": "packages/laravelplus/payment-gateway",
-                "reference": "b8673ed174542d5296796d2f3959080ac8a5bb5f"
-            },
-            "require": {
-                "illuminate/database": "^11.0|^12.0",
-                "illuminate/http": "^11.0|^12.0",
-                "illuminate/support": "^11.0|^12.0",
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^9.0",
-                "phpunit/phpunit": "^11.0"
-            },
-            "suggest": {
-                "coinbase/coinbase-commerce": "Required for Coinbase Crypto gateway",
-                "paypal/paypal-checkout-sdk": "Required for PayPal gateway (^1.0)",
-                "stripe/stripe-php": "Required for Stripe gateway (^13.0|^14.0|^15.0)"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Nejcc\\PaymentGateway\\PaymentGatewayServiceProvider"
-                    ],
-                    "aliases": {
-                        "Payment": "Nejcc\\PaymentGateway\\Facades\\Payment"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Nejcc\\PaymentGateway\\": "src/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Nejcc\\PaymentGateway\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nejc",
-                    "email": "nejc@example.com"
-                }
-            ],
-            "description": "A flexible multi-provider payment gateway for Laravel with support for Stripe, PayPal, Crypto, and more.",
-            "keywords": [
-                "crypto",
-                "gateway",
-                "laravel",
-                "payment",
-                "paypal",
-                "stripe",
-                "subscriptions"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "nejcc/subscribe",
-            "version": "dev-33df4b072b38654b9d73af43d7fe3a6a0bc60d5e",
-            "dist": {
-                "type": "path",
-                "url": "packages/laravelplus/subscribe",
-                "reference": "d5177c746bb86b782e55396c51e0e818dbfe5ba8"
-            },
-            "require": {
-                "illuminate/database": "^11.0|^12.0",
-                "illuminate/http": "^11.0|^12.0",
-                "illuminate/support": "^11.0|^12.0",
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^9.0|^10.0",
-                "phpunit/phpunit": "^11.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Nejcc\\Subscribe\\SubscribeServiceProvider"
-                    ],
-                    "aliases": {
-                        "Subscribe": "Nejcc\\Subscribe\\Facades\\Subscribe"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Nejcc\\Subscribe\\": "src/",
-                    "Nejcc\\Subscribe\\Database\\Factories\\": "database/factories/",
-                    "Nejcc\\Subscribe\\Database\\Seeders\\": "database/seeders/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Nejcc\\Subscribe\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nejc Cotic",
-                    "email": "nejc.cotic@gmail.com"
-                }
-            ],
-            "description": "Email subscription and newsletter management with multi-provider support (Brevo, Mailchimp, HubSpot, ConvertKit)",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
         },
         {
             "name": "nesbot/carbon",
@@ -9686,12 +9436,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "laravelplus/global-settings": 20,
-        "laravelplus/localization": 20,
-        "nejcc/payment-gateway": 20,
-        "nejcc/subscribe": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

@@ -207,8 +207,8 @@ app/
 └── Services/         # Business logic layer (Service Pattern)
 
 packages/
-├── nejcc/payment-gateway/   # Multi-provider payment processing
-└── nejcc/subscribe/         # Email subscription management
+├── laravelplus/payment-gateway/   # Multi-provider payment processing
+└── laravelplus/subscribe/         # Email subscription management
 
 resources/js/
 ├── components/       # Vue components (shadcn-vue in ui/)
@@ -227,8 +227,8 @@ routes/
 | Package | Description |
 |---------|-------------|
 | `laravelplus/global-settings` | Key-value settings with admin panel and role-based access |
-| `nejcc/payment-gateway` | Multi-provider payments, subscriptions, invoices, refunds, webhooks |
-| `nejcc/subscribe` | Email subscriptions with Brevo, Mailchimp, HubSpot, ConvertKit support |
+| `laravelplus/payment-gateway` | Multi-provider payments, subscriptions, invoices, refunds, webhooks |
+| `laravelplus/subscribe` | Email subscriptions with Brevo, Mailchimp, HubSpot, ConvertKit support |
 
 ## Tech Stack
 

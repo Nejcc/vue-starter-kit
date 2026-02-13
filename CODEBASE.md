@@ -46,8 +46,8 @@ This is a **generic Laravel starter kit** designed to be cloned and customized f
 - **Notification system** with mark-as-read, filtering, and pagination
 - **Theme/appearance management** (light/dark mode)
 - **Security headers middleware** (X-Frame-Options, CSP, HSTS, Referrer-Policy, Permissions-Policy)
-- **Payment gateway integration** (Stripe, PayPal, Crypto, Bank Transfer, COD) via `nejcc/payment-gateway` package
-- **Subscriber management** via `nejcc/subscribe` package
+- **Payment gateway integration** (Stripe, PayPal, Crypto, Bank Transfer, COD) via `laravelplus/payment-gateway` package
+- **Subscriber management** via `laravelplus/subscribe` package
 - **Global settings** via `laravelplus/global-settings` package
 
 ### Key Philosophy
@@ -403,8 +403,8 @@ SESSION_ENCRYPT=false              # Enable in production
 
 ### Local Packages
 
-- **`nejcc/payment-gateway`** (`packages/nejcc/payment-gateway`) - Multi-driver payment/billing (Stripe, PayPal, Crypto, Bank Transfer, COD), provides `Billable` trait
-- **`nejcc/subscribe`** (`packages/nejcc/subscribe`) - Subscriber/mailing list management
+- **`laravelplus/payment-gateway`** (`packages/laravelplus/payment-gateway`) - Multi-driver payment/billing (Stripe, PayPal, Crypto, Bank Transfer, COD), provides `Billable` trait
+- **`laravelplus/subscribe`** (`packages/laravelplus/subscribe`) - Subscriber/mailing list management
 - **`laravelplus/global-settings`** (`packages/laravelplus/global-settings`) - Dynamic key-value application settings with role-based access
 - **`laravelplus/installer`** (`packages/laravelplus/installer`) - Application installer/setup wizard
 
@@ -2653,7 +2653,7 @@ This starter kit includes the following comprehensive features out of the box:
 - Admin viewer with pagination
 - Used by impersonation, database browser, and other sensitive operations
 
-**Payment Management** (via `nejcc/payment-gateway`):
+**Payment Management** (via `laravelplus/payment-gateway`):
 - Payment dashboard with overview metrics
 - Plan management (CRUD)
 - Customer management with details view
@@ -2662,7 +2662,7 @@ This starter kit includes the following comprehensive features out of the box:
 - Transaction listing and details
 - Multi-driver support: Stripe, PayPal, Crypto, Bank Transfer, COD
 
-**Subscriber Management** (via `nejcc/subscribe`):
+**Subscriber Management** (via `laravelplus/subscribe`):
 - Subscriber dashboard
 - Subscriber listing and details
 - Mailing list management
