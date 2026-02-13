@@ -126,8 +126,7 @@ final class FortifyServiceProvider extends ServiceProvider
      */
     private function isDevQuickLoginEnabled(): bool
     {
-        return (bool) config('security.dev_routes.enabled', true)
-            && !app()->environment('production');
+        return app()->environment('local');
     }
 
     /**
