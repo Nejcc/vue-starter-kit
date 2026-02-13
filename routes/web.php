@@ -24,13 +24,24 @@ Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index
 
 // Quick login & register for development - only when APP_ENV=local
 if (app()->environment('local')) {
-    Route::post('quick-login/{userId}', function (int $userId) {
-        $user = App\Models\User::find($userId);
+    Route::post('quick-login/{role}', function (string $role) {
+        $allowedRoles = ['super-admin', 'admin', 'user'];
+
+        if (!in_array($role, $allowedRoles, true)) {
+            return back()->withErrors([
+                'role' => "Invalid role: {$role}.",
+            ]);
+        }
+
+        $user = App\Models\User::role($role)->first();
 
         if (!$user) {
-            return back()->withErrors([
-                'email' => "User {$userId} does not exist.",
+            $user = App\Models\User::factory()->create([
+                'name' => ucfirst(str_replace('-', ' ', $role)),
+                'email' => $role . '@example.com',
+                'email_verified_at' => now(),
             ]);
+            $user->assignRole($role);
         }
 
         Illuminate\Support\Facades\Auth::login($user);

@@ -16,8 +16,8 @@ import type { LoginPageProps } from '@/types';
 
 defineProps<LoginPageProps>();
 
-const quickLogin = (userId: number): void => {
-    router.post(`/quick-login/${userId}`);
+const quickLogin = (role: string): void => {
+    router.post(`/quick-login/${role}`);
 };
 </script>
 
@@ -125,7 +125,7 @@ const quickLogin = (userId: number): void => {
                                 variant="outline"
                                 size="sm"
                                 :tabindex="6"
-                                @click="quickLogin(1)"
+                                @click="quickLogin('super-admin')"
                                 data-test="quick-login-super-admin"
                             >
                                 Super Admin
@@ -135,7 +135,7 @@ const quickLogin = (userId: number): void => {
                                 variant="outline"
                                 size="sm"
                                 :tabindex="7"
-                                @click="quickLogin(2)"
+                                @click="quickLogin('admin')"
                                 data-test="quick-login-admin"
                             >
                                 Admin
@@ -145,7 +145,7 @@ const quickLogin = (userId: number): void => {
                                 variant="outline"
                                 size="sm"
                                 :tabindex="8"
-                                @click="quickLogin(3)"
+                                @click="quickLogin('user')"
                                 data-test="quick-login-user"
                             >
                                 User
