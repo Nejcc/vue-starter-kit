@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Constants\RoleNames;
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,26 +21,6 @@ use Inertia\Response;
  */
 final class DatabaseController extends Controller
 {
-    /**
-     * Create a new admin database controller instance.
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Check if user has admin or super-admin role.
-     */
-    private function authorizeAdmin(): void
-    {
-        $user = auth()->user();
-
-        if (!$user || (!$user->hasRole(RoleNames::SUPER_ADMIN) && !$user->hasRole(RoleNames::ADMIN))) {
-            abort(403, 'Unauthorized. Admin access required.');
-        }
-    }
-
     /**
      * Test database connection.
      *
@@ -69,14 +49,10 @@ final class DatabaseController extends Controller
     /**
      * Show the database tables index page.
      *
-     * @param  Request  $request  The incoming request
      * @param  string|null  $connection  The database connection name (optional route parameter)
-     * @return Response|RedirectResponse The Inertia response with tables list or redirect
      */
     public function index(Request $request, ?string $connection = null): Response|RedirectResponse
     {
-        $this->authorizeAdmin();
-
         $connections = array_keys(config('database.connections'));
 
         // Get connection from route parameter or query parameter
@@ -162,16 +138,12 @@ final class DatabaseController extends Controller
     /**
      * Show details for a specific table.
      *
-     * @param  Request  $request  The incoming request
      * @param  string  $connection  The database connection name
      * @param  string  $table  The table name
      * @param  string|null  $view  The view type (structure, data, indexes, actions)
-     * @return Response The Inertia response with table details
      */
     public function show(Request $request, string $connection, string $table, ?string $view = null): Response
     {
-        $this->authorizeAdmin();
-
         $connections = array_keys(config('database.connections'));
 
         // Validate connection exists
@@ -222,6 +194,17 @@ final class DatabaseController extends Controller
                             'query' => $request->query(),
                         ]
                     );
+
+                    $maskedColumns = config('security.database_browser.masked_columns', []);
+                    $data = array_map(function (array $row) use ($maskedColumns): array {
+                        foreach ($row as $column => $value) {
+                            if ($value !== null && in_array($column, $maskedColumns, true)) {
+                                $row[$column] = str_repeat("\u{2022}", 8);
+                            }
+                        }
+
+                        return $row;
+                    }, $data);
 
                     $tableInfo['data'] = $data;
                     $tableInfo['pagination'] = [
@@ -416,6 +399,12 @@ final class DatabaseController extends Controller
             $view = null;
         }
 
+        AuditLog::log('database.viewed', null, null, [
+            'connection' => $connection,
+            'table' => $table,
+            'view' => $view ?? 'structure',
+        ]);
+
         return Inertia::render('admin/Database/Show', [
             'table' => $tableInfo,
             'connections' => $connections,
@@ -427,13 +416,9 @@ final class DatabaseController extends Controller
 
     /**
      * List all database connections.
-     *
-     * @return Response The Inertia response with connections list
      */
     public function listConnections(): Response
     {
-        $this->authorizeAdmin();
-
         $connections = array_keys(config('database.connections'));
         $defaultConnection = config('database.default');
 

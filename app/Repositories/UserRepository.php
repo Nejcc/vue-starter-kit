@@ -158,4 +158,36 @@ final class UserRepository extends BaseRepository implements UserRepositoryInter
             ->orderBy('name')
             ->get($columns);
     }
+
+    public function searchPaginated(?string $search, int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        $query = $this->query()->with('roles');
+
+        if ($search) {
+            $query->where(function ($q) use ($search): void {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->latest()->paginate($perPage);
+    }
+
+    public function countAll(): int
+    {
+        return $this->query()->count();
+    }
+
+    public function countVerified(): int
+    {
+        return $this->query()->whereNotNull('email_verified_at')->count();
+    }
+
+    public function getRecent(int $limit = 5): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->query()
+            ->latest()
+            ->limit($limit)
+            ->get(['id', 'name', 'email', 'created_at']);
+    }
 }

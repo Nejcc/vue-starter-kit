@@ -2,11 +2,13 @@
 import { Form, Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
+import CheckboxGroup from '@/components/CheckboxGroup.vue';
+import FormField from '@/components/FormField.vue';
 import Heading from '@/components/Heading.vue';
-import InputError from '@/components/InputError.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useDateFormat } from '@/composables/useDateFormat';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { destroy, index, update } from '@/routes/admin/users';
 import { type BreadcrumbItem } from '@/types';
@@ -27,6 +29,7 @@ interface EditUserPageProps {
 }
 
 const props = defineProps<EditUserPageProps>();
+const { formatDate } = useDateFormat();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -79,8 +82,12 @@ const confirmDelete = () => {
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
-                    <div class="grid gap-2">
-                        <Label for="name">Name</Label>
+                    <FormField
+                        label="Name"
+                        id="name"
+                        :error="errors.name"
+                        required
+                    >
                         <Input
                             id="name"
                             name="name"
@@ -89,11 +96,14 @@ const confirmDelete = () => {
                             :default-value="user.name"
                             placeholder="John Doe"
                         />
-                        <InputError :message="errors.name" />
-                    </div>
+                    </FormField>
 
-                    <div class="grid gap-2">
-                        <Label for="email">Email</Label>
+                    <FormField
+                        label="Email"
+                        id="email"
+                        :error="errors.email"
+                        required
+                    >
                         <Input
                             id="email"
                             name="email"
@@ -102,62 +112,43 @@ const confirmDelete = () => {
                             :default-value="user.email"
                             placeholder="user@example.com"
                         />
-                        <InputError :message="errors.email" />
-                    </div>
+                    </FormField>
 
-                    <div class="grid gap-2">
-                        <Label for="password">New Password</Label>
+                    <FormField
+                        label="New Password"
+                        id="password"
+                        :error="errors.password"
+                        description="Leave blank to keep the current password"
+                    >
                         <Input
                             id="password"
                             name="password"
                             type="password"
                             placeholder="Leave blank to keep current password"
                         />
-                        <p class="text-xs text-muted-foreground">
-                            Leave blank to keep the current password
-                        </p>
-                        <InputError :message="errors.password" />
-                    </div>
+                    </FormField>
 
-                    <div class="grid gap-2">
-                        <Label for="password_confirmation"
-                            >Confirm New Password</Label
-                        >
+                    <FormField
+                        label="Confirm New Password"
+                        id="password_confirmation"
+                        :error="errors.password_confirmation"
+                    >
                         <Input
                             id="password_confirmation"
                             name="password_confirmation"
                             type="password"
                             placeholder="Confirm new password"
                         />
-                        <InputError :message="errors.password_confirmation" />
-                    </div>
+                    </FormField>
 
-                    <div v-if="roles.length > 0" class="grid gap-2">
-                        <Label>Roles</Label>
-                        <div class="space-y-2">
-                            <div
-                                v-for="role in roles"
-                                :key="role"
-                                class="flex items-center space-x-2"
-                            >
-                                <input
-                                    :id="`role-${role}`"
-                                    v-model="selectedRoles"
-                                    type="checkbox"
-                                    :value="role"
-                                    name="roles[]"
-                                    class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                                />
-                                <Label
-                                    :for="`role-${role}`"
-                                    class="text-sm font-medium"
-                                >
-                                    {{ role }}
-                                </Label>
-                            </div>
-                        </div>
-                        <InputError :message="errors.roles" />
-                    </div>
+                    <CheckboxGroup
+                        v-if="roles.length > 0"
+                        v-model="selectedRoles"
+                        :options="roles"
+                        name="roles"
+                        label="Roles"
+                        :error="errors.roles"
+                    />
 
                     <div class="rounded-lg border border-muted bg-muted/50 p-4">
                         <h4 class="text-sm font-medium">User Information</h4>
@@ -166,33 +157,21 @@ const confirmDelete = () => {
                         >
                             <div class="flex gap-2">
                                 <dt>Created:</dt>
-                                <dd>
-                                    {{
-                                        new Date(
-                                            user.created_at,
-                                        ).toLocaleDateString()
-                                    }}
-                                </dd>
+                                <dd>{{ formatDate(user.created_at) }}</dd>
                             </div>
                             <div class="flex gap-2">
                                 <dt>Email verified:</dt>
                                 <dd>
-                                    <span
+                                    <StatusBadge
                                         v-if="user.email_verified_at"
-                                        class="text-green-600 dark:text-green-400"
-                                    >
-                                        {{
-                                            new Date(
-                                                user.email_verified_at,
-                                            ).toLocaleDateString()
-                                        }}
-                                    </span>
-                                    <span
+                                        :label="formatDate(user.email_verified_at)"
+                                        variant="success"
+                                    />
+                                    <StatusBadge
                                         v-else
-                                        class="text-yellow-600 dark:text-yellow-400"
-                                    >
-                                        Not verified
-                                    </span>
+                                        label="Not verified"
+                                        variant="warning"
+                                    />
                                 </dd>
                             </div>
                         </dl>

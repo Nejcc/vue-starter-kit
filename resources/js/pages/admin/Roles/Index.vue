@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { useDebounceFn } from '@vueuse/core';
 import { ref } from 'vue';
 
+import DataCard from '@/components/DataCard.vue';
 import FormErrors from '@/components/FormErrors.vue';
 import Heading from '@/components/Heading.vue';
+import SearchInput from '@/components/SearchInput.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -14,7 +16,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import { useDateFormat } from '@/composables/useDateFormat';
+import { useSearch } from '@/composables/useSearch';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { create, destroy, edit, index } from '@/routes/admin/roles';
 import { type BreadcrumbItem } from '@/types';
@@ -39,8 +42,13 @@ interface RolesPageProps {
 }
 
 const props = defineProps<RolesPageProps>();
+const { formatDate } = useDateFormat();
 
-const searchQuery = ref(props.filters?.search ?? '');
+const { searchQuery, handleSearch, clearSearch } = useSearch({
+    url: index().url,
+});
+searchQuery.value = props.filters?.search ?? '';
+
 const showDeleteDialog = ref(false);
 const roleToDelete = ref<{ name: string } | null>(null);
 
@@ -65,25 +73,6 @@ const confirmDelete = (): void => {
         showDeleteDialog.value = false;
         roleToDelete.value = null;
     }
-};
-
-const debouncedSearch = useDebounceFn((query: string) => {
-    router.get(
-        index().url,
-        { search: query || null },
-        {
-            preserveState: true,
-            preserveScroll: true,
-        },
-    );
-}, 300);
-
-const handleSearch = (): void => {
-    debouncedSearch(searchQuery.value);
-};
-
-const performSearch = (): void => {
-    debouncedSearch(searchQuery.value);
 };
 
 const breadcrumbItems: BreadcrumbItem[] = [
@@ -129,144 +118,114 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     :errors="page.props.errors as Record<string, string>"
                 />
 
-                <div class="flex items-center gap-4">
-                    <div class="flex-1">
-                        <Input
-                            v-model="searchQuery"
-                            type="text"
-                            placeholder="Search roles by name..."
-                            class="w-full"
-                            @input="handleSearch"
-                        />
-                    </div>
-                    <Button
-                        v-if="filters?.search"
-                        variant="outline"
-                        @click="
-                            router.get(
-                                index().url,
-                                {},
-                                { preserveState: false },
-                            )
-                        "
-                    >
-                        Clear
-                    </Button>
-                </div>
+                <SearchInput
+                    v-model="searchQuery"
+                    placeholder="Search roles by name..."
+                    :show-clear="!!filters?.search"
+                    @search="handleSearch"
+                    @clear="clearSearch"
+                />
 
                 <div class="space-y-4">
-                    <div
+                    <DataCard
                         v-for="role in roles"
                         :key="role.id"
-                        class="rounded-lg border p-4"
                     >
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1 space-y-2">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-base font-medium">
-                                        {{ role.name }}
-                                    </h3>
-                                    <span
-                                        v-if="role.is_super_admin"
-                                        class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400"
-                                        title="This role has all permissions automatically granted"
-                                    >
-                                        System Role
-                                    </span>
-                                </div>
-                                <p
-                                    v-if="role.is_super_admin"
-                                    class="text-sm text-muted-foreground italic"
-                                >
-                                    This role has all permissions automatically
-                                    granted. No permissions need to be assigned.
-                                </p>
-                                <div class="flex items-center gap-2">
-                                    <span
-                                        class="text-sm font-medium text-muted-foreground"
-                                        >Users:</span
-                                    >
-                                    <span class="text-sm">{{
-                                        role.users_count
-                                    }}</span>
-                                </div>
-                                <div
-                                    v-if="role.is_super_admin"
-                                    class="space-y-1"
-                                >
-                                    <span
-                                        class="text-sm font-medium text-muted-foreground"
-                                        >Permissions:</span
-                                    >
-                                    <span
-                                        class="text-sm text-muted-foreground italic"
-                                        >All permissions (automatically
-                                        granted)</span
-                                    >
-                                </div>
-                                <div
-                                    v-else-if="role.permissions.length > 0"
-                                    class="space-y-1"
-                                >
-                                    <span
-                                        class="text-sm font-medium text-muted-foreground"
-                                        >Permissions:</span
-                                    >
-                                    <div class="flex flex-wrap gap-2">
-                                        <span
-                                            v-for="permission in role.permissions"
-                                            :key="permission"
-                                            class="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900/20 dark:text-purple-400"
-                                        >
-                                            {{ permission }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <p class="text-xs text-muted-foreground">
-                                    Created:
-                                    {{
-                                        new Date(
-                                            role.created_at,
-                                        ).toLocaleDateString()
-                                    }}
-                                </p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <Link
-                                    v-if="!role.is_super_admin"
-                                    :href="edit(role.name).url"
-                                    class="text-sm text-primary hover:underline"
-                                >
-                                    Edit
-                                </Link>
-                                <span
-                                    v-else
-                                    class="text-sm text-muted-foreground"
-                                    title="Super-admin role cannot be edited"
-                                >
-                                    Edit
-                                </span>
-                                <button
-                                    type="button"
-                                    :disabled="role.is_super_admin"
-                                    @click="
-                                        deleteRole(
-                                            role.name,
-                                            role.is_super_admin ?? false,
-                                        )
-                                    "
-                                    :class="{
-                                        'text-sm text-destructive hover:underline':
-                                            !role.is_super_admin,
-                                        'cursor-not-allowed text-sm text-muted-foreground':
-                                            role.is_super_admin,
-                                    }"
-                                >
-                                    Delete
-                                </button>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-medium">
+                                {{ role.name }}
+                            </h3>
+                            <StatusBadge
+                                v-if="role.is_super_admin"
+                                label="System Role"
+                                variant="danger"
+                            />
+                        </div>
+                        <p
+                            v-if="role.is_super_admin"
+                            class="text-sm text-muted-foreground italic"
+                        >
+                            This role has all permissions automatically
+                            granted. No permissions need to be assigned.
+                        </p>
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="text-sm font-medium text-muted-foreground"
+                                >Users:</span
+                            >
+                            <span class="text-sm">{{
+                                role.users_count
+                            }}</span>
+                        </div>
+                        <div
+                            v-if="role.is_super_admin"
+                            class="space-y-1"
+                        >
+                            <span
+                                class="text-sm font-medium text-muted-foreground"
+                                >Permissions:</span
+                            >
+                            <span
+                                class="text-sm text-muted-foreground italic"
+                                >All permissions (automatically
+                                granted)</span
+                            >
+                        </div>
+                        <div
+                            v-else-if="role.permissions.length > 0"
+                            class="space-y-1"
+                        >
+                            <span
+                                class="text-sm font-medium text-muted-foreground"
+                                >Permissions:</span
+                            >
+                            <div class="flex flex-wrap gap-2">
+                                <StatusBadge
+                                    v-for="permission in role.permissions"
+                                    :key="permission"
+                                    :label="permission"
+                                    variant="purple"
+                                />
                             </div>
                         </div>
-                    </div>
+                        <p class="text-xs text-muted-foreground">
+                            Created: {{ formatDate(role.created_at) }}
+                        </p>
+                        <template #actions>
+                            <Link
+                                v-if="!role.is_super_admin"
+                                :href="edit(role.name).url"
+                                class="text-sm text-primary hover:underline"
+                            >
+                                Edit
+                            </Link>
+                            <span
+                                v-else
+                                class="text-sm text-muted-foreground"
+                                title="Super-admin role cannot be edited"
+                            >
+                                Edit
+                            </span>
+                            <button
+                                type="button"
+                                :disabled="role.is_super_admin"
+                                @click="
+                                    deleteRole(
+                                        role.name,
+                                        role.is_super_admin ?? false,
+                                    )
+                                "
+                                :class="{
+                                    'text-sm text-destructive hover:underline':
+                                        !role.is_super_admin,
+                                    'cursor-not-allowed text-sm text-muted-foreground':
+                                        role.is_super_admin,
+                                }"
+                            >
+                                Delete
+                            </button>
+                        </template>
+                    </DataCard>
                 </div>
 
                 <div

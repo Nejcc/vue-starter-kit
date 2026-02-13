@@ -18,9 +18,7 @@ final class PasswordController extends Controller
      */
     public function __construct(
         private readonly UpdateUserPasswordAction $updateUserPasswordAction
-    ) {
-        $this->middleware('auth');
-    }
+    ) {}
 
     /**
      * Show the user's password settings page.

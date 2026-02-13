@@ -255,7 +255,7 @@ return [
         'prefix' => env('PAYMENT_ADMIN_PREFIX', 'admin/payments'),
 
         // Middleware to apply to admin routes
-        'middleware' => ['web', 'auth'],
+        'middleware' => ['web', 'auth', 'role:super-admin,admin'],
 
         // Dashboard settings
         'dashboard' => [

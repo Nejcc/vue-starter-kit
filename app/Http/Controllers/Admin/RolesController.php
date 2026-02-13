@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Constants\RoleNames;
 use App\Contracts\Services\RoleServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRoleRequest;
@@ -18,36 +17,13 @@ use InvalidArgumentException;
 
 final class RolesController extends Controller
 {
-    /**
-     * Create a new admin roles controller instance.
-     */
-    public function __construct(private RoleServiceInterface $roleService)
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Check if user has admin or super-admin role.
-     */
-    private function authorizeAdmin(): void
-    {
-        $user = auth()->user();
-
-        if (!$user || (!$user->hasRole(RoleNames::SUPER_ADMIN) && !$user->hasRole(RoleNames::ADMIN))) {
-            abort(403, 'Unauthorized. Admin access required.');
-        }
-    }
+    public function __construct(private readonly RoleServiceInterface $roleService) {}
 
     /**
      * Display a listing of roles.
-     *
-     * @param  Request  $request  The incoming request
-     * @return Response The Inertia response with roles page data
      */
     public function index(Request $request): Response
     {
-        $this->authorizeAdmin();
-
         $search = $request->filled('search') ? $request->get('search') : null;
 
         return Inertia::render('admin/Roles/Index', [
@@ -61,13 +37,9 @@ final class RolesController extends Controller
 
     /**
      * Show the form for creating a new role.
-     *
-     * @return Response The Inertia response with create form
      */
     public function create(): Response
     {
-        $this->authorizeAdmin();
-
         return Inertia::render('admin/Roles/Create', [
             'permissions' => $this->roleService->getAllPermissions(),
         ]);
@@ -75,14 +47,9 @@ final class RolesController extends Controller
 
     /**
      * Store a newly created role.
-     *
-     * @param  StoreRoleRequest  $request  The validated request
-     * @return RedirectResponse Redirect to roles index page
      */
     public function store(StoreRoleRequest $request): RedirectResponse
     {
-        $this->authorizeAdmin();
-
         try {
             $this->roleService->create($request->validated());
         } catch (InvalidArgumentException $e) {
@@ -95,14 +62,9 @@ final class RolesController extends Controller
 
     /**
      * Show the form for editing a role.
-     *
-     * @param  Role  $role  The role to edit
-     * @return Response The Inertia response with edit form
      */
     public function edit(Role $role): Response
     {
-        $this->authorizeAdmin();
-
         return Inertia::render('admin/Roles/Edit', [
             'role' => $this->roleService->getForEdit($role),
             'permissions' => $this->roleService->getAllPermissions(),
@@ -111,15 +73,9 @@ final class RolesController extends Controller
 
     /**
      * Update the specified role.
-     *
-     * @param  UpdateRoleRequest  $request  The validated request
-     * @param  Role  $role  The role to update
-     * @return RedirectResponse Redirect to roles index page
      */
     public function update(UpdateRoleRequest $request, Role $role): RedirectResponse
     {
-        $this->authorizeAdmin();
-
         try {
             $this->roleService->update($role, $request->validated());
         } catch (InvalidArgumentException $e) {
@@ -132,14 +88,9 @@ final class RolesController extends Controller
 
     /**
      * Remove the specified role.
-     *
-     * @param  Role  $role  The role to delete
-     * @return RedirectResponse Redirect to roles index page
      */
     public function destroy(Role $role): RedirectResponse
     {
-        $this->authorizeAdmin();
-
         try {
             $this->roleService->delete($role);
         } catch (InvalidArgumentException $e) {

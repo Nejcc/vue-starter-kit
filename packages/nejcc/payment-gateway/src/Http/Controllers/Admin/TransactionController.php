@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Nejcc\PaymentGateway\Enums\PaymentStatus;
 use Nejcc\PaymentGateway\Facades\Payment;
+use Nejcc\PaymentGateway\Http\Requests\Admin\RefundTransactionRequest;
 use Nejcc\PaymentGateway\Models\Transaction;
 
 final class TransactionController extends Controller
@@ -126,12 +127,8 @@ final class TransactionController extends Controller
         ]);
     }
 
-    public function refund(Request $request, Transaction $transaction): RedirectResponse
+    public function refund(RefundTransactionRequest $request, Transaction $transaction): RedirectResponse
     {
-        $request->validate([
-            'amount' => ['nullable', 'integer', 'min:1', 'max:'.$transaction->getRefundableAmount()],
-            'reason' => ['nullable', 'string', 'max:500'],
-        ]);
 
         if (! $transaction->isSuccessful()) {
             return back()->with('error', 'Cannot refund a transaction that is not successful.');

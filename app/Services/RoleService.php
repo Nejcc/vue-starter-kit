@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Constants\RoleNames;
+use App\Contracts\Repositories\RoleRepositoryInterface;
 use App\Contracts\Services\RoleServiceInterface;
 use App\Models\AuditLog;
-use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 /**
@@ -19,8 +18,13 @@ use InvalidArgumentException;
  * Provides business logic for role management including creation, updates,
  * and deletion with super-admin protection.
  */
-final class RoleService implements RoleServiceInterface
+final class RoleService extends AbstractService implements RoleServiceInterface
 {
+    public function __construct(RoleRepositoryInterface $repository)
+    {
+        parent::__construct($repository);
+    }
+
     /**
      * Get all roles with permissions and optional search.
      *
@@ -28,13 +32,7 @@ final class RoleService implements RoleServiceInterface
      */
     public function getAll(?string $search = null): Collection
     {
-        $query = Role::with('permissions');
-
-        if ($search) {
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        return $query->latest()->get()->map(fn ($role) => [
+        return $this->getRepository()->getAllWithPermissions($search)->map(fn ($role) => [
             'id' => $role->id,
             'name' => $role->name,
             'is_super_admin' => $role->name === RoleNames::SUPER_ADMIN,
@@ -57,8 +55,8 @@ final class RoleService implements RoleServiceInterface
             throw new InvalidArgumentException('The super-admin role cannot be created. It is a system role.');
         }
 
-        return DB::transaction(function () use ($data): Role {
-            $role = Role::create(['name' => $data['name']]);
+        return $this->transaction(function () use ($data): Role {
+            $role = $this->getRepository()->create(['name' => $data['name']]);
 
             if (!empty($data['permissions']) && is_array($data['permissions'])) {
                 $role->givePermissionTo($data['permissions']);
@@ -95,8 +93,8 @@ final class RoleService implements RoleServiceInterface
             'permissions' => $role->permissions->pluck('name')->toArray(),
         ];
 
-        return DB::transaction(function () use ($role, $data, $oldValues): Role {
-            $role->update(['name' => $data['name']]);
+        return $this->transaction(function () use ($role, $data, $oldValues): Role {
+            $this->getRepository()->update($role->id, ['name' => $data['name']]);
 
             if (isset($data['permissions']) && is_array($data['permissions'])) {
                 $role->syncPermissions($data['permissions']);
@@ -137,7 +135,7 @@ final class RoleService implements RoleServiceInterface
             'name' => $role->name,
         ]);
 
-        return (bool) $role->delete();
+        return $this->getRepository()->delete($role->id);
     }
 
     /**
@@ -162,6 +160,24 @@ final class RoleService implements RoleServiceInterface
      */
     public function getAllPermissions(): Collection
     {
-        return Permission::all()->pluck('name');
+        return $this->getRepository()->getAllPermissionNames();
+    }
+
+    /**
+     * Get all role names.
+     *
+     * @return Collection<int, string>
+     */
+    public function getAllRoleNames(): Collection
+    {
+        return $this->getRepository()->all()->pluck('name');
+    }
+
+    /**
+     * Get total number of roles.
+     */
+    public function getTotalCount(): int
+    {
+        return $this->getRepository()->all()->count();
     }
 }

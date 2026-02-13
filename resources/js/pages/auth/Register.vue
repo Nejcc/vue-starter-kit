@@ -66,18 +66,24 @@ const quickRegister = (role: string): void => {
                         class="grid gap-2"
                     />
 
-                    <FormField
-                        id="password"
-                        label="Password"
-                        type="password"
-                        name="password"
-                        required
-                        :tabindex="3"
-                        autocomplete="new-password"
-                        placeholder="Password"
-                        :error="errors.password"
-                        class="grid gap-2"
-                    />
+                    <div class="grid gap-2">
+                        <FormField
+                            id="password"
+                            label="Password"
+                            type="password"
+                            name="password"
+                            required
+                            :tabindex="3"
+                            autocomplete="new-password"
+                            placeholder="Password"
+                            :error="errors.password"
+                            class="grid gap-2"
+                        />
+                        <p class="text-xs text-muted-foreground">
+                            Must be at least 12 characters with uppercase,
+                            lowercase, numbers, and symbols.
+                        </p>
+                    </div>
 
                     <FormField
                         id="password_confirmation"

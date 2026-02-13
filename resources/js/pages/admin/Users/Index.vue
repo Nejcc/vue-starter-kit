@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
-import { useDebounceFn } from '@vueuse/core';
+import { Head, Link } from '@inertiajs/vue3';
 import { Users } from 'lucide-vue-next';
-import { ref } from 'vue';
 
+import DataCard from '@/components/DataCard.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import Heading from '@/components/Heading.vue';
 import SearchEmptyState from '@/components/SearchEmptyState.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import SearchInput from '@/components/SearchInput.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
+import { useDateFormat } from '@/composables/useDateFormat';
+import { useSearch } from '@/composables/useSearch';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { create, edit, index } from '@/routes/admin/users';
 import { type BreadcrumbItem } from '@/types';
@@ -36,27 +37,12 @@ interface UsersPageProps {
 }
 
 const props = defineProps<UsersPageProps>();
+const { formatDate } = useDateFormat();
 
-const searchQuery = ref(props.filters?.search ?? '');
-
-const debouncedSearch = useDebounceFn((query: string) => {
-    router.get(
-        index().url,
-        { search: query || null },
-        {
-            preserveState: true,
-            preserveScroll: true,
-        },
-    );
-}, 300);
-
-const handleSearch = (): void => {
-    debouncedSearch(searchQuery.value);
-};
-
-const performSearch = (): void => {
-    debouncedSearch(searchQuery.value);
-};
+const { searchQuery, handleSearch, clearSearch } = useSearch({
+    url: index().url,
+});
+searchQuery.value = props.filters?.search ?? '';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -97,42 +83,19 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     {{ status }}
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <div class="flex-1">
-                        <Input
-                            v-model="searchQuery"
-                            type="text"
-                            placeholder="Search users by name or email..."
-                            class="w-full"
-                            @input="handleSearch"
-                        />
-                    </div>
-                    <Button
-                        v-if="filters?.search"
-                        variant="outline"
-                        @click="
-                            router.get(
-                                index().url,
-                                {},
-                                { preserveState: false },
-                            )
-                        "
-                    >
-                        Clear
-                    </Button>
-                </div>
+                <SearchInput
+                    v-model="searchQuery"
+                    placeholder="Search users by name or email..."
+                    :show-clear="!!filters?.search"
+                    @search="handleSearch"
+                    @clear="clearSearch"
+                />
 
                 <div v-if="users.data.length === 0">
                     <SearchEmptyState
                         v-if="filters?.search"
                         :search-query="filters.search"
-                        @clear-search="
-                            router.get(
-                                index().url,
-                                {},
-                                { preserveState: false },
-                            )
-                        "
+                        @clear-search="clearSearch"
                     />
                     <EmptyState
                         v-else
@@ -145,62 +108,50 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 </div>
 
                 <div v-else class="space-y-4">
-                    <div
+                    <DataCard
                         v-for="user in users.data"
                         :key="user.id"
-                        class="rounded-lg border p-4"
                     >
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1 space-y-2">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-base font-medium">
-                                        {{ user.name }}
-                                    </h3>
-                                    <span
-                                        v-if="user.email_verified_at"
-                                        class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400"
-                                    >
-                                        Verified
-                                    </span>
-                                </div>
-                                <p class="text-sm text-muted-foreground">
-                                    {{ user.email }}
-                                </p>
-                                <div
-                                    v-if="user.roles.length > 0"
-                                    class="flex items-center gap-2"
-                                >
-                                    <span
-                                        class="text-sm font-medium text-muted-foreground"
-                                        >Roles:</span
-                                    >
-                                    <span
-                                        v-for="role in user.roles"
-                                        :key="role"
-                                        class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
-                                    >
-                                        {{ role }}
-                                    </span>
-                                </div>
-                                <p class="text-xs text-muted-foreground">
-                                    Joined:
-                                    {{
-                                        new Date(
-                                            user.created_at,
-                                        ).toLocaleDateString()
-                                    }}
-                                </p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <Link
-                                    :href="edit(user.slug).url"
-                                    class="text-sm text-primary hover:underline"
-                                >
-                                    Edit
-                                </Link>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-medium">
+                                {{ user.name }}
+                            </h3>
+                            <StatusBadge
+                                v-if="user.email_verified_at"
+                                label="Verified"
+                                variant="success"
+                            />
                         </div>
-                    </div>
+                        <p class="text-sm text-muted-foreground">
+                            {{ user.email }}
+                        </p>
+                        <div
+                            v-if="user.roles.length > 0"
+                            class="flex items-center gap-2"
+                        >
+                            <span
+                                class="text-sm font-medium text-muted-foreground"
+                                >Roles:</span
+                            >
+                            <StatusBadge
+                                v-for="role in user.roles"
+                                :key="role"
+                                :label="role"
+                                variant="info"
+                            />
+                        </div>
+                        <p class="text-xs text-muted-foreground">
+                            Joined: {{ formatDate(user.created_at) }}
+                        </p>
+                        <template #actions>
+                            <Link
+                                :href="edit(user.slug).url"
+                                class="text-sm text-primary hover:underline"
+                            >
+                                Edit
+                            </Link>
+                        </template>
+                    </DataCard>
                 </div>
             </div>
         </div>

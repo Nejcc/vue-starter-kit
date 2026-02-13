@@ -30,3 +30,17 @@ export function urlIsActive(
 export function toUrl(href: NonNullable<InertiaLinkProps['href']>) {
     return typeof href === 'string' ? href : href?.url;
 }
+
+const htmlEntities: Record<string, string> = {
+    '&laquo;': '\u00AB',
+    '&raquo;': '\u00BB',
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&nbsp;': ' ',
+    '&hellip;': '\u2026',
+};
+
+export function decodePaginationLabel(label: string): string {
+    return label.replace(/&\w+;/g, (entity) => htmlEntities[entity] ?? entity);
+}

@@ -12,6 +12,8 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Nejcc\Subscribe\DTOs\SubscriberList as SubscriberListDTO;
 use Nejcc\Subscribe\Facades\Subscribe;
+use Nejcc\Subscribe\Http\Requests\StoreListRequest;
+use Nejcc\Subscribe\Http\Requests\UpdateListRequest;
 use Nejcc\Subscribe\Models\SubscriptionList;
 
 final class ListController extends Controller
@@ -27,18 +29,9 @@ final class ListController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreListRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:1000'],
-            'is_public' => ['boolean'],
-            'is_default' => ['boolean'],
-            'double_opt_in' => ['boolean'],
-            'welcome_email_enabled' => ['boolean'],
-            'welcome_email_subject' => ['nullable', 'required_if:welcome_email_enabled,true', 'string', 'max:255'],
-            'welcome_email_content' => ['nullable', 'required_if:welcome_email_enabled,true', 'string'],
-        ]);
+        $validated = $request->validated();
 
         if ($validated['is_default'] ?? false) {
             SubscriptionList::where('is_default', true)->update(['is_default' => false]);
@@ -82,18 +75,9 @@ final class ListController extends Controller
         ]);
     }
 
-    public function update(Request $request, SubscriptionList $list): RedirectResponse
+    public function update(UpdateListRequest $request, SubscriptionList $list): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:1000'],
-            'is_public' => ['boolean'],
-            'is_default' => ['boolean'],
-            'double_opt_in' => ['boolean'],
-            'welcome_email_enabled' => ['boolean'],
-            'welcome_email_subject' => ['nullable', 'required_if:welcome_email_enabled,true', 'string', 'max:255'],
-            'welcome_email_content' => ['nullable', 'required_if:welcome_email_enabled,true', 'string'],
-        ]);
+        $validated = $request->validated();
 
         if (($validated['is_default'] ?? false) && !$list->is_default) {
             SubscriptionList::where('is_default', true)->update(['is_default' => false]);

@@ -19,6 +19,12 @@ const { getInitials } = useInitials();
 const showAvatar = computed(
     () => props.user.avatar && props.user.avatar !== '',
 );
+
+const primaryRole = computed(() => {
+    const roles = props.user.roles as string[] | undefined;
+    if (!roles || roles.length === 0) return null;
+    return roles[0];
+});
 </script>
 
 <template>
@@ -31,6 +37,9 @@ const showAvatar = computed(
 
     <div class="grid flex-1 text-left text-sm leading-tight">
         <span class="truncate font-medium">{{ user.name }}</span>
+        <span v-if="primaryRole && !showEmail" class="truncate text-xs capitalize text-muted-foreground">{{
+            primaryRole
+        }}</span>
         <span v-if="showEmail" class="truncate text-xs text-muted-foreground">{{
             user.email
         }}</span>

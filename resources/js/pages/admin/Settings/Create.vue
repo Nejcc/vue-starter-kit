@@ -7,8 +7,11 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { useSettingsNav } from '@/composables/useSettingsNav';
+import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
+
+const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useSettingsNav();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -29,7 +32,7 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
 </script>
 
 <template>
-    <AdminLayout :breadcrumbs="breadcrumbItems">
+    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
         <Head title="Create Setting" />
 
         <div class="container mx-auto py-8">
@@ -180,7 +183,7 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
                             Create Setting
                         </Button>
                         <Link
-                            :href="index().url"
+                            href="/admin/settings"
                             class="text-sm text-muted-foreground hover:underline"
                         >
                             Cancel
@@ -202,5 +205,5 @@ const fieldType = ref<'input' | 'checkbox' | 'multioptions'>('input');
                 </Form>
             </div>
         </div>
-    </AdminLayout>
+    </ModuleLayout>
 </template>

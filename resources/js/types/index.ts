@@ -25,6 +25,9 @@ export type {
 // Re-export model types
 export type {
     DatabaseNotification,
+    Organization,
+    OrganizationInvitation,
+    OrganizationMember,
     PaginatedResponse,
     Paginator,
 } from './models';
@@ -41,11 +44,15 @@ export type {
 } from './forms';
 
 import type { Auth } from './auth';
+import type { ModuleNavGroupData } from './navigation';
 
 export interface InstalledModules {
+    globalSettings: boolean;
     payments: boolean;
     subscribers: boolean;
     horizon: boolean;
+    organizations: boolean;
+    localizations: boolean;
 }
 
 export interface AppPageProps {
@@ -54,6 +61,7 @@ export interface AppPageProps {
     auth_layout: 'simple' | 'split';
     sidebarOpen: boolean;
     modules: InstalledModules;
+    moduleNavigation: ModuleNavGroupData[];
     notifications: {
         unreadCount: number;
     };

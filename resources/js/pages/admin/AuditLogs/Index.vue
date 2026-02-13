@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import { useDebounceFn } from '@vueuse/core';
-import { Activity, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { Activity } from 'lucide-vue-next';
 import { ref } from 'vue';
 
+import DataTable from '@/components/DataTable.vue';
 import Heading from '@/components/Heading.vue';
+import Pagination from '@/components/Pagination.vue';
+import SearchInput from '@/components/SearchInput.vue';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useDateFormat } from '@/composables/useDateFormat';
+import { useSearch } from '@/composables/useSearch';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { index as auditLogsIndex } from '@/routes/admin/audit-logs';
 import { type BreadcrumbItem } from '@/types';
 
 interface AuditUser {
@@ -30,12 +34,6 @@ interface AuditLogEntry {
     user: AuditUser | null;
 }
 
-interface PaginationLink {
-    url: string | null;
-    label: string;
-    active: boolean;
-}
-
 interface PaginatedLogs {
     data: AuditLogEntry[];
     current_page: number;
@@ -44,7 +42,7 @@ interface PaginatedLogs {
     total: number;
     from: number | null;
     to: number | null;
-    links: PaginationLink[];
+    links: Array<{ url: string | null; label: string; active: boolean }>;
     first_page_url: string;
     last_page_url: string;
     next_page_url: string | null;
@@ -61,59 +59,45 @@ interface AuditLogsPageProps {
 }
 
 const props = defineProps<AuditLogsPageProps>();
+const { formatDateTime } = useDateFormat();
 
-const searchQuery = ref(props.filters.search);
 const selectedEvent = ref(props.filters.event);
+
+const { searchQuery, handleSearch } = useSearch({
+    url: auditLogsIndex().url,
+    extraParams: () => ({ event: selectedEvent.value || null }),
+});
+searchQuery.value = props.filters.search;
 
 const breadcrumbItems: BreadcrumbItem[] = [
     { title: 'Admin', href: '#' },
     { title: 'Audit Logs', href: '#' },
 ];
 
-function applyFilters(params: Record<string, string | null>): void {
+const columns = [
+    { key: 'event', label: 'Event' },
+    { key: 'user', label: 'User' },
+    { key: 'subject', label: 'Subject', hideBelow: 'md' as const },
+    { key: 'ip_address', label: 'IP Address', hideBelow: 'md' as const },
+    { key: 'created_at', label: 'Date' },
+];
+
+function handleEventFilter(value: string): void {
+    selectedEvent.value = value === 'all' ? '' : value;
     router.get(
-        route('admin.audit-logs.index'),
+        auditLogsIndex().url,
         {
-            search:
-                params.search !== undefined
-                    ? params.search
-                    : searchQuery.value || null,
-            event:
-                params.event !== undefined
-                    ? params.event
-                    : selectedEvent.value || null,
+            search: searchQuery.value || null,
+            event: value === 'all' ? null : value,
         },
         { preserveState: true, preserveScroll: true },
     );
 }
 
-const debouncedSearch = useDebounceFn((query: string) => {
-    applyFilters({ search: query || null });
-}, 300);
-
-function handleSearch(): void {
-    debouncedSearch(searchQuery.value);
-}
-
-function handleEventFilter(value: string): void {
-    selectedEvent.value = value === 'all' ? '' : value;
-    applyFilters({ event: value === 'all' ? null : value });
-}
-
 function clearFilters(): void {
     searchQuery.value = '';
     selectedEvent.value = '';
-    router.get(route('admin.audit-logs.index'), {}, { preserveState: false });
-}
-
-function formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
+    router.get(auditLogsIndex().url, {}, { preserveState: false });
 }
 
 function formatEventName(event: string): string {
@@ -121,17 +105,9 @@ function formatEventName(event: string): string {
 }
 
 function formatModelType(type: string | null): string {
-    if (!type) {
-        return '';
-    }
+    if (!type) return '';
     const parts = type.split('\\');
     return parts[parts.length - 1];
-}
-
-function goToPage(url: string | null): void {
-    if (url) {
-        router.get(url, {}, { preserveState: true, preserveScroll: true });
-    }
 }
 </script>
 
@@ -150,12 +126,11 @@ function goToPage(url: string | null): void {
                 <!-- Filters -->
                 <div class="flex flex-wrap items-center gap-4">
                     <div class="flex-1">
-                        <Input
+                        <SearchInput
                             v-model="searchQuery"
-                            type="text"
                             placeholder="Search by event, user, or IP address..."
-                            class="w-full"
-                            @input="handleSearch"
+                            :show-clear="false"
+                            @search="handleSearch"
                         />
                     </div>
                     <select
@@ -192,98 +167,53 @@ function goToPage(url: string | null): void {
                 </p>
 
                 <!-- Logs table -->
-                <div
+                <DataTable
                     v-if="logs.data.length > 0"
-                    class="overflow-hidden rounded-lg border"
+                    :columns="columns"
+                    :rows="(logs.data as Record<string, unknown>[])"
+                    row-key="id"
                 >
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b bg-muted/50">
-                                <th class="px-4 py-3 text-left font-medium">
-                                    Event
-                                </th>
-                                <th class="px-4 py-3 text-left font-medium">
-                                    User
-                                </th>
-                                <th
-                                    class="hidden px-4 py-3 text-left font-medium md:table-cell"
-                                >
-                                    Subject
-                                </th>
-                                <th
-                                    class="hidden px-4 py-3 text-left font-medium md:table-cell"
-                                >
-                                    IP Address
-                                </th>
-                                <th class="px-4 py-3 text-left font-medium">
-                                    Date
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y">
-                            <tr
-                                v-for="log in logs.data"
-                                :key="log.id"
-                                class="hover:bg-muted/30"
-                            >
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2">
-                                        <Activity
-                                            class="h-4 w-4 shrink-0 text-muted-foreground"
-                                        />
-                                        <span class="font-medium">{{
-                                            formatEventName(log.event)
-                                        }}</span>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div v-if="log.user">
-                                        <p class="font-medium">
-                                            {{ log.user.name }}
-                                        </p>
-                                        <p
-                                            class="text-xs text-muted-foreground"
-                                        >
-                                            {{ log.user.email }}
-                                        </p>
-                                    </div>
-                                    <span v-else class="text-muted-foreground"
-                                        >System</span
-                                    >
-                                </td>
-                                <td class="hidden px-4 py-3 md:table-cell">
-                                    <span
-                                        v-if="log.auditable_type"
-                                        class="text-muted-foreground"
-                                    >
-                                        {{
-                                            formatModelType(log.auditable_type)
-                                        }}
-                                        <span v-if="log.auditable_id"
-                                            >#{{ log.auditable_id }}</span
-                                        >
-                                    </span>
-                                    <span v-else class="text-muted-foreground"
-                                        >&mdash;</span
-                                    >
-                                </td>
-                                <td class="hidden px-4 py-3 md:table-cell">
-                                    <code
-                                        v-if="log.ip_address"
-                                        class="text-xs"
-                                        >{{ log.ip_address }}</code
-                                    >
-                                    <span v-else class="text-muted-foreground"
-                                        >&mdash;</span
-                                    >
-                                </td>
-                                <td class="px-4 py-3 text-muted-foreground">
-                                    {{ formatDate(log.created_at) }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <template #cell-event="{ row }">
+                        <div class="flex items-center gap-2">
+                            <Activity
+                                class="h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                            <span class="font-medium">{{
+                                formatEventName(row.event as string)
+                            }}</span>
+                        </div>
+                    </template>
+                    <template #cell-user="{ row }">
+                        <div v-if="(row as any).user">
+                            <p class="font-medium">
+                                {{ (row as any).user.name }}
+                            </p>
+                            <p class="text-xs text-muted-foreground">
+                                {{ (row as any).user.email }}
+                            </p>
+                        </div>
+                        <span v-else class="text-muted-foreground">System</span>
+                    </template>
+                    <template #cell-subject="{ row }">
+                        <span
+                            v-if="row.auditable_type"
+                            class="text-muted-foreground"
+                        >
+                            {{ formatModelType(row.auditable_type as string | null) }}
+                            <span v-if="row.auditable_id">#{{ row.auditable_id }}</span>
+                        </span>
+                        <span v-else class="text-muted-foreground">&mdash;</span>
+                    </template>
+                    <template #cell-ip_address="{ row }">
+                        <code v-if="row.ip_address" class="text-xs">{{ row.ip_address }}</code>
+                        <span v-else class="text-muted-foreground">&mdash;</span>
+                    </template>
+                    <template #cell-created_at="{ row }">
+                        <span class="text-muted-foreground">
+                            {{ formatDateTime(row.created_at as string) }}
+                        </span>
+                    </template>
+                </DataTable>
 
                 <!-- Empty state -->
                 <div v-else class="rounded-lg border p-12 text-center">
@@ -300,32 +230,7 @@ function goToPage(url: string | null): void {
                 </div>
 
                 <!-- Pagination -->
-                <div
-                    v-if="logs.last_page > 1"
-                    class="flex items-center justify-between"
-                >
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        :disabled="!logs.prev_page_url"
-                        @click="goToPage(logs.prev_page_url)"
-                    >
-                        <ChevronLeft class="mr-1 h-4 w-4" />
-                        Previous
-                    </Button>
-                    <span class="text-sm text-muted-foreground">
-                        Page {{ logs.current_page }} of {{ logs.last_page }}
-                    </span>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        :disabled="!logs.next_page_url"
-                        @click="goToPage(logs.next_page_url)"
-                    >
-                        Next
-                        <ChevronRight class="ml-1 h-4 w-4" />
-                    </Button>
-                </div>
+                <Pagination :pagination="logs" />
             </div>
         </div>
     </AdminLayout>

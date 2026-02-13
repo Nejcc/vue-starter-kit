@@ -68,4 +68,26 @@ interface UserRepositoryInterface extends RepositoryInterface
      * @return \Illuminate\Database\Eloquent\Collection<int, User> Collection of users
      */
     public function getAllForImpersonation(int $excludeUserId, array $columns = ['*']): \Illuminate\Database\Eloquent\Collection;
+
+    /**
+     * Search users with pagination and eager-loaded roles.
+     */
+    public function searchPaginated(?string $search, int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator;
+
+    /**
+     * Count all users.
+     */
+    public function countAll(): int;
+
+    /**
+     * Count users with verified emails.
+     */
+    public function countVerified(): int;
+
+    /**
+     * Get the most recent users.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, User>
+     */
+    public function getRecent(int $limit = 5): \Illuminate\Database\Eloquent\Collection;
 }

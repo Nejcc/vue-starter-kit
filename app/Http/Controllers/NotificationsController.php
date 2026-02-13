@@ -18,9 +18,7 @@ final class NotificationsController extends Controller
 {
     public function __construct(
         private readonly NotificationServiceInterface $notificationService,
-    ) {
-        $this->middleware('auth');
-    }
+    ) {}
 
     /**
      * Display the notifications page.

@@ -16,20 +16,17 @@ use Nejcc\Subscribe\Events\Subscribed;
 use Nejcc\Subscribe\Events\SubscriptionConfirmed;
 use Nejcc\Subscribe\Events\Unsubscribed;
 use Nejcc\Subscribe\Facades\Subscribe;
+use Nejcc\Subscribe\Http\Requests\SubscribeRequest;
+use Nejcc\Subscribe\Http\Requests\UnsubscribeRequest;
 use Nejcc\Subscribe\Mail\ConfirmSubscription;
 use Nejcc\Subscribe\Models\Subscriber;
 use Nejcc\Subscribe\Models\SubscriptionList;
 
 final class SubscribeController extends Controller
 {
-    public function subscribe(Request $request): JsonResponse|RedirectResponse
+    public function subscribe(SubscribeRequest $request): JsonResponse|RedirectResponse
     {
-        $validated = $request->validate([
-            'email' => ['required', 'email', 'max:255'],
-            'first_name' => ['nullable', 'string', 'max:255'],
-            'last_name' => ['nullable', 'string', 'max:255'],
-            'list_id' => ['nullable', 'exists:subscription_lists,id'],
-        ]);
+        $validated = $request->validated();
 
         $list = $validated['list_id']
             ? SubscriptionList::find($validated['list_id'])
@@ -139,12 +136,9 @@ final class SubscribeController extends Controller
             ->with('success', __('You have been unsubscribed successfully.'));
     }
 
-    public function unsubscribe(Request $request): JsonResponse|RedirectResponse
+    public function unsubscribe(UnsubscribeRequest $request): JsonResponse|RedirectResponse
     {
-        $validated = $request->validate([
-            'email' => ['required', 'email', 'exists:subscribers,email'],
-            'list_id' => ['nullable', 'exists:subscription_lists,id'],
-        ]);
+        $validated = $request->validated();
 
         $subscriber = Subscriber::where('email', $validated['email'])->first();
 

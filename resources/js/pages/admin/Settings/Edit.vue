@@ -8,8 +8,11 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { useSettingsNav } from '@/composables/useSettingsNav';
+import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
+
+const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useSettingsNav();
 
 interface Setting {
     id: number;
@@ -80,7 +83,7 @@ const deleteSetting = (): void => {
 </script>
 
 <template>
-    <AdminLayout :breadcrumbs="breadcrumbItems">
+    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
         <Head title="Edit Setting" />
 
         <div class="container mx-auto py-8">
@@ -288,5 +291,5 @@ const deleteSetting = (): void => {
                 </Form>
             </div>
         </div>
-    </AdminLayout>
+    </ModuleLayout>
 </template>

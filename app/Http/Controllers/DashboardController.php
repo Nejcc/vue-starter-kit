@@ -13,14 +13,6 @@ use Inertia\Response;
 final class DashboardController extends Controller
 {
     /**
-     * Create a new dashboard controller instance.
-     */
-    public function __construct()
-    {
-        $this->middleware(['auth', 'verified']);
-    }
-
-    /**
      * Display the user's dashboard.
      */
     public function index(): Response

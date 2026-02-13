@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
-import { Bell, Check, CheckCheck, ExternalLink, Trash2 } from 'lucide-vue-next';
+import { Bell, Check, CheckCheck, ExternalLink } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import {
+    index,
+    markAllAsRead as markAllAsReadAction,
+    markAsRead as markAsReadAction,
+    recent,
+} from '@/actions/App/Http/Controllers/NotificationsController';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -14,9 +20,11 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useDateFormat } from '@/composables/useDateFormat';
 import type { DatabaseNotification } from '@/types';
 
 const page = usePage();
+const { formatTimeAgo } = useDateFormat();
 const unreadCount = computed(() => page.props.notifications?.unreadCount ?? 0);
 
 const recentNotifications = ref<DatabaseNotification[]>([]);
@@ -27,7 +35,7 @@ async function fetchRecent() {
     if (loaded.value || loading.value) return;
     loading.value = true;
     try {
-        const response = await fetch(route('notifications.recent'), {
+        const response = await fetch(recent.url(), {
             headers: { Accept: 'application/json' },
         });
         const data = await response.json();
@@ -47,7 +55,7 @@ function handleOpen(open: boolean) {
 
 function markAsRead(id: string) {
     router.patch(
-        route('notifications.mark-as-read', { id }),
+        markAsReadAction.url(id),
         {},
         {
             preserveScroll: true,
@@ -61,7 +69,7 @@ function markAsRead(id: string) {
 
 function markAllAsRead() {
     router.post(
-        route('notifications.mark-all-read'),
+        markAllAsReadAction.url(),
         {},
         {
             preserveScroll: true,
@@ -72,18 +80,6 @@ function markAllAsRead() {
             },
         },
     );
-}
-
-function formatTimeAgo(dateStr: string): string {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-    return date.toLocaleDateString();
 }
 </script>
 
@@ -200,7 +196,7 @@ function formatTimeAgo(dateStr: string): string {
 
             <div class="border-t px-3 py-2 text-center">
                 <Link
-                    :href="route('notifications.index')"
+                    :href="index.url()"
                     class="text-xs font-medium text-primary hover:underline"
                 >
                     View all notifications

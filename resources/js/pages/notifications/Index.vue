@@ -10,17 +10,24 @@ import {
     Trash2,
 } from 'lucide-vue-next';
 
+import {
+    destroy,
+    index,
+    markAllAsRead as markAllAsReadAction,
+    markAsRead as markAsReadAction,
+} from '@/actions/App/Http/Controllers/NotificationsController';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 import type { NotificationsPageProps } from '@/types/pages';
 
 const props = defineProps<NotificationsPageProps>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: route('dashboard') },
-    { title: 'Notifications', href: route('notifications.index') },
+    { title: 'Dashboard', href: dashboard().url },
+    { title: 'Notifications', href: index.url() },
 ];
 
 const filters = [
@@ -31,7 +38,7 @@ const filters = [
 
 function applyFilter(filter: string) {
     router.get(
-        route('notifications.index'),
+        index.url(),
         filter === 'all' ? {} : { filter },
         { preserveState: true, preserveScroll: true },
     );
@@ -39,7 +46,7 @@ function applyFilter(filter: string) {
 
 function markAsRead(id: string) {
     router.patch(
-        route('notifications.mark-as-read', { id }),
+        markAsReadAction.url(id),
         {},
         { preserveScroll: true },
     );
@@ -47,14 +54,14 @@ function markAsRead(id: string) {
 
 function markAllAsRead() {
     router.post(
-        route('notifications.mark-all-read'),
+        markAllAsReadAction.url(),
         {},
         { preserveScroll: true },
     );
 }
 
 function deleteNotification(id: string) {
-    router.delete(route('notifications.destroy', { id }), {
+    router.delete(destroy.url(id), {
         preserveScroll: true,
     });
 }

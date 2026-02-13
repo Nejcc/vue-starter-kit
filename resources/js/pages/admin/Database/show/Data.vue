@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { Database } from 'lucide-vue-next';
+import { decodePaginationLabel } from '@/lib/utils';
 import { view } from '@/routes/admin/database/connection/show';
 import type { Column, Pagination } from './types';
 
@@ -138,19 +139,19 @@ const props = defineProps<Props>();
                             :href="link.url"
                             class="rounded-md border px-3 py-1.5 text-sm hover:bg-accent"
                         >
-                            <span v-html="link.label" />
+                            {{ decodePaginationLabel(link.label) }}
                         </Link>
                         <span
                             v-else-if="link.active"
                             class="rounded-md border border-primary bg-primary px-3 py-1.5 text-sm text-primary-foreground"
                         >
-                            <span v-html="link.label" />
+                            {{ decodePaginationLabel(link.label) }}
                         </span>
                         <span
                             v-else
                             class="px-3 py-1.5 text-sm text-muted-foreground"
                         >
-                            <span v-html="link.label" />
+                            {{ decodePaginationLabel(link.label) }}
                         </span>
                     </template>
                     <Link

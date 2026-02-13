@@ -109,7 +109,7 @@ Controllers -> Services -> Repositories -> Models
   Actions (single-responsibility operations)
 ```
 
-- **Repositories** (`app/Repositories/`) — Extend `AbstractRepository` with built-in caching (3600s TTL), CRUD, and query building
+- **Repositories** (`app/Repositories/`) — Extend `BaseRepository` with CRUD and query building
 - **Services** (`app/Services/`) — Extend `AbstractService` with transaction support, bound via contracts
 - **Actions** (`app/Actions/`) — Single-responsibility classes implementing `ActionInterface`, organized by domain
 

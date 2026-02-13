@@ -3,11 +3,10 @@ import { Form, Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft } from 'lucide-vue-next';
 import { ref } from 'vue';
 
+import FormField from '@/components/FormField.vue';
 import Heading from '@/components/Heading.vue';
-import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { index, update } from '@/routes/admin/permissions';
 import { type BreadcrumbItem } from '@/types';
@@ -45,7 +44,6 @@ const formData = ref({
 });
 
 const deletePermission = (): void => {
-    // TODO: Implement destroy route and method in PermissionsController
     alert('Delete functionality is not yet implemented.');
 };
 </script>
@@ -81,8 +79,12 @@ const deletePermission = (): void => {
                     v-slot="{ errors, processing, recentlySuccessful }"
                     :data="formData"
                 >
-                    <div class="grid gap-2">
-                        <Label for="name">Permission Name</Label>
+                    <FormField
+                        label="Permission Name"
+                        id="name"
+                        :error="errors.name"
+                        required
+                    >
                         <Input
                             id="name"
                             v-model="formData.name"
@@ -90,11 +92,14 @@ const deletePermission = (): void => {
                             type="text"
                             required
                         />
-                        <InputError :message="errors.name" />
-                    </div>
+                    </FormField>
 
-                    <div class="grid gap-2">
-                        <Label for="group_name">Group Name</Label>
+                    <FormField
+                        label="Group Name"
+                        id="group_name"
+                        :error="errors.group_name"
+                        description="Optional: Group permissions together"
+                    >
                         <Input
                             id="group_name"
                             v-model="formData.group_name"
@@ -102,11 +107,7 @@ const deletePermission = (): void => {
                             type="text"
                             placeholder="e.g., users, posts, settings"
                         />
-                        <InputError :message="errors.group_name" />
-                        <p class="text-sm text-muted-foreground">
-                            Optional: Group permissions together
-                        </p>
-                    </div>
+                    </FormField>
 
                     <div class="flex items-center gap-4">
                         <Button :disabled="processing" type="submit">

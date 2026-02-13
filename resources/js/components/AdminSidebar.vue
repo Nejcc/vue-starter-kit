@@ -2,13 +2,15 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     Activity,
-    Blocks,
+    Building2,
     ClipboardList,
     CreditCard,
     Database,
     Home,
     Key,
-    Mail,
+    Languages,
+    List,
+    Package,
     Settings,
     ShieldCheck,
     Users,
@@ -33,32 +35,40 @@ import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { dashboard } from '@/routes';
 import { index as auditLogsIndex } from '@/routes/admin/audit-logs';
 import { index as databaseIndex } from '@/routes/admin/database';
+import { index as modulesIndex } from '@/routes/admin/modules';
+import { index as packagesIndex } from '@/routes/admin/packages';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as usersIndex } from '@/routes/admin/users';
-import { type NavGroup } from '@/types';
+import { type ModuleNavGroupData, type NavGroup } from '@/types';
 import AppLogo from './AppLogo.vue';
 
 const page = usePage();
 const modules = computed(() => page.props.modules);
+const moduleNavigation = computed<ModuleNavGroupData[]>(
+    () => page.props.moduleNavigation ?? [],
+);
 const { isCurrentUrl } = useCurrentUrl();
 
+/**
+ * Get the first href from a module navigation group matched by keyword.
+ */
+function moduleHref(keyword: string, fallback: string): string {
+    const group = moduleNavigation.value.find((g) =>
+        g.title.toLowerCase().includes(keyword.toLowerCase()),
+    );
+    return group?.items[0]?.href ?? fallback;
+}
+
 const navGroups = computed<NavGroup[]>(() => {
+    // --- Static groups ---
     const groups: NavGroup[] = [
         {
             title: 'Access Control',
             icon: ShieldCheck,
             items: [
-                {
-                    title: 'Users',
-                    href: usersIndex().url,
-                    icon: Users,
-                },
-                {
-                    title: 'Roles',
-                    href: rolesIndex().url,
-                    icon: ShieldCheck,
-                },
+                { title: 'Users', href: usersIndex().url, icon: Users },
+                { title: 'Roles', href: rolesIndex().url, icon: ShieldCheck },
                 {
                     title: 'Permissions',
                     href: permissionsIndex().url,
@@ -80,50 +90,126 @@ const navGroups = computed<NavGroup[]>(() => {
                     href: auditLogsIndex().url,
                     icon: ClipboardList,
                 },
-                ...(modules.value?.globalSettings
-                    ? [
-                          {
-                              title: 'Settings',
-                              href: '/admin/settings',
-                              icon: Settings,
-                          },
-                      ]
-                    : []),
+                {
+                    title: 'Packages',
+                    href: packagesIndex().url,
+                    icon: Package,
+                },
             ],
         },
     ];
 
-    // Add Modules group if any module is enabled
-    const moduleItems = [];
-    if (modules.value?.payments) {
+    // --- Modules group ---
+    const moduleItems: NavItem[] = [];
+
+    // Global Settings
+    if (modules.value?.globalSettings) {
         moduleItems.push({
-            title: 'Payments',
-            href: '/admin/payments',
-            icon: CreditCard,
+            title: 'Global Settings',
+            href: '/admin/settings',
+            icon: Settings,
+        });
+    } else {
+        moduleItems.push({
+            title: 'Global Settings',
+            href: '#',
+            icon: Settings,
+            disabled: true,
         });
     }
+
+    // Payment Gateway
+    if (modules.value?.payments) {
+        moduleItems.push({
+            title: 'Payment Gateway',
+            href: moduleHref('payment', '/admin/payments'),
+            icon: CreditCard,
+        });
+    } else {
+        moduleItems.push({
+            title: 'Payment Gateway',
+            href: '#',
+            icon: CreditCard,
+            disabled: true,
+        });
+    }
+
+    // Subscribers
     if (modules.value?.subscribers) {
         moduleItems.push({
             title: 'Subscribers',
-            href: '/admin/subscribers',
-            icon: Mail,
+            href: moduleHref('subscriber', '/admin/subscribers'),
+            icon: List,
+        });
+    } else {
+        moduleItems.push({
+            title: 'Subscribers',
+            href: '#',
+            icon: List,
+            disabled: true,
         });
     }
+
+    // Localization
+    if (modules.value?.localizations) {
+        moduleItems.push({
+            title: 'Localization',
+            href: moduleHref('localization', '/admin/localizations/languages'),
+            icon: Languages,
+        });
+    } else {
+        moduleItems.push({
+            title: 'Localization',
+            href: '#',
+            icon: Languages,
+            disabled: true,
+        });
+    }
+
+    // Organizations
+    if (modules.value?.organizations) {
+        moduleItems.push({
+            title: 'Organizations',
+            href: moduleHref('organization', '/admin/organizations'),
+            icon: Building2,
+        });
+    } else {
+        moduleItems.push({
+            title: 'Organizations',
+            href: '#',
+            icon: Building2,
+            disabled: true,
+        });
+    }
+
+    // Horizon
     if (modules.value?.horizon) {
         moduleItems.push({
             title: 'Horizon',
             href: '/horizon',
             icon: Activity,
         });
-    }
-
-    if (moduleItems.length > 0) {
-        groups.push({
-            title: 'Modules',
-            icon: Blocks,
-            items: moduleItems,
+    } else {
+        moduleItems.push({
+            title: 'Horizon',
+            href: '#',
+            icon: Activity,
+            disabled: true,
         });
     }
+
+    // "View All" link
+    moduleItems.push({
+        title: 'View All',
+        href: modulesIndex().url,
+        icon: Package,
+    });
+
+    groups.push({
+        title: 'Modules',
+        icon: Package,
+        items: moduleItems,
+    });
 
     return groups;
 });
@@ -144,7 +230,6 @@ const navGroups = computed<NavGroup[]>(() => {
         </SidebarHeader>
 
         <SidebarContent>
-            <!-- Dashboard as standalone top-level item -->
             <SidebarGroup class="px-2 py-0">
                 <SidebarGroupLabel>Platform</SidebarGroupLabel>
                 <SidebarMenu>
@@ -162,8 +247,6 @@ const navGroups = computed<NavGroup[]>(() => {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarGroup>
-
-            <!-- Collapsible nav groups -->
             <NavMain :groups="navGroups" />
         </SidebarContent>
 

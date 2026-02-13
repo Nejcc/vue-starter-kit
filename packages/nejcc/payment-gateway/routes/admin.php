@@ -21,7 +21,7 @@ use Nejcc\PaymentGateway\Http\Controllers\Admin\TransactionController;
 */
 
 Route::prefix(config('payment-gateway.admin.prefix', 'admin/payments'))
-    ->middleware(config('payment-gateway.admin.middleware', ['web', 'auth']))
+    ->middleware(config('payment-gateway.admin.middleware', ['web', 'auth', 'role:super-admin,admin']))
     ->name('admin.payments.')
     ->group(function (): void {
         // Dashboard

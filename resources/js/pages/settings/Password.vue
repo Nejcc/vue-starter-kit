@@ -70,6 +70,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             autocomplete="new-password"
                             placeholder="New password"
                         />
+                        <p class="text-xs text-muted-foreground">
+                            Must be at least 12 characters with uppercase,
+                            lowercase, numbers, and symbols.
+                        </p>
                         <InputError :message="errors.password" />
                     </div>
 

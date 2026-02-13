@@ -99,13 +99,23 @@ final class FortifyServiceProvider extends ServiceProvider
      */
     private function configureRateLimiting(): void
     {
-        RateLimiter::for('two-factor', fn (Request $request) => Limit::perMinute(5)->by($request->session()->get('login.id')));
+        RateLimiter::for('two-factor', fn (Request $request) => Limit::perMinute(
+            (int) config('security.rate_limiting.two_factor', 5)
+        )->by($request->session()->get('login.id')));
 
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
-            return Limit::perMinute(5)->by($throttleKey);
+            return Limit::perMinute((int) config('security.rate_limiting.login', 5))->by($throttleKey);
         });
+
+        RateLimiter::for('register', fn (Request $request) => Limit::perMinute(
+            (int) config('security.rate_limiting.registration', 5)
+        )->by($request->ip()));
+
+        RateLimiter::for('impersonate', fn (Request $request) => Limit::perMinute(
+            (int) config('security.rate_limiting.impersonation', 5)
+        )->by(auth()->id() ?? $request->ip()));
     }
 
     /**

@@ -17,7 +17,6 @@
 </template>
 
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3';
 import { UserRound } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import {
@@ -25,6 +24,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useUserPermissions } from '@/composables/useUserPermissions';
 import ImpersonateModal from './ImpersonateModal.vue';
 
 interface User {
@@ -34,35 +34,14 @@ interface User {
     initials: string;
 }
 
-const page = usePage();
-const auth = computed(
-    () =>
-        page.props.auth as {
-            user?: {
-                roles?: string[];
-                permissions?: string[];
-            } | null;
-        },
-);
+const { isSuperAdmin, hasPermission } = useUserPermissions();
 
-const canImpersonate = computed(() => {
-    const user = auth.value?.user;
-    if (!user) {
-        return false;
-    }
-
-    const roles = user.roles ?? [];
-    const permissions = user.permissions ?? [];
-
-    // Check if user is super-admin or has impersonate permission
-    return roles.includes('super-admin') || permissions.includes('impersonate');
-});
+const canImpersonate = computed(() => isSuperAdmin.value || hasPermission('impersonate'));
 
 const isModalOpen = ref(false);
 const users = ref<User[]>([]);
 
 const openModal = async () => {
-    // Load users when modal opens
     await loadUsers();
     isModalOpen.value = true;
 };

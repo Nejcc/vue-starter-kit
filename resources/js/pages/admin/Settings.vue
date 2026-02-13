@@ -22,8 +22,11 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { useSettingsNav } from '@/composables/useSettingsNav';
+import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
+
+const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useSettingsNav();
 
 interface Setting {
     id: number;
@@ -173,7 +176,7 @@ const deleteSetting = (
 </script>
 
 <template>
-    <AdminLayout :breadcrumbs="breadcrumbItems">
+    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
         <Head title="Admin Settings" />
 
         <div class="container mx-auto py-8">
@@ -581,5 +584,5 @@ const deleteSetting = (
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-    </AdminLayout>
+    </ModuleLayout>
 </template>

@@ -17,8 +17,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { useSubscriberNav } from '@/composables/useSubscriberNav';
+import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
+
+const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useSubscriberNav();
 
 interface Subscriber {
     id: number;
@@ -96,7 +99,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <AdminLayout :breadcrumbs="breadcrumbItems">
+    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
         <Head :title="`List: ${list.name}`" />
 
         <div class="container mx-auto py-8">
@@ -441,5 +444,5 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 </div>
             </div>
         </div>
-    </AdminLayout>
+    </ModuleLayout>
 </template>

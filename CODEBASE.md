@@ -40,9 +40,15 @@ This is a **generic Laravel starter kit** designed to be cloned and customized f
 - **Repository, Service, and Action patterns** for clean architecture
 - **User impersonation** for admin testing
 - **Cookie consent management** with GDPR compliance
-- **Database management UI** for viewing tables and data
+- **Database management UI** for viewing tables and data (with sensitive column masking)
 - **Last login tracking** for security auditing
+- **Audit logging** with polymorphic trail for user actions
+- **Notification system** with mark-as-read, filtering, and pagination
 - **Theme/appearance management** (light/dark mode)
+- **Security headers middleware** (X-Frame-Options, CSP, HSTS, Referrer-Policy, Permissions-Policy)
+- **Payment gateway integration** (Stripe, PayPal, Crypto, Bank Transfer, COD) via `nejcc/payment-gateway` package
+- **Subscriber management** via `nejcc/subscribe` package
+- **Global settings** via `laravelplus/global-settings` package
 
 ### Key Philosophy
 
@@ -73,7 +79,7 @@ This is a **generic Laravel starter kit** designed to be cloned and customized f
    - Default user: Check `database/seeders/UserSeeder.php`
 
 4. **Key Files to Understand First**:
-   - `app/Repositories/AbstractRepository.php` - Repository pattern
+   - `app/Repositories/BaseRepository.php` - Repository pattern
    - `app/Services/AbstractService.php` - Service pattern
    - `app/Http/Controllers/DashboardController.php` - Simple controller example
    - `resources/js/pages/Dashboard.vue` - Simple page example
@@ -93,11 +99,9 @@ This starter kit follows a clean architecture pattern with clear separation of c
 
 **Location**: `app/Repositories/`
 
-- **AbstractRepository**: Base repository with caching, CRUD operations, and query building
-- **BaseRepository**: Extends AbstractRepository (if needed for additional base functionality)
+- **BaseRepository**: Base repository with CRUD operations and query building
 - **RepositoryInterface**: Contract defining repository methods
 - Repositories handle all database interactions and provide a clean abstraction layer
-- Built-in caching with automatic invalidation on write operations
 
 **Flow**: Controllers → Services → Repositories → Models
 
@@ -213,10 +217,10 @@ app/
 │       ├── Admin/
 │       └── Settings/
 ├── Listeners/           # Event listeners
-├── Models/              # Eloquent models
+├── Models/              # Eloquent models (User, AuditLog, Role, Permission)
 ├── Providers/           # Service providers
 ├── Repositories/        # Data access layer
-├── Services/            # Business logic layer
+├── Services/            # Business logic layer (User, Notification, Role, Permission, Impersonation)
 ├── SettingRole.php     # Setting role enum
 └── Traits/              # Reusable traits
 ```
@@ -234,9 +238,10 @@ resources/js/
 │   ├── auth/
 │   └── settings/
 ├── pages/               # Inertia page components
-│   ├── admin/
-│   ├── auth/
-│   └── settings/
+│   ├── admin/          # Admin panel (users, roles, permissions, settings, database, payments, subscribers, audit logs)
+│   ├── auth/           # Authentication pages
+│   ├── notifications/  # Notification center
+│   └── settings/       # User settings
 ├── routes/              # Wayfinder-generated routes
 ├── types/               # TypeScript type definitions
 ├── app.ts              # Main application entry point
@@ -353,7 +358,7 @@ This command runs concurrently:
 ```env
 APP_NAME="Your App Name"
 APP_ENV=local
-APP_DEBUG=true
+APP_DEBUG=true                     # Must be false in production
 APP_URL=http://localhost:8000
 
 DB_CONNECTION=sqlite
@@ -364,6 +369,12 @@ QUEUE_CONNECTION=sync
 
 CACHE_DRIVER=file
 SESSION_DRIVER=file
+
+# Security
+SECURITY_HEADERS_ENABLED=true      # HTTP security headers
+SECURITY_HSTS_ENABLED=false        # Enable in production with HTTPS
+SECURITY_DEV_ROUTES_ENABLED=false  # Quick-login/register dev routes
+SESSION_ENCRYPT=false              # Enable in production
 ```
 
 ---
@@ -390,6 +401,13 @@ SESSION_DRIVER=file
 - **Lucide Vue** - Icon library
 - **VueUse** - Vue composition utilities
 
+### Local Packages
+
+- **`nejcc/payment-gateway`** (`packages/nejcc/payment-gateway`) - Multi-driver payment/billing (Stripe, PayPal, Crypto, Bank Transfer, COD), provides `Billable` trait
+- **`nejcc/subscribe`** (`packages/nejcc/subscribe`) - Subscriber/mailing list management
+- **`laravelplus/global-settings`** (`packages/laravelplus/global-settings`) - Dynamic key-value application settings with role-based access
+- **`laravelplus/installer`** (`packages/laravelplus/installer`) - Application installer/setup wizard
+
 ### Development Tools
 
 - **Vite** - Build tool and dev server
@@ -398,8 +416,10 @@ SESSION_DRIVER=file
 - **TypeScript ESLint** - TypeScript linting
 - **Laravel Pint** - PHP code style fixer (required)
 - **Laravel Pail** - Real-time log viewer
+- **Laravel Horizon** - Queue monitoring dashboard
 - **Laravel Debugbar** - Development debugging toolbar
 - **PHPUnit** - Testing framework
+- **Nightwatch.js** - E2E browser testing
 
 ---
 
@@ -494,7 +514,7 @@ SESSION_DRIVER=file
 **`jobs`**:
 - Queue jobs table for background processing
 
-### Migrations (10 total)
+### Migrations (11 total)
 
 1. **`create_users_table.php`** - Basic user schema
 2. **`create_cache_table.php`** - Cache storage
@@ -506,6 +526,7 @@ SESSION_DRIVER=file
 8. **`add_group_name_to_permissions_table.php`** - Permission grouping
 9. **`create_settings_table.php`** - Application settings
 10. **`add_role_to_settings_table.php`** - Setting roles (system/user/plugin)
+11. **`create_audit_logs_table.php`** - Polymorphic audit trail
 
 ### Database Seeders (5 seeders)
 
@@ -650,9 +671,9 @@ Admin database browser for inspecting database structure and data:
 - Support for multiple database connections
 
 **Implementation**:
-- `Admin\DatabaseController` handles all database operations
-- Uses `mcp__laravel-boost__database-schema` MCP tool for schema inspection
-- Uses `mcp__laravel-boost__database-query` MCP tool for data queries
+- `Admin\DatabaseController` handles all database operations using direct DB queries and schema introspection
+- Sensitive columns masked via `config('security.database_browser.masked_columns')`
+- Audit logging of database views via `AuditLog::log()`
 - Frontend pages: `Database/Index.vue`, `Database/Show.vue` with sub-views (Structure, Data, Indexes, Actions)
 - Routes under `/admin/database` prefix
 
@@ -673,26 +694,20 @@ Tracks when users last logged in for security auditing:
 
 ### Development Features
 
-#### Quick Login (Local Development Only)
+#### Quick Login & Register (Local Development Only)
 
 Provides quick authentication during local development without entering credentials:
 
 **Features**:
-- Available only when `APP_ENV=local`
-- Route: `GET /quick-login`
-- Automatically logs in as first user in database
+- Available only when `APP_ENV=local` AND `SECURITY_DEV_ROUTES_ENABLED=true`
+- Route: `POST /quick-login/{userId}` - Login as any user by ID
+- Route: `POST /quick-register/{role}` - Create and login as user with role (super-admin, admin, user)
 - Bypasses password and 2FA requirements
-- Disabled in production for security
 
 **Security**:
-- Restricted to local environment only
-- Returns 404 in non-local environments
-- Should never be deployed to production
-
-**Usage**:
-- Visit `/quick-login` in browser during local development
-- Automatically authenticates and redirects to dashboard
-- Useful for rapid development and testing
+- Requires both `SECURITY_DEV_ROUTES_ENABLED=true` config and `local` environment
+- IP-restricted to allowed IPs (default: `127.0.0.1,::1`, configurable via `SECURITY_DEV_ROUTES_IPS`)
+- Disabled by default — must be explicitly enabled in `.env`
 
 ---
 
@@ -1229,8 +1244,7 @@ final class PostServiceTest extends TestCase
 
 5. **Repository** (`app/Repositories/UserRepository.php`)
    - Extends `BaseRepository`
-   - Calls `AbstractRepository::create()`
-   - Clears cache automatically
+   - Calls `BaseRepository::create()`
 
 6. **Model** (`app/Models/User.php`)
    - Eloquent creates record
@@ -1399,15 +1413,10 @@ This section documents every important file in the codebase, organized by catego
 - All repositories must implement this interface
 - Provides type-safe contract for data access layer
 
-**`app/Repositories/AbstractRepository.php`**
-- Base repository implementation with caching
-- Provides: `find()`, `findOrFail()`, `create()`, `update()`, `delete()`, `all()`, `paginate()`
-- Automatic cache invalidation on write operations
-- Cache TTL: 3600 seconds (1 hour) by default
-
 **`app/Repositories/BaseRepository.php`**
-- Extends AbstractRepository (if additional base functionality is needed)
-- Check this file for any base repository extensions
+- Base repository implementation providing CRUD operations
+- Provides: `find()`, `findOrFail()`, `findBy()`, `findAllBy()`, `create()`, `update()`, `delete()`, `all()`, `paginate()`, `query()`
+- All concrete repositories extend this class
 
 **`app/Contracts/Actions/ActionInterface.php`**
 - Base action contract for single-purpose operations
@@ -1493,6 +1502,25 @@ This section documents every important file in the codebase, organized by catego
 - Handles user creation, profile updates, password changes, account deletion
 - Uses transactions for data integrity
 - Validates data before operations
+
+**`app/Services/ImpersonationService.php`**
+- Impersonation service implementation
+- Handles starting/stopping user impersonation sessions
+- Session-based impersonation state management
+
+**`app/Services/NotificationService.php`**
+- Notification service implementation
+- Handles notification retrieval, pagination, mark-as-read, and filtering
+
+**`app/Services/RoleService.php`**
+- Role service implementation
+- CRUD operations for Spatie Permission roles
+- Permission assignment to roles
+
+**`app/Services/PermissionService.php`**
+- Permission service implementation
+- CRUD operations for Spatie Permission permissions
+- Permission grouping management
 
 ### 9.4 Action Classes
 
@@ -1602,7 +1630,18 @@ This section documents every important file in the codebase, organized by catego
   - Browse table data with pagination
   - View indexes and foreign keys
   - Display row counts for all tables
-- Uses Laravel Boost MCP tools for database inspection
+  - Sensitive column masking (passwords, tokens, secrets) via `config('security.database_browser.masked_columns')`
+  - Audit logging of database views via `AuditLog::log()`
+
+**`app/Http/Controllers/Admin/AuditLogsController.php`**
+- Audit log viewer for admin panel
+- Methods: `index()` - List audit logs with pagination
+- Displays polymorphic audit trail entries
+
+**`app/Http/Controllers/NotificationsController.php`**
+- Notification center for authenticated users
+- Methods: `index()`, `markAsRead()`, `markAllAsRead()`
+- Pagination and filtering support
 
 #### Settings Controllers
 
@@ -1717,6 +1756,13 @@ This section documents every important file in the codebase, organized by catego
   - `set($key, $value)` - Update or create setting value
 - **Use cases**: Feature flags, system configuration, user preferences, plugin settings
 
+**`app/Models/AuditLog.php`**
+- Polymorphic audit log model for tracking user actions
+- Stores event type, old/new values, IP address, user agent
+- Polymorphic `auditable` relationship for linking to any model
+- Static `log()` method for convenient logging
+- Used by impersonation, database browser, and other sensitive operations
+
 #### Traits
 
 **`app/Traits/TracksLastLogin.php`**
@@ -1766,6 +1812,17 @@ This section documents every important file in the codebase, organized by catego
 - Registered as 'role' middleware alias in bootstrap/app.php
 - Usage: `Route::middleware('role:admin')` or `Route::middleware('role:super-admin,admin')`
 - Returns 403 Forbidden if user lacks required role
+
+**`app/Http/Middleware/EnsureUserExists.php`**
+- Ensures the authenticated user record still exists in the database
+- Prevents stale sessions from accessing protected routes
+
+**`app/Http/Middleware/SecurityHeaders.php`**
+- Adds HTTP security headers to all web responses
+- Configurable via `config('security.headers')`
+- Headers: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
+- Optional HSTS (Strict-Transport-Security) when enabled for production
+- Registered in `bootstrap/app.php` web middleware stack
 
 ### 9.9 Frontend Files
 
@@ -1824,10 +1881,35 @@ This section documents every important file in the codebase, organized by catego
 - `Database/show/Data.vue` - Table data browser with pagination
 - `Database/show/Indexes.vue` - Table indexes and foreign keys
 - `Database/show/Actions.vue` - Table actions (future functionality)
-- `Databases/Index.vue` - Database connections list (legacy/alternate view)
+- `Databases/Index.vue` - Database connections list (alternate view)
+- `AuditLogs/Index.vue` - Audit log viewer with pagination
+
+**Admin Payment Pages** (`resources/js/pages/admin/payments/`):
+- `Dashboard.vue` - Payment overview dashboard
+- `plans/Index.vue` - Payment plans list
+- `plans/Create.vue` - Create payment plan
+- `plans/Edit.vue` - Edit payment plan
+- `invoices/Index.vue` - Invoices list with pagination
+- `invoices/Show.vue` - Invoice details
+- `customers/Index.vue` - Customers list with pagination
+- `customers/Show.vue` - Customer details
+- `subscriptions/Index.vue` - Subscriptions list with pagination
+- `subscriptions/Show.vue` - Subscription details
+- `transactions/Index.vue` - Transactions list with pagination
+- `transactions/Show.vue` - Transaction details
+
+**Admin Subscriber Pages** (`resources/js/pages/admin/subscribers/`):
+- `Dashboard.vue` - Subscriber overview dashboard
+- `Index.vue` - Subscribers list
+- `Show.vue` - Subscriber details
+- `lists/Index.vue` - Mailing lists
+- `lists/Show.vue` - Mailing list details
+
+**Notification Pages** (`resources/js/pages/notifications/`):
+- Notification center with mark-as-read, filtering, and pagination
 
 **Other Pages**:
-- `resources/js/pages/Impersonate/Index.vue` - User impersonation interface
+- `resources/js/pages/About.vue` - About page
 
 #### Layouts
 
@@ -1874,6 +1956,18 @@ This section documents every important file in the codebase, organized by catego
 **`resources/js/composables/useTwoFactorAuth.ts`**
 - 2FA functionality
 - Handles 2FA setup and verification
+
+**`resources/js/composables/useCurrentUrl.ts`**
+- Returns the current page URL from Inertia
+- Useful for active link detection and navigation state
+
+**`resources/js/composables/useErrorHandler.ts`**
+- Centralized error handling for frontend operations
+- Provides consistent error display and logging
+
+**`resources/js/composables/useToast.ts`**
+- Toast notification composable
+- Provides success/error/info toast messages
 
 #### Components
 
@@ -1927,6 +2021,13 @@ TypeScript type definitions for:
   - `/admin/permissions/*` - Permission CRUD
   - `/admin/database` - Database browser
   - `/admin/database/{connection}/{table}` - Table details
+  - `/admin/audit-logs` - Audit log viewer
+- **Notification Routes**:
+  - Notification center with mark-as-read and filtering
+- **Payment Routes** (via payment-gateway package, admin middleware):
+  - Payment dashboard, plans CRUD, invoices, customers, subscriptions, transactions
+- **Subscriber Routes** (via subscribe package):
+  - Subscriber dashboard, subscriber list, mailing lists
 
 **`routes/settings.php`** (6 routes)
 - User settings routes (prefix: `/settings`, auth + verified middleware)
@@ -1961,6 +2062,19 @@ TypeScript type definitions for:
 **`config/permission.php`**
 - Spatie Laravel Permission configuration
 
+**`config/security.php`**
+- Centralized security configuration
+- Sections: headers, rate_limiting, dev_routes, database_browser, session, password_timeout
+- All values configurable via environment variables
+
+**`config/cookie.php`**
+- Cookie consent configuration
+- Category definitions (essential, analytics, marketing, preferences)
+
+**`config/horizon.php`**
+- Laravel Horizon queue monitoring configuration
+- Queue worker and supervisor settings
+
 **`vite.config.ts`**
 - Vite build configuration
 - Plugins: Laravel, Tailwind, Wayfinder, Vue
@@ -1986,7 +2100,7 @@ TypeScript type definitions for:
 - Base test case class
 - All tests extend this
 
-#### Feature Tests (18 test files)
+#### Feature Tests (27 test files)
 
 **Location**: `tests/Feature/`
 
@@ -2006,20 +2120,30 @@ Feature tests for HTTP endpoints and complete user flows:
 - `LastLoginTrackingTest.php` - Last login timestamp tracking
 - `ImpersonateTest.php` - User impersonation functionality
 - `CookieConsentTest.php` - Cookie consent management
+- `CookieConsentControllerTest.php` - Cookie consent controller endpoints
+- `NotificationsControllerTest.php` - Notification endpoints
+- `AboutControllerTest.php` - About page
 
 **Settings Tests** (`tests/Feature/Settings/`):
 - `ProfileUpdateTest.php` - Profile information updates
 - `PasswordUpdateTest.php` - Password change functionality
 - `TwoFactorAuthenticationTest.php` - 2FA enable/disable/recovery codes
+- `AppearanceTest.php` - Appearance/theme settings
 
 **Admin Tests** (`tests/Feature/Admin/`):
+- `AdminDashboardTest.php` - Admin dashboard access
 - `UsersControllerTest.php` - Admin user management
+- `RolesControllerTest.php` - Admin role CRUD
+- `PermissionsControllerTest.php` - Admin permission CRUD
+- `SettingsControllerTest.php` - Admin settings management
+- `DatabaseControllerTest.php` - Database browser
+- `AuditLogsControllerTest.php` - Audit log viewer
 
 **Integration Tests**:
 - `RepositoryServiceIntegrationTest.php` - Repository and Service integration
 - `ExampleTest.php` - Example feature test
 
-#### Unit Tests (12 test files)
+#### Unit Tests (15 test files)
 
 **Location**: `tests/Unit/`
 
@@ -2030,12 +2154,17 @@ Feature tests for HTTP endpoints and complete user flows:
 - `DeleteUserActionTest.php` - User deletion action
 
 **Repository Tests** (`tests/Unit/Repositories/`):
-- `AbstractRepositoryTest.php` - Base repository functionality (caching, CRUD)
+- `AbstractRepositoryTest.php` - Base repository functionality (CRUD)
 - `UserRepositoryTest.php` - User repository specific methods
 
 **Service Tests** (`tests/Unit/Services/`):
 - `AbstractServiceTest.php` - Base service functionality (transactions, validation)
 - `UserServiceTest.php` - User service business logic
+- `NotificationServiceTest.php` - Notification service
+- `ImpersonationServiceTest.php` - Impersonation service
+- `RoleServiceTest.php` - Role service
+- `PermissionServiceTest.php` - Permission service
+- `SettingsServiceTest.php` - Settings service
 
 **Utility Tests**:
 - `ExampleTest.php` - Example unit test
@@ -2043,10 +2172,14 @@ Feature tests for HTTP endpoints and complete user flows:
 - `OptionsTest.php` - Options utility functionality
 - `WorkflowResultTest.php` - Workflow result handling
 
-**Test Coverage**:
+**Test Coverage** (413 tests, 1695 assertions):
 - All authentication flows (login, register, 2FA, password reset)
 - User management CRUD operations
-- Role-based access control
+- Role and permission CRUD
+- Admin settings management
+- Database browser
+- Audit logging
+- Notifications
 - Cookie consent management
 - Impersonation functionality
 - Repository pattern with caching
@@ -2179,7 +2312,24 @@ DB::select("SELECT * FROM posts WHERE title = '{$title}'");
 
 **Inertia automatically escapes data**:
 - All props passed to Inertia are automatically escaped
-- Use `v-html` only when absolutely necessary and with sanitized content
+- `v-html` is not used in this codebase — pagination labels use `decodePaginationLabel()` utility from `@/lib/utils` to safely decode HTML entities (e.g., `&laquo;` → `«`)
+- Always use `{{ }}` interpolation or `v-text` instead of `v-html`
+
+### Security Headers
+
+**SecurityHeaders middleware** adds HTTP security headers to all responses:
+- X-Frame-Options (default: SAMEORIGIN)
+- X-Content-Type-Options: nosniff
+- Referrer-Policy (default: strict-origin-when-cross-origin)
+- Permissions-Policy (default: camera=(), microphone=(), geolocation=())
+- Optional HSTS for production (configurable via `SECURITY_HSTS_ENABLED`)
+- Configurable via `config/security.php` and environment variables
+
+### Sensitive Data Masking
+
+**Database browser** masks sensitive columns (passwords, tokens, secrets):
+- Configured via `config('security.database_browser.masked_columns')`
+- Values displayed as `••••••••` in the admin UI
 
 ### CSRF Protection
 
@@ -2305,7 +2455,7 @@ When adding a new feature, follow this workflow:
 
 4. **Create Repository**
    - Create in `app/Repositories/`
-   - Extend `BaseRepository` or `AbstractRepository`
+   - Extend `BaseRepository`
    - Implement your interface
    - Register in `RepositoryServiceProvider`
 
@@ -2494,6 +2644,33 @@ This starter kit includes the following comprehensive features out of the box:
 - View indexes and foreign keys
 - Support for: SQLite, MySQL, MariaDB, PostgreSQL, SQL Server
 - Row counts for all tables
+- Sensitive column masking (passwords, tokens, secrets)
+- Audit logging of database views
+
+**Audit Logs**:
+- Polymorphic audit trail for user actions
+- Tracks event type, old/new values, IP address, user agent
+- Admin viewer with pagination
+- Used by impersonation, database browser, and other sensitive operations
+
+**Payment Management** (via `nejcc/payment-gateway`):
+- Payment dashboard with overview metrics
+- Plan management (CRUD)
+- Customer management with details view
+- Invoice listing and details
+- Subscription management with details view
+- Transaction listing and details
+- Multi-driver support: Stripe, PayPal, Crypto, Bank Transfer, COD
+
+**Subscriber Management** (via `nejcc/subscribe`):
+- Subscriber dashboard
+- Subscriber listing and details
+- Mailing list management
+
+**Notification Center**:
+- In-app notifications with mark-as-read
+- Mark all as read functionality
+- Pagination and filtering
 
 ### Cookie Consent & GDPR
 
@@ -2536,14 +2713,15 @@ This starter kit includes the following comprehensive features out of the box:
 **Development Tools**:
 - Laravel Pint for PHP code formatting
 - Laravel Pail for real-time log viewing
+- Laravel Horizon for queue monitoring
 - Laravel Debugbar for development debugging
-- Quick login for local development (disabled in production)
-- Comprehensive test suite (30+ tests)
+- Quick login for local development (disabled by default, IP-restricted)
+- Comprehensive test suite (413 tests, 1695 assertions)
 
 **Testing**:
-- 18 feature tests covering all major flows
-- 12 unit tests for actions, repositories, and services
-- Test coverage for authentication, authorization, CRUD operations
+- 27 feature test files covering all major flows
+- 15 unit test files for actions, repositories, and services
+- Test coverage for authentication, authorization, CRUD operations, admin panel
 - PHPUnit 11 test framework
 
 ### Frontend Features
@@ -2616,7 +2794,7 @@ This starter kit includes the following comprehensive features out of the box:
 
 ### Key Files
 
-- **Core Repository**: `app/Repositories/AbstractRepository.php`
+- **Core Repository**: `app/Repositories/BaseRepository.php`
 - **Core Service**: `app/Services/AbstractService.php`
 - **Service Provider**: `app/Providers/RepositoryServiceProvider.php`
 - **Bootstrap**: `bootstrap/app.php`
@@ -2650,24 +2828,24 @@ php artisan route:clear       # Clear route cache
 
 ## Documentation Updates
 
-**Last Updated**: 2026-01-22
+**Last Updated**: 2026-01-31
 
 **Recent Changes**:
-- Added comprehensive Database Schema & Migrations section
-- Added detailed documentation for all middleware (including EnsureUserHasRole)
-- Expanded User model documentation with all methods and features
-- Added comprehensive testing documentation (18 feature tests, 12 unit tests)
-- Documented Quick Login development feature
-- Added detailed route documentation (94 web routes, 6 settings routes)
-- Expanded UI components section with 136+ components
-- Added Key Features Summary section for quick overview
-- Updated all controller documentation with detailed method descriptions
-- Added facades documentation
-- Enhanced Admin Database Management documentation
-- Added User Impersonation feature documentation
-- Expanded Cookie Consent & GDPR documentation
-- Added Last Login Tracking documentation
-- Updated migrations and seeders documentation with complete details
+- Added security hardening documentation (SecurityHeaders middleware, sensitive column masking, XSS prevention)
+- Added AuditLog model documentation
+- Added NotificationsController and AuditLogsController documentation
+- Added ImpersonationService, NotificationService, RoleService, PermissionService documentation
+- Added useCurrentUrl, useErrorHandler, useToast composable documentation
+- Added config/security.php, config/cookie.php, config/horizon.php documentation
+- Added admin payment pages documentation (dashboard, plans, invoices, customers, subscriptions, transactions)
+- Added admin subscriber pages documentation (dashboard, list, mailing lists)
+- Added notification pages documentation
+- Added EnsureUserExists and SecurityHeaders middleware documentation
+- Updated test counts (413 tests, 1695 assertions across 27 feature + 15 unit test files)
+- Updated XSS prevention section (v-html replaced with safe decodePaginationLabel utility)
+- Added Security Headers and Sensitive Data Masking sections
+- Updated Quick Login section with security hardening (config toggle, IP restriction)
+- Updated database browser with masking and audit logging features
 
 **Documentation Maintenance**:
 This documentation should be updated whenever new features are added to the starter kit. Use `git log --follow CODEBASE.md` to track documentation changes over time.

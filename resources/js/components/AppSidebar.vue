@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
+import { Link, usePage } from '@inertiajs/vue3';
+import { BookOpen, Building2, Folder, LayoutGrid } from 'lucide-vue-next';
+import { computed } from 'vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
+import OrganizationSwitcher from '@/components/OrganizationSwitcher.vue';
 import {
     Sidebar,
     SidebarContent,
@@ -17,13 +19,28 @@ import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
+const page = usePage();
+const hasOrganizations = computed(() => page.props.modules?.organizations);
+
+const mainNavItems = computed<NavItem[]>(() => {
+    const items: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
+    ];
+
+    if (hasOrganizations.value) {
+        items.push({
+            title: 'Organizations',
+            href: '/organizations',
+            icon: Building2,
+        });
+    }
+
+    return items;
+});
 
 const footerNavItems: NavItem[] = [
     {
@@ -44,7 +61,8 @@ const footerNavItems: NavItem[] = [
         <SidebarHeader>
             <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton size="lg" as-child>
+                    <OrganizationSwitcher v-if="hasOrganizations" />
+                    <SidebarMenuButton v-else size="lg" as-child>
                         <Link :href="dashboard()" prefetch>
                             <AppLogo />
                         </Link>

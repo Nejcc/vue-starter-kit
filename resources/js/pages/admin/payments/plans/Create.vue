@@ -9,8 +9,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { usePaymentNav } from '@/composables/usePaymentNav';
+import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
+
+const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = usePaymentNav();
 
 interface Props {
     intervals: string[];
@@ -53,7 +56,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <AdminLayout :breadcrumbs="breadcrumbItems">
+    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
         <Head title="Create Plan" />
 
         <div class="container mx-auto py-8">
@@ -324,5 +327,5 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 </form>
             </div>
         </div>
-    </AdminLayout>
+    </ModuleLayout>
 </template>

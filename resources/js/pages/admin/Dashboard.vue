@@ -11,6 +11,8 @@ import {
     Users,
 } from 'lucide-vue-next';
 import Heading from '@/components/Heading.vue';
+import StatCard from '@/components/StatCard.vue';
+import { useDateFormat } from '@/composables/useDateFormat';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { index as databasesIndex } from '@/routes/admin/databases';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
@@ -51,6 +53,7 @@ interface DashboardProps {
 }
 
 const props = defineProps<DashboardProps>();
+const { formatShortDate } = useDateFormat();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -106,40 +109,31 @@ const statCards = [
         label: 'Total Users',
         value: props.stats.totalUsers,
         icon: Users,
-        color: 'text-blue-600 dark:text-blue-400',
-        bg: 'bg-blue-50 dark:bg-blue-950/50',
+        iconColor: 'text-blue-600 dark:text-blue-400',
+        iconBg: 'bg-blue-50 dark:bg-blue-950/50',
     },
     {
         label: 'Verified Users',
         value: props.stats.verifiedUsers,
         icon: UserCheck,
-        color: 'text-green-600 dark:text-green-400',
-        bg: 'bg-green-50 dark:bg-green-950/50',
+        iconColor: 'text-green-600 dark:text-green-400',
+        iconBg: 'bg-green-50 dark:bg-green-950/50',
     },
     {
         label: 'Roles',
         value: props.stats.totalRoles,
         icon: Shield,
-        color: 'text-purple-600 dark:text-purple-400',
-        bg: 'bg-purple-50 dark:bg-purple-950/50',
+        iconColor: 'text-purple-600 dark:text-purple-400',
+        iconBg: 'bg-purple-50 dark:bg-purple-950/50',
     },
     {
         label: 'Permissions',
         value: props.stats.totalPermissions,
         icon: Key,
-        color: 'text-orange-600 dark:text-orange-400',
-        bg: 'bg-orange-50 dark:bg-orange-950/50',
+        iconColor: 'text-orange-600 dark:text-orange-400',
+        iconBg: 'bg-orange-50 dark:bg-orange-950/50',
     },
 ];
-
-function formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-}
 
 function formatEventName(event: string): string {
     return event.replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -160,28 +154,15 @@ function formatEventName(event: string): string {
 
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                    <div
+                    <StatCard
                         v-for="stat in statCards"
                         :key="stat.label"
-                        class="rounded-lg border p-4"
-                    >
-                        <div class="flex items-center gap-3">
-                            <div :class="[stat.bg, 'rounded-lg p-2']">
-                                <component
-                                    :is="stat.icon"
-                                    :class="[stat.color, 'h-5 w-5']"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-2xl font-bold">
-                                    {{ stat.value }}
-                                </p>
-                                <p class="text-xs text-muted-foreground">
-                                    {{ stat.label }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                        :label="stat.label"
+                        :value="stat.value"
+                        :icon="stat.icon"
+                        :icon-color="stat.iconColor"
+                        :icon-bg="stat.iconBg"
+                    />
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-2">
@@ -213,7 +194,7 @@ function formatEventName(event: string): string {
                                     </p>
                                 </div>
                                 <p class="text-xs text-muted-foreground">
-                                    {{ formatDate(user.created_at) }}
+                                    {{ formatShortDate(user.created_at) }}
                                 </p>
                             </div>
                         </div>
@@ -256,7 +237,7 @@ function formatEventName(event: string): string {
                                         >
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        {{ formatDate(entry.created_at) }}
+                                        {{ formatShortDate(entry.created_at) }}
                                     </p>
                                 </div>
                             </div>

@@ -2,11 +2,11 @@
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
+import CheckboxGroup from '@/components/CheckboxGroup.vue';
+import FormField from '@/components/FormField.vue';
 import Heading from '@/components/Heading.vue';
-import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { index, store } from '@/routes/admin/users';
 import { type BreadcrumbItem } from '@/types';
@@ -53,8 +53,12 @@ const selectedRoles = ref<string[]>([]);
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
-                    <div class="grid gap-2">
-                        <Label for="name">Name</Label>
+                    <FormField
+                        label="Name"
+                        id="name"
+                        :error="errors.name"
+                        required
+                    >
                         <Input
                             id="name"
                             name="name"
@@ -62,11 +66,14 @@ const selectedRoles = ref<string[]>([]);
                             required
                             placeholder="John Doe"
                         />
-                        <InputError :message="errors.name" />
-                    </div>
+                    </FormField>
 
-                    <div class="grid gap-2">
-                        <Label for="email">Email</Label>
+                    <FormField
+                        label="Email"
+                        id="email"
+                        :error="errors.email"
+                        required
+                    >
                         <Input
                             id="email"
                             name="email"
@@ -74,11 +81,14 @@ const selectedRoles = ref<string[]>([]);
                             required
                             placeholder="user@example.com"
                         />
-                        <InputError :message="errors.email" />
-                    </div>
+                    </FormField>
 
-                    <div class="grid gap-2">
-                        <Label for="password">Password</Label>
+                    <FormField
+                        label="Password"
+                        id="password"
+                        :error="errors.password"
+                        required
+                    >
                         <Input
                             id="password"
                             name="password"
@@ -86,13 +96,14 @@ const selectedRoles = ref<string[]>([]);
                             required
                             placeholder="Minimum 8 characters"
                         />
-                        <InputError :message="errors.password" />
-                    </div>
+                    </FormField>
 
-                    <div class="grid gap-2">
-                        <Label for="password_confirmation"
-                            >Confirm Password</Label
-                        >
+                    <FormField
+                        label="Confirm Password"
+                        id="password_confirmation"
+                        :error="errors.password_confirmation"
+                        required
+                    >
                         <Input
                             id="password_confirmation"
                             name="password_confirmation"
@@ -100,35 +111,16 @@ const selectedRoles = ref<string[]>([]);
                             required
                             placeholder="Confirm password"
                         />
-                        <InputError :message="errors.password_confirmation" />
-                    </div>
+                    </FormField>
 
-                    <div v-if="roles.length > 0" class="grid gap-2">
-                        <Label>Roles</Label>
-                        <div class="space-y-2">
-                            <div
-                                v-for="role in roles"
-                                :key="role"
-                                class="flex items-center space-x-2"
-                            >
-                                <input
-                                    :id="`role-${role}`"
-                                    v-model="selectedRoles"
-                                    type="checkbox"
-                                    :value="role"
-                                    name="roles[]"
-                                    class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                                />
-                                <Label
-                                    :for="`role-${role}`"
-                                    class="text-sm font-medium"
-                                >
-                                    {{ role }}
-                                </Label>
-                            </div>
-                        </div>
-                        <InputError :message="errors.roles" />
-                    </div>
+                    <CheckboxGroup
+                        v-if="roles.length > 0"
+                        v-model="selectedRoles"
+                        :options="roles"
+                        name="roles"
+                        label="Roles"
+                        :error="errors.roles"
+                    />
 
                     <div class="flex items-center gap-4">
                         <Button :disabled="processing" type="submit">
