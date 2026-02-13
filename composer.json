@@ -8,7 +8,13 @@
         "framework"
     ],
     "license": "MIT",
-    "repositories": [],
+    "repositories": [
+        {"type": "path", "url": "packages/laravelplus/global-settings"},
+        {"type": "path", "url": "packages/laravelplus/localization"},
+        {"type": "path", "url": "packages/laravelplus/payment-gateway"},
+        {"type": "path", "url": "packages/laravelplus/subscribe"},
+        {"type": "path", "url": "packages/laravelplus/tenants"}
+    ],
     "require": {
         "php": "^8.4",
         "inertiajs/inertia-laravel": "^2.0.19",
@@ -17,6 +23,11 @@
         "laravel/horizon": "^5.43",
         "laravel/tinker": "^2.11.0",
         "laravel/wayfinder": "^0.1.13",
+        "laravelplus/global-settings": "@dev",
+        "laravelplus/localization": "@dev",
+        "laravelplus/payment-gateway": "@dev",
+        "laravelplus/subscribe": "@dev",
+        "laravelplus/tenants": "@dev",
         "spatie/laravel-permission": "^6.24"
     },
     "require-dev": {

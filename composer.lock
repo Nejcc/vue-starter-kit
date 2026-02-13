@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b046ad2380b5642b4b0795f2d6be681",
+    "content-hash": "a3e847055155cc413ea0da8f8df3dd9f",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1839,6 +1839,323 @@
                 "source": "https://github.com/laravel/wayfinder"
             },
             "time": "2026-01-12T19:57:57+00:00"
+        },
+        {
+            "name": "laravelplus/global-settings",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "packages/laravelplus/global-settings",
+                "reference": "7a95b116f2729466acab73274b60cd2074a7e676"
+            },
+            "require": {
+                "illuminate/database": "^12.0",
+                "illuminate/http": "^12.0",
+                "illuminate/support": "^12.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "inertiajs/inertia-laravel": "^2.0",
+                "orchestra/testbench": "^10.0",
+                "phpunit/phpunit": "^11.0",
+                "spatie/laravel-permission": "^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelPlus\\GlobalSettings\\GlobalSettingsServiceProvider"
+                    ],
+                    "aliases": {
+                        "GlobalSettings": "LaravelPlus\\GlobalSettings\\Facades\\GlobalSettings"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelPlus\\GlobalSettings\\": "src/"
+                },
+                "classmap": [
+                    "database/seeders"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LaravelPlus\\GlobalSettings\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "LaravelPlus",
+                    "email": "info@laravelplus.com"
+                }
+            ],
+            "description": "A global settings management package for Laravel with admin panel support.",
+            "keywords": [
+                "admin",
+                "global-settings",
+                "laravel",
+                "settings"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "laravelplus/localization",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "packages/laravelplus/localization",
+                "reference": "5aea534ba3e19fe73b4898d3a5620acf7a105b3e"
+            },
+            "require": {
+                "illuminate/database": "^12.0",
+                "illuminate/http": "^12.0",
+                "illuminate/support": "^12.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "inertiajs/inertia-laravel": "^2.0",
+                "laravelplus/global-settings": "@dev",
+                "orchestra/testbench": "^10.0",
+                "phpunit/phpunit": "^11.0",
+                "spatie/laravel-permission": "^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelPlus\\Localization\\LocalizationServiceProvider"
+                    ],
+                    "aliases": {
+                        "Localization": "LaravelPlus\\Localization\\Facades\\Localization"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelPlus\\Localization\\": "src/",
+                    "LaravelPlus\\Localization\\Database\\Factories\\": "database/factories/",
+                    "LaravelPlus\\Localization\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LaravelPlus\\Localization\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "LaravelPlus",
+                    "email": "info@laravelplus.com"
+                }
+            ],
+            "description": "Multi-language localization package for Laravel with database-driven translations, content translation traits, and admin UI.",
+            "keywords": [
+                "i18n",
+                "laravel",
+                "localization",
+                "multi-language",
+                "translations"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "laravelplus/payment-gateway",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/laravelplus/payment-gateway",
+                "reference": "0360b8695324bd6de945abd09042f78ebe4a49ee"
+            },
+            "require": {
+                "illuminate/database": "^11.0|^12.0",
+                "illuminate/http": "^11.0|^12.0",
+                "illuminate/support": "^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "suggest": {
+                "coinbase/coinbase-commerce": "Required for Coinbase Crypto gateway",
+                "paypal/paypal-checkout-sdk": "Required for PayPal gateway (^1.0)",
+                "stripe/stripe-php": "Required for Stripe gateway (^13.0|^14.0|^15.0)"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelPlus\\PaymentGateway\\PaymentGatewayServiceProvider"
+                    ],
+                    "aliases": {
+                        "Payment": "LaravelPlus\\PaymentGateway\\Facades\\Payment"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelPlus\\PaymentGateway\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LaravelPlus\\PaymentGateway\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "LaravelPlus",
+                    "email": "nejc@example.com"
+                }
+            ],
+            "description": "A flexible multi-provider payment gateway for Laravel with support for Stripe, PayPal, Crypto, and more.",
+            "keywords": [
+                "crypto",
+                "gateway",
+                "laravel",
+                "payment",
+                "paypal",
+                "stripe",
+                "subscriptions"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "laravelplus/subscribe",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/laravelplus/subscribe",
+                "reference": "56818ee0bf8edf6b7df9dade91553a0b0621578a"
+            },
+            "require": {
+                "illuminate/database": "^11.0|^12.0",
+                "illuminate/http": "^11.0|^12.0",
+                "illuminate/support": "^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0|^10.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelPlus\\Subscribe\\SubscribeServiceProvider"
+                    ],
+                    "aliases": {
+                        "Subscribe": "LaravelPlus\\Subscribe\\Facades\\Subscribe"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelPlus\\Subscribe\\": "src/",
+                    "LaravelPlus\\Subscribe\\Database\\Factories\\": "database/factories/",
+                    "LaravelPlus\\Subscribe\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LaravelPlus\\Subscribe\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "LaravelPlus",
+                    "email": "nejc.cotic@gmail.com"
+                }
+            ],
+            "description": "Email subscription and newsletter management with multi-provider support (Brevo, Mailchimp, HubSpot, ConvertKit)",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "laravelplus/tenants",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "packages/laravelplus/tenants",
+                "reference": "1b0235a16cd4959d5b1d063d14b9a544136cacd5"
+            },
+            "require": {
+                "illuminate/database": "^12.0",
+                "illuminate/http": "^12.0",
+                "illuminate/mail": "^12.0",
+                "illuminate/notifications": "^12.0",
+                "illuminate/support": "^12.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "inertiajs/inertia-laravel": "^2.0",
+                "laravelplus/global-settings": "@dev",
+                "orchestra/testbench": "^10.0",
+                "phpunit/phpunit": "^11.0",
+                "spatie/laravel-permission": "^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelPlus\\Tenants\\TenantsServiceProvider"
+                    ],
+                    "aliases": {
+                        "Organization": "LaravelPlus\\Tenants\\Facades\\Organization"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelPlus\\Tenants\\": "src/",
+                    "LaravelPlus\\Tenants\\Database\\Factories\\": "database/factories/",
+                    "LaravelPlus\\Tenants\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LaravelPlus\\Tenants\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "LaravelPlus",
+                    "email": "info@laravelplus.com"
+                }
+            ],
+            "description": "Multi-tenancy organization management package for Laravel.",
+            "keywords": [
+                "laravel",
+                "multi-tenancy",
+                "organizations",
+                "tenants"
+            ],
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "league/commonmark",
@@ -9436,7 +9753,13 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "laravelplus/global-settings": 20,
+        "laravelplus/localization": 20,
+        "laravelplus/payment-gateway": 20,
+        "laravelplus/subscribe": 20,
+        "laravelplus/tenants": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

@@ -10,7 +10,7 @@ import StatusBadge from '@/components/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
-import { destroy, index, update } from '@/routes/admin/roles';
+import { destroy, index, permissions, update } from '@/routes/admin/roles';
 import { type BreadcrumbItem } from '@/types';
 
 interface Role {
@@ -158,6 +158,15 @@ const deleteRole = (): void => {
                         class="rounded-md border p-4 text-sm text-muted-foreground"
                     >
                         No permissions available. Create permissions first.
+                    </div>
+
+                    <div v-if="!role.is_super_admin">
+                        <Link
+                            :href="permissions(role.name).url"
+                            class="text-sm text-primary hover:underline"
+                        >
+                            Manage Permissions
+                        </Link>
                     </div>
 
                     <div class="flex items-center gap-4">

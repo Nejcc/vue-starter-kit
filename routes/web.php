@@ -118,12 +118,16 @@ Route::middleware(['auth', 'role:super-admin,admin'])->prefix('admin')->name('ad
     Route::get('users/{user}/edit', [App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('users.edit');
     Route::patch('users/{user}', [App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
     Route::delete('users/{user}', [App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy');
+    Route::get('users/{user}/permissions', [App\Http\Controllers\Admin\UsersController::class, 'permissions'])->name('users.permissions');
+    Route::patch('users/{user}/permissions', [App\Http\Controllers\Admin\UsersController::class, 'updatePermissions'])->name('users.permissions.update');
     Route::get('roles', [App\Http\Controllers\Admin\RolesController::class, 'index'])->name('roles.index');
     Route::get('roles/create', [App\Http\Controllers\Admin\RolesController::class, 'create'])->name('roles.create');
     Route::post('roles', [App\Http\Controllers\Admin\RolesController::class, 'store'])->name('roles.store');
     Route::get('roles/{role}/edit', [App\Http\Controllers\Admin\RolesController::class, 'edit'])->name('roles.edit');
     Route::patch('roles/{role}', [App\Http\Controllers\Admin\RolesController::class, 'update'])->name('roles.update');
     Route::delete('roles/{role}', [App\Http\Controllers\Admin\RolesController::class, 'destroy'])->name('roles.destroy');
+    Route::get('roles/{role}/permissions', [App\Http\Controllers\Admin\RolesController::class, 'permissions'])->name('roles.permissions');
+    Route::patch('roles/{role}/permissions', [App\Http\Controllers\Admin\RolesController::class, 'updatePermissions'])->name('roles.permissions.update');
     Route::get('permissions', [App\Http\Controllers\Admin\PermissionsController::class, 'index'])->name('permissions.index');
     Route::get('permissions/create', [App\Http\Controllers\Admin\PermissionsController::class, 'create'])->name('permissions.create');
     Route::post('permissions', [App\Http\Controllers\Admin\PermissionsController::class, 'store'])->name('permissions.store');

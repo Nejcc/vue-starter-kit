@@ -9,6 +9,7 @@ use App\Contracts\Repositories\RoleRepositoryInterface;
 use App\Contracts\Services\RoleServiceInterface;
 use App\Models\AuditLog;
 use App\Models\Role;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
@@ -33,6 +34,21 @@ final class RoleService extends AbstractService implements RoleServiceInterface
     public function getAll(?string $search = null): Collection
     {
         return $this->getRepository()->getAllWithPermissions($search)->map(fn ($role) => [
+            'id' => $role->id,
+            'name' => $role->name,
+            'is_super_admin' => $role->name === RoleNames::SUPER_ADMIN,
+            'permissions' => $role->permissions->pluck('name'),
+            'users_count' => $role->users()->count(),
+            'created_at' => $role->created_at,
+        ]);
+    }
+
+    /**
+     * Get paginated roles with permissions and optional search.
+     */
+    public function getPaginated(?string $search = null, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->getRepository()->paginateWithPermissions($search, $perPage)->through(fn ($role) => [
             'id' => $role->id,
             'name' => $role->name,
             'is_super_admin' => $role->name === RoleNames::SUPER_ADMIN,
@@ -179,5 +195,50 @@ final class RoleService extends AbstractService implements RoleServiceInterface
     public function getTotalCount(): int
     {
         return $this->getRepository()->all()->count();
+    }
+
+    /**
+     * Get role permissions data for the dedicated permissions page.
+     *
+     * @return array<string, mixed>
+     */
+    public function getPermissionsData(Role $role): array
+    {
+        return [
+            'id' => $role->id,
+            'name' => $role->name,
+            'is_super_admin' => $role->name === RoleNames::SUPER_ADMIN,
+            'permissions' => $role->permissions->pluck('name')->toArray(),
+            'users_count' => $role->users()->count(),
+        ];
+    }
+
+    /**
+     * Sync permissions on a role.
+     *
+     * @param  array<string, mixed>  $data
+     *
+     * @throws InvalidArgumentException If trying to modify super-admin permissions
+     */
+    public function syncPermissions(Role $role, array $data): Role
+    {
+        if ($role->name === RoleNames::SUPER_ADMIN) {
+            throw new InvalidArgumentException('The super-admin role has all permissions automatically. Permissions cannot be modified.');
+        }
+
+        $oldPermissions = $role->permissions->pluck('name')->toArray();
+
+        return $this->transaction(function () use ($role, $data, $oldPermissions): Role {
+            $role->syncPermissions($data['permissions'] ?? []);
+            $role->refresh();
+
+            AuditLog::log('role.permissions_synced', $role, [
+                'permissions' => $oldPermissions,
+            ], [
+                'permissions' => $role->permissions->pluck('name')->toArray(),
+            ]);
+
+            return $role;
+        });
     }
 }

@@ -84,4 +84,18 @@ interface UserServiceInterface
      * @return Collection<int, User>
      */
     public function getRecentUsers(int $limit = 5): Collection;
+
+    /**
+     * Get user permissions data for the dedicated permissions page.
+     *
+     * @return array<string, mixed>
+     */
+    public function getPermissionsData(User $user): array;
+
+    /**
+     * Sync direct permissions on a user.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function syncPermissions(User $user, array $data): User;
 }

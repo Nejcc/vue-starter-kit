@@ -6,6 +6,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Route;
 use LaravelPlus\GlobalSettings\Models\Setting;
+use RuntimeException;
 
 final class PackageManagerService
 {
@@ -142,6 +143,10 @@ final class PackageManagerService
         // Prevent disabling required packages
         if (self::PACKAGES[$key]['required'] && !$enabled) {
             return;
+        }
+
+        if (!class_exists(Setting::class)) {
+            throw new RuntimeException('The global-settings package is required to toggle package state.');
         }
 
         Setting::set("package.{$key}.enabled", $enabled ? '1' : '0');

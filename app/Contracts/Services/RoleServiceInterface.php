@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Contracts\Services;
 
 use App\Models\Role;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 interface RoleServiceInterface
 {
@@ -15,6 +17,11 @@ interface RoleServiceInterface
      * @return Collection<int, array<string, mixed>>
      */
     public function getAll(?string $search = null): Collection;
+
+    /**
+     * Get paginated roles with permissions and optional search.
+     */
+    public function getPaginated(?string $search = null, int $perPage = 15): LengthAwarePaginator;
 
     /**
      * Create a new role with optional permissions.
@@ -56,4 +63,20 @@ interface RoleServiceInterface
      * Get total number of roles.
      */
     public function getTotalCount(): int;
+
+    /**
+     * Get role permissions data for the dedicated permissions page.
+     *
+     * @return array<string, mixed>
+     */
+    public function getPermissionsData(Role $role): array;
+
+    /**
+     * Sync permissions on a role.
+     *
+     * @param  array<string, mixed>  $data
+     *
+     * @throws InvalidArgumentException If trying to modify super-admin permissions
+     */
+    public function syncPermissions(Role $role, array $data): Role;
 }
