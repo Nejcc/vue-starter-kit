@@ -1,4 +1,6 @@
-import type { AppPageProps } from './index';
+import type { Auth } from '@/types/auth';
+import type { InstalledModules } from '@/types/index';
+import type { ModuleNavGroupData } from '@/types/navigation';
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -14,7 +16,20 @@ declare module 'vite/client' {
 }
 
 declare module '@inertiajs/core' {
-    interface PageProps extends InertiaPageProps, AppPageProps {}
+    export interface InertiaConfig {
+        sharedPageProps: {
+            name: string;
+            auth: Auth;
+            auth_layout: 'simple' | 'split';
+            sidebarOpen: boolean;
+            modules: InstalledModules;
+            moduleNavigation: ModuleNavGroupData[];
+            notifications: {
+                unreadCount: number;
+            };
+            [key: string]: unknown;
+        };
+    }
 }
 
 declare module 'vue' {

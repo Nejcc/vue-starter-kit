@@ -26,8 +26,7 @@ final class PermissionsController extends Controller
         $search = $request->filled('search') ? $request->get('search') : null;
 
         return Inertia::render('admin/Permissions/Index', [
-            'permissions' => $this->permissionService->getAll($search)->values(),
-            'groupedPermissions' => $this->permissionService->getGrouped($search),
+            'permissions' => $this->permissionService->getPaginated($search),
             'status' => $request->session()->get('status'),
             'filters' => [
                 'search' => $request->get('search', ''),

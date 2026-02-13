@@ -89,10 +89,10 @@ final class RolesControllerTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('admin/Roles/Index')
-            ->has('roles', 3) // super-admin, admin, user
-            ->has('roles.0.name')
-            ->has('roles.1.name')
-            ->has('roles.2.name')
+            ->has('roles.data', 3) // super-admin, admin, user
+            ->has('roles.data.0.name')
+            ->has('roles.data.1.name')
+            ->has('roles.data.2.name')
         );
     }
 
@@ -103,8 +103,8 @@ final class RolesControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
-            ->has('roles', 1)
-            ->where('roles.0.name', RoleNames::SUPER_ADMIN)
+            ->has('roles.data', 1)
+            ->where('roles.data.0.name', RoleNames::SUPER_ADMIN)
         );
     }
 
@@ -113,9 +113,9 @@ final class RolesControllerTest extends TestCase
         $response = $this->actingAs($this->superAdmin)->get(route('admin.roles.index'));
 
         $response->assertInertia(fn ($page) => $page
-            ->where('roles.0.users_count', 1) // 1 user
-            ->where('roles.1.users_count', 1) // 1 admin
-            ->where('roles.2.users_count', 1) // 1 super-admin
+            ->where('roles.data.0.users_count', 1) // 1 user
+            ->where('roles.data.1.users_count', 1) // 1 admin
+            ->where('roles.data.2.users_count', 1) // 1 super-admin
         );
     }
 
@@ -127,9 +127,9 @@ final class RolesControllerTest extends TestCase
         $response = $this->actingAs($this->superAdmin)->get(route('admin.roles.index'));
 
         $response->assertInertia(fn ($page) => $page
-            ->where('roles.1.name', RoleNames::ADMIN)
-            ->where('roles.1.permissions.0', 'view-users')
-            ->where('roles.1.permissions.1', 'edit-users')
+            ->where('roles.data.1.name', RoleNames::ADMIN)
+            ->where('roles.data.1.permissions.0', 'view-users')
+            ->where('roles.data.1.permissions.1', 'edit-users')
         );
     }
 

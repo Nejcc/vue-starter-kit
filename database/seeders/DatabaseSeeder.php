@@ -17,11 +17,17 @@ final class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        $this->call([
+        $seeders = [
             PermissionSeeder::class,
             RoleSeeder::class,
-            \LaravelPlus\GlobalSettings\Database\Seeders\SettingsSeeder::class,
-            UserSeeder::class,
-        ]);
+        ];
+
+        if (class_exists(\LaravelPlus\GlobalSettings\Database\Seeders\SettingsSeeder::class)) {
+            $seeders[] = \LaravelPlus\GlobalSettings\Database\Seeders\SettingsSeeder::class;
+        }
+
+        $seeders[] = UserSeeder::class;
+
+        $this->call($seeders);
     }
 }

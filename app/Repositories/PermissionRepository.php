@@ -6,6 +6,8 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\PermissionRepositoryInterface;
 use App\Models\Permission;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 /**
@@ -27,6 +29,16 @@ final class PermissionRepository extends BaseRepository implements PermissionRep
 
     public function getAllWithRoles(?string $search = null): Collection
     {
+        return $this->buildPermissionsQuery($search)->get();
+    }
+
+    public function paginateWithRoles(?string $search = null, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->buildPermissionsQuery($search)->paginate($perPage);
+    }
+
+    private function buildPermissionsQuery(?string $search = null): Builder
+    {
         $query = $this->query()->with('roles');
 
         if ($search) {
@@ -36,6 +48,6 @@ final class PermissionRepository extends BaseRepository implements PermissionRep
             });
         }
 
-        return $query->latest()->get();
+        return $query->latest();
     }
 }

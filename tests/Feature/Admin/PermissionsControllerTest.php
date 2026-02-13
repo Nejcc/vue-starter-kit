@@ -66,8 +66,7 @@ final class PermissionsControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
             ->component('admin/Permissions/Index')
-            ->has('permissions')
-            ->has('groupedPermissions')
+            ->has('permissions.data')
             ->has('filters')
         );
     }
@@ -120,23 +119,7 @@ final class PermissionsControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
             ->component('admin/Permissions/Index')
-            ->has('permissions', 3)
-        );
-    }
-
-    public function test_permissions_index_shows_grouped_permissions(): void
-    {
-        Permission::create(['name' => 'edit-posts', 'group_name' => 'Posts']);
-        Permission::create(['name' => 'delete-posts', 'group_name' => 'Posts']);
-        Permission::create(['name' => 'manage-users', 'group_name' => 'Users']);
-
-        $response = $this->actingAs($this->admin)->get(route('admin.permissions.index'));
-
-        $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page
-            ->component('admin/Permissions/Index')
-            ->has('groupedPermissions.Posts', 2)
-            ->has('groupedPermissions.Users', 1)
+            ->has('permissions.data', 3)
         );
     }
 
@@ -150,8 +133,8 @@ final class PermissionsControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
             ->component('admin/Permissions/Index')
-            ->has('permissions', 1)
-            ->where('permissions.0.name', 'edit-posts')
+            ->has('permissions.data', 1)
+            ->where('permissions.data.0.name', 'edit-posts')
         );
     }
 
@@ -165,8 +148,8 @@ final class PermissionsControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
             ->component('admin/Permissions/Index')
-            ->has('permissions', 1)
-            ->where('permissions.0.name', 'manage-users')
+            ->has('permissions.data', 1)
+            ->where('permissions.data.0.name', 'manage-users')
         );
     }
 
@@ -178,7 +161,7 @@ final class PermissionsControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->has('permissions', 0)
+            ->has('permissions.data', 0)
         );
     }
 
@@ -192,8 +175,8 @@ final class PermissionsControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->where('permissions.0.roles_count', 1)
-            ->has('permissions.0.roles', 1)
+            ->where('permissions.data.0.roles_count', 1)
+            ->has('permissions.data.0.roles', 1)
         );
     }
 

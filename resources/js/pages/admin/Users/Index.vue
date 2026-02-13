@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { Users } from 'lucide-vue-next';
-
-import DataCard from '@/components/DataCard.vue';
-import EmptyState from '@/components/EmptyState.vue';
 import Heading from '@/components/Heading.vue';
-import SearchEmptyState from '@/components/SearchEmptyState.vue';
+import Pagination from '@/components/Pagination.vue';
 import SearchInput from '@/components/SearchInput.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 import { useDateFormat } from '@/composables/useDateFormat';
 import { useSearch } from '@/composables/useSearch';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { create, edit, index } from '@/routes/admin/users';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type PaginatedResponse } from '@/types';
 
 interface User {
     id: number;
@@ -25,11 +21,7 @@ interface User {
 }
 
 interface UsersPageProps {
-    users: {
-        data: User[];
-        links: any[];
-        meta: any;
-    };
+    users: PaginatedResponse<User>;
     status?: string;
     filters?: {
         search?: string;
@@ -63,11 +55,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <Heading
-                        variant="small"
-                        title="Users"
-                        description="Manage application users"
-                    />
+                    <Heading variant="small" title="Users" description="Manage application users" />
                     <Link
                         :href="create().url"
                         class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
@@ -91,68 +79,59 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     @clear="clearSearch"
                 />
 
-                <div v-if="users.data.length === 0">
-                    <SearchEmptyState
-                        v-if="filters?.search"
-                        :search-query="filters.search"
-                        @clear-search="clearSearch"
-                    />
-                    <EmptyState
-                        v-else
-                        :icon="Users"
-                        title="No users yet"
-                        description="Get started by creating your first user."
-                        action-text="Create User"
-                        :action-href="create().url"
-                    />
+                <div class="overflow-x-auto rounded-lg border">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b bg-muted/50">
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Name</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Email</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Roles</th>
+                                <th class="px-4 py-3 text-center text-sm font-semibold">Verified</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Joined</th>
+                                <th class="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="user in users.data" :key="user.id" class="border-b last:border-b-0">
+                                <td class="px-4 py-3 font-medium">
+                                    {{ user.name }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-muted-foreground">
+                                    {{ user.email }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div v-if="user.roles.length > 0" class="flex flex-wrap gap-1">
+                                        <StatusBadge v-for="role in user.roles" :key="role" :label="role" variant="info" />
+                                    </div>
+                                    <span v-else class="text-sm text-muted-foreground">None</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <StatusBadge
+                                        v-if="user.email_verified_at"
+                                        label="Verified"
+                                        variant="success"
+                                    />
+                                    <span v-else class="text-sm text-muted-foreground">No</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-muted-foreground">
+                                    {{ formatDate(user.created_at) }}
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <Link :href="edit(user.slug).url" class="text-sm text-primary hover:underline">
+                                        Edit
+                                    </Link>
+                                </td>
+                            </tr>
+                            <tr v-if="users.data.length === 0">
+                                <td colspan="6" class="px-4 py-8 text-center text-muted-foreground">
+                                    No users found.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div v-else class="space-y-4">
-                    <DataCard
-                        v-for="user in users.data"
-                        :key="user.id"
-                    >
-                        <div class="flex items-center gap-2">
-                            <h3 class="text-base font-medium">
-                                {{ user.name }}
-                            </h3>
-                            <StatusBadge
-                                v-if="user.email_verified_at"
-                                label="Verified"
-                                variant="success"
-                            />
-                        </div>
-                        <p class="text-sm text-muted-foreground">
-                            {{ user.email }}
-                        </p>
-                        <div
-                            v-if="user.roles.length > 0"
-                            class="flex items-center gap-2"
-                        >
-                            <span
-                                class="text-sm font-medium text-muted-foreground"
-                                >Roles:</span
-                            >
-                            <StatusBadge
-                                v-for="role in user.roles"
-                                :key="role"
-                                :label="role"
-                                variant="info"
-                            />
-                        </div>
-                        <p class="text-xs text-muted-foreground">
-                            Joined: {{ formatDate(user.created_at) }}
-                        </p>
-                        <template #actions>
-                            <Link
-                                :href="edit(user.slug).url"
-                                class="text-sm text-primary hover:underline"
-                            >
-                                Edit
-                            </Link>
-                        </template>
-                    </DataCard>
-                </div>
+                <Pagination :pagination="users" />
             </div>
         </div>
     </AdminLayout>

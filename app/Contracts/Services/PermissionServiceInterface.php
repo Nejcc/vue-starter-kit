@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Contracts\Services;
 
 use App\Models\Permission;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 interface PermissionServiceInterface
@@ -15,6 +16,11 @@ interface PermissionServiceInterface
      * @return Collection<int, array<string, mixed>>
      */
     public function getAll(?string $search = null): Collection;
+
+    /**
+     * Get paginated permissions with roles and optional search.
+     */
+    public function getPaginated(?string $search = null, int $perPage = 15): LengthAwarePaginator;
 
     /**
      * Get permissions grouped by group_name.
