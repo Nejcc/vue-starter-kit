@@ -1,1 +1,15 @@
-
+[submodule "packages/laravelplus/global-settings"]
+	path = packages/laravelplus/global-settings
+	url = https://github.com/LaravelPlus/global-settings.git
+[submodule "packages/laravelplus/localization"]
+	path = packages/laravelplus/localization
+	url = https://github.com/LaravelPlus/localization.git
+[submodule "packages/laravelplus/tenants"]
+	path = packages/laravelplus/tenants
+	url = https://github.com/LaravelPlus/tanants.git
+[submodule "packages/laravelplus/payment-gateway"]
+	path = packages/laravelplus/payment-gateway
+	url = https://github.com/LaravelPlus/payment-gateway.git
+[submodule "packages/laravelplus/subscribe"]
+	path = packages/laravelplus/subscribe
+	url = https://github.com/LaravelPlus/subscribe.git

@@ -9,11 +9,26 @@
     ],
     "license": "MIT",
     "repositories": [
-        {"type": "path", "url": "packages/laravelplus/global-settings"},
-        {"type": "path", "url": "packages/laravelplus/localization"},
-        {"type": "path", "url": "packages/laravelplus/payment-gateway"},
-        {"type": "path", "url": "packages/laravelplus/subscribe"},
-        {"type": "path", "url": "packages/laravelplus/tenants"}
+        {
+            "type": "path",
+            "url": "packages/laravelplus/global-settings"
+        },
+        {
+            "type": "path",
+            "url": "packages/laravelplus/localization"
+        },
+        {
+            "type": "path",
+            "url": "packages/laravelplus/payment-gateway"
+        },
+        {
+            "type": "path",
+            "url": "packages/laravelplus/subscribe"
+        },
+        {
+            "type": "path",
+            "url": "packages/laravelplus/tenants"
+        }
     ],
     "require": {
         "php": "^8.4",

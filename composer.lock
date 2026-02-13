@@ -1159,16 +1159,16 @@
         },
         {
             "name": "inertiajs/inertia-laravel",
-            "version": "v2.0.19",
+            "version": "v2.0.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/inertiajs/inertia-laravel.git",
-                "reference": "732a991342a0f82653a935440e2f3b9be1eb6f6e"
+                "reference": "02a719d1120378aed68053b5b2d35157140df50e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/732a991342a0f82653a935440e2f3b9be1eb6f6e",
-                "reference": "732a991342a0f82653a935440e2f3b9be1eb6f6e",
+                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/02a719d1120378aed68053b5b2d35157140df50e",
+                "reference": "02a719d1120378aed68053b5b2d35157140df50e",
                 "shasum": ""
             },
             "require": {
@@ -1223,9 +1223,9 @@
             ],
             "support": {
                 "issues": "https://github.com/inertiajs/inertia-laravel/issues",
-                "source": "https://github.com/inertiajs/inertia-laravel/tree/v2.0.19"
+                "source": "https://github.com/inertiajs/inertia-laravel/tree/v2.0.20"
             },
-            "time": "2026-01-13T15:29:20+00:00"
+            "time": "2026-02-13T11:53:06+00:00"
         },
         {
             "name": "laravel/fortify",
@@ -1846,7 +1846,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/laravelplus/global-settings",
-                "reference": "7a95b116f2729466acab73274b60cd2074a7e676"
+                "reference": "203eb2947271c274b42d5afd09425fc7c5fc6e59"
             },
             "require": {
                 "illuminate/database": "^12.0",
@@ -1855,10 +1855,8 @@
                 "php": "^8.4"
             },
             "require-dev": {
-                "inertiajs/inertia-laravel": "^2.0",
-                "orchestra/testbench": "^10.0",
-                "phpunit/phpunit": "^11.0",
-                "spatie/laravel-permission": "^6.0"
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^11.0"
             },
             "type": "library",
             "extra": {
@@ -1906,7 +1904,7 @@
         },
         {
             "name": "laravelplus/localization",
-            "version": "dev-master",
+            "version": "dev-a7c5cfd00b42cba99bca5a44bb739c74d1c8c0e2",
             "dist": {
                 "type": "path",
                 "url": "packages/laravelplus/localization",
@@ -1971,7 +1969,7 @@
         },
         {
             "name": "laravelplus/payment-gateway",
-            "version": "dev-main",
+            "version": "dev-afb40cb9181c79b8d07e19be76f31916f476e719",
             "dist": {
                 "type": "path",
                 "url": "packages/laravelplus/payment-gateway",
@@ -2038,7 +2036,7 @@
         },
         {
             "name": "laravelplus/subscribe",
-            "version": "dev-main",
+            "version": "dev-cdddc9e908ee894339901954b1846badb664c9ab",
             "dist": {
                 "type": "path",
                 "url": "packages/laravelplus/subscribe",
@@ -2093,11 +2091,11 @@
         },
         {
             "name": "laravelplus/tenants",
-            "version": "dev-master",
+            "version": "dev-1b0235a16cd4959d5b1d063d14b9a544136cacd5",
             "dist": {
                 "type": "path",
                 "url": "packages/laravelplus/tenants",
-                "reference": "1b0235a16cd4959d5b1d063d14b9a544136cacd5"
+                "reference": "ae65567759d2cd22bf97ddcbbb1ceb5b343223df"
             },
             "require": {
                 "illuminate/database": "^12.0",
@@ -7219,16 +7217,16 @@
         },
         {
             "name": "laravel/boost",
-            "version": "v2.1.3",
+            "version": "v2.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/boost.git",
-                "reference": "b96e0ab547d51d3810498dcc4d5535486991df6f"
+                "reference": "acf33b7c17b51307837d3d63ce1795fc1bd12e4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/boost/zipball/b96e0ab547d51d3810498dcc4d5535486991df6f",
-                "reference": "b96e0ab547d51d3810498dcc4d5535486991df6f",
+                "url": "https://api.github.com/repos/laravel/boost/zipball/acf33b7c17b51307837d3d63ce1795fc1bd12e4b",
+                "reference": "acf33b7c17b51307837d3d63ce1795fc1bd12e4b",
                 "shasum": ""
             },
             "require": {
@@ -7281,20 +7279,20 @@
                 "issues": "https://github.com/laravel/boost/issues",
                 "source": "https://github.com/laravel/boost"
             },
-            "time": "2026-02-11T19:22:04+00:00"
+            "time": "2026-02-13T12:09:09+00:00"
         },
         {
             "name": "laravel/mcp",
-            "version": "v0.5.6",
+            "version": "v0.5.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/mcp.git",
-                "reference": "87905978bf2a230d6c01f8d03e172249e37917f7"
+                "reference": "97fcdacbce93c572e3d25457cf30395dede67088"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/mcp/zipball/87905978bf2a230d6c01f8d03e172249e37917f7",
-                "reference": "87905978bf2a230d6c01f8d03e172249e37917f7",
+                "url": "https://api.github.com/repos/laravel/mcp/zipball/97fcdacbce93c572e3d25457cf30395dede67088",
+                "reference": "97fcdacbce93c572e3d25457cf30395dede67088",
                 "shasum": ""
             },
             "require": {
@@ -7354,7 +7352,7 @@
                 "issues": "https://github.com/laravel/mcp/issues",
                 "source": "https://github.com/laravel/mcp"
             },
-            "time": "2026-02-09T22:08:43+00:00"
+            "time": "2026-02-13T14:08:37+00:00"
         },
         {
             "name": "laravel/pail",
@@ -9766,5 +9764,5 @@
         "php": "^8.4"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
