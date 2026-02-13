@@ -12,14 +12,10 @@ import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 
 interface LocalizationSettings {
-    'static.driver': 'file' | 'database' | 'hybrid';
-    'content.enabled': boolean;
-    'content.strategy': 'json_column' | 'polymorphic_table';
-    'detection.strategy': 'session' | 'url_prefix' | 'user_preference' | 'browser' | 'chain';
-    'detection.chain': string[];
-    'detection.user_column': string;
-    'cache.enabled': boolean;
-    'cache.ttl': number;
+    static: { driver: 'file' | 'database' | 'hybrid' };
+    content: { enabled: boolean; strategy: 'json_column' | 'polymorphic_table' };
+    detection: { strategy: 'session' | 'url_prefix' | 'user_preference' | 'browser' | 'chain'; chain: string[]; user_column: string };
+    cache: { enabled: boolean; ttl: number };
 }
 
 interface SettingsPageProps {
@@ -37,23 +33,23 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 const availableResolvers = ['session', 'url_prefix', 'user_preference', 'browser'];
 
-const formData = ref<LocalizationSettings>({
-    'static.driver': props.settings['static.driver'],
-    'content.enabled': props.settings['content.enabled'],
-    'content.strategy': props.settings['content.strategy'],
-    'detection.strategy': props.settings['detection.strategy'],
-    'detection.chain': [...(props.settings['detection.chain'] ?? [])],
-    'detection.user_column': props.settings['detection.user_column'],
-    'cache.enabled': props.settings['cache.enabled'],
-    'cache.ttl': props.settings['cache.ttl'],
+const formData = ref({
+    static: { driver: props.settings.static.driver },
+    content: { enabled: props.settings.content.enabled, strategy: props.settings.content.strategy },
+    detection: {
+        strategy: props.settings.detection.strategy,
+        chain: [...(props.settings.detection.chain ?? [])],
+        user_column: props.settings.detection.user_column,
+    },
+    cache: { enabled: props.settings.cache.enabled, ttl: props.settings.cache.ttl },
 });
 
 function toggleChainResolver(resolver: string): void {
-    const index = formData.value['detection.chain'].indexOf(resolver);
+    const index = formData.value.detection.chain.indexOf(resolver);
     if (index === -1) {
-        formData.value['detection.chain'].push(resolver);
+        formData.value.detection.chain.push(resolver);
     } else {
-        formData.value['detection.chain'].splice(index, 1);
+        formData.value.detection.chain.splice(index, 1);
     }
 }
 </script>
@@ -80,7 +76,7 @@ function toggleChainResolver(resolver: string): void {
                             <Label for="static.driver">Driver</Label>
                             <select
                                 id="static.driver"
-                                v-model="formData['static.driver']"
+                                v-model="formData.static.driver"
                                 class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                             >
                                 <option value="file">File</option>
@@ -99,7 +95,7 @@ function toggleChainResolver(resolver: string): void {
                             <label class="flex items-center gap-3">
                                 <input
                                     type="checkbox"
-                                    v-model="formData['content.enabled']"
+                                    v-model="formData.content.enabled"
                                     class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                                 />
                                 <div>
@@ -113,7 +109,7 @@ function toggleChainResolver(resolver: string): void {
                                 <Label for="content.strategy">Content Strategy</Label>
                                 <select
                                     id="content.strategy"
-                                    v-model="formData['content.strategy']"
+                                    v-model="formData.content.strategy"
                                     class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                                 >
                                     <option value="json_column">JSON Column</option>
@@ -133,7 +129,7 @@ function toggleChainResolver(resolver: string): void {
                                 <Label for="detection.strategy">Detection Strategy</Label>
                                 <select
                                     id="detection.strategy"
-                                    v-model="formData['detection.strategy']"
+                                    v-model="formData.detection.strategy"
                                     class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                                 >
                                     <option value="session">Session</option>
@@ -149,7 +145,7 @@ function toggleChainResolver(resolver: string): void {
                                 <Label for="detection.user_column">User Column</Label>
                                 <Input
                                     id="detection.user_column"
-                                    v-model="formData['detection.user_column']"
+                                    v-model="formData.detection.user_column"
                                     type="text"
                                     placeholder="locale"
                                 />
@@ -158,7 +154,7 @@ function toggleChainResolver(resolver: string): void {
                             </div>
                         </div>
 
-                        <div v-if="formData['detection.strategy'] === 'chain'" class="space-y-3">
+                        <div v-if="formData.detection.strategy === 'chain'" class="space-y-3">
                             <Label>Chain Resolvers (in priority order)</Label>
                             <div class="space-y-2">
                                 <label
@@ -168,7 +164,7 @@ function toggleChainResolver(resolver: string): void {
                                 >
                                     <input
                                         type="checkbox"
-                                        :checked="formData['detection.chain'].includes(resolver)"
+                                        :checked="formData.detection.chain.includes(resolver)"
                                         class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                                         @change="toggleChainResolver(resolver)"
                                     />
@@ -187,7 +183,7 @@ function toggleChainResolver(resolver: string): void {
                             <label class="flex items-center gap-3">
                                 <input
                                     type="checkbox"
-                                    v-model="formData['cache.enabled']"
+                                    v-model="formData.cache.enabled"
                                     class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                                 />
                                 <div>
@@ -201,7 +197,7 @@ function toggleChainResolver(resolver: string): void {
                                 <Label for="cache.ttl">Cache TTL (seconds)</Label>
                                 <Input
                                     id="cache.ttl"
-                                    v-model.number="formData['cache.ttl']"
+                                    v-model.number="formData.cache.ttl"
                                     type="number"
                                     min="0"
                                 />

@@ -10,7 +10,8 @@ import { toast } from 'vue-sonner';
  */
 export function initializeToastPlugin() {
     router.on('finish', (event) => {
-        const page = event.detail.page as Page;
+        const page = event.detail?.page as Page | undefined;
+        if (!page?.props) return;
         const props = page.props;
 
         // Success messages
