@@ -1,16 +1,1 @@
-[submodule "packages/laravelplus/localization"]
-	path = packages/laravelplus/localization
-	url = git@github.com:LaravelPlus/localization.git
-	branch = master
-[submodule "packages/laravelplus/tenants"]
-	path = packages/laravelplus/tenants
-	url = git@github.com:LaravelPlus/tanents.git
-	branch = master
-[submodule "packages/laravelplus/global-settings"]
-	path = packages/laravelplus/global-settings
-	url = git@github.com:LaravelPlus/global-settings.git
-	branch = master
-[submodule "packages/laravelplus/installer"]
-	path = packages/laravelplus/installer
-	url = git@github.com:LaravelPlus/installer.git
-	branch = master
+

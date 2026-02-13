@@ -124,8 +124,8 @@ Skills are activated in two ways:
 | `inertia-vue-development` | Inertia.js v2 Vue patterns — pages, forms, navigation, deferred props, prefetching |
 | `tailwindcss-development` | Tailwind CSS v4 utilities — styling, responsive design, dark mode, colors |
 | `developing-with-fortify` | Laravel Fortify auth — login, registration, 2FA, password reset, email verification |
-| `payment-gateway-development` | nejcc/payment-gateway — Payment facade, Billable trait, drivers, transactions, subscriptions, plans, invoices |
-| `subscribe-development` | nejcc/subscribe — Subscribe facade, subscribers, lists, email providers, double opt-in |
+| `payment-gateway-development` | laravelplus/payment-gateway — Payment facade, Billable trait, drivers, transactions, subscriptions, plans, invoices |
+| `subscribe-development` | laravelplus/subscribe — Subscribe facade, subscribers, lists, email providers, double opt-in |
 | `global-settings-development` | laravelplus/global-settings — GlobalSettings facade, Setting model, SettingRole enum |
 | `laravelplus-starter-kit` | Core application — services, repositories, controllers, middleware, navigation, shared props |
 

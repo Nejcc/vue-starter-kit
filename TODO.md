@@ -46,7 +46,7 @@
 ### ✅ Completed (2026-01-27)
 
 #### Payment Gateway Package - Session 10
-- ✅ **Created `nejcc/payment-gateway` Laravel package** - Full multi-provider payment system:
+- ✅ **Created `laravelplus/payment-gateway` Laravel package** - Full multi-provider payment system:
   - **5 Payment Drivers**: Stripe, PayPal, Crypto (Coinbase), Bank Transfer, Cash on Delivery
   - **All amounts in cents** (integers) for precision
   - **Laravel Manager pattern** for driver management
@@ -70,7 +70,7 @@
 - ✅ **Payment Facade** for easy access: `Payment::driver('stripe')->charge(...)`
 - ✅ **Updated .env.example** with all payment gateway variables
 
-**Package Location**: `packages/nejcc/payment-gateway/`
+**Package Location**: `packages/laravelplus/payment-gateway/`
 
 **Files Created**: 50+ PHP files
 - `composer.json` - Package definition with Laravel auto-discovery
@@ -940,7 +940,7 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 
 ### Third-Party Integrations
 
-- [x] **Payment gateway** ✅ - Created `nejcc/payment-gateway` package with Stripe, PayPal, Crypto, Bank Transfer, COD support (Session 10)
+- [x] **Payment gateway** ✅ - Created `laravelplus/payment-gateway` package with Stripe, PayPal, Crypto, Bank Transfer, COD support (Session 10)
 - [ ] **Email providers** - SendGrid, Mailgun, SES
 - [ ] **SMS providers** - Twilio, Vonage
 - [ ] **Cloud storage** - AWS S3, DigitalOcean Spaces

@@ -27,6 +27,8 @@ Options:
   --no-clean              Do not remove existing vendor/ and node_modules/.
   --fresh                 Use php artisan migrate:fresh --seed instead of migrate --seed.
   --no-fresh              Force regular migrate --seed.
+  --packages <list>       Comma-separated packages to install (or "all"/"none").
+                          Available: global-settings,localization,tenants,payment-gateway,subscribe
   --telescope             Install Laravel Telescope (composer --dev) and publish assets.
   --no-telescope          Do not install Laravel Telescope.
   --nightwatch            Install Nightwatch (npm -D) and init config.
@@ -38,6 +40,8 @@ Examples:
   ./install.sh -m prod -y           # non-interactive production install
   ./install.sh --mode dev --no-clean
   ./install.sh -y --fresh           # non-interactive with migrate:fresh --seed
+  ./install.sh --packages all       # install all packages
+  ./install.sh --packages global-settings,tenants  # install specific packages
 USAGE
 }
 
@@ -47,6 +51,7 @@ CLEAN_DEPS=1
 FRESH_FLAG=""
 TELESCOPE_FLAG=""
 NIGHTWATCH_FLAG=""
+PACKAGES_FLAG=""
 
 while [ "${1-}" != "" ]; do
   case "$1" in
@@ -68,6 +73,8 @@ while [ "${1-}" != "" ]; do
       NIGHTWATCH_FLAG="yes"; shift ;;
     --no-nightwatch)
       NIGHTWATCH_FLAG="no"; shift ;;
+    --packages)
+      PACKAGES_FLAG="${2-}"; shift 2 || { error "Missing value for $1"; exit 2; } ;;
     -h|--help)
       usage; exit 0 ;;
     *)
@@ -214,11 +221,91 @@ else
   fi
 fi
 
-info "Clearing Laravel caches"
-php artisan config:clear 2>/dev/null || true
-php artisan cache:clear 2>/dev/null || true
-php artisan route:clear 2>/dev/null || true
-php artisan view:clear 2>/dev/null || true
+# ── Package selection ──────────────────────────────────────────────────────────
+# Define available packages (submodule path : display name : composer require name)
+AVAILABLE_PACKAGES=(
+  "packages/laravelplus/global-settings:Global Settings:laravelplus/global-settings"
+  "packages/laravelplus/localization:Localization:laravelplus/localization"
+  "packages/laravelplus/tenants:Tenants:laravelplus/tenants"
+  "packages/laravelplus/payment-gateway:Payment Gateway:laravelplus/payment-gateway"
+  "packages/laravelplus/subscribe:Subscribe:laravelplus/subscribe"
+)
+
+SELECTED_PACKAGES=()
+
+if [ -n "$PACKAGES_FLAG" ]; then
+  if [ "$PACKAGES_FLAG" = "all" ]; then
+    for pkg_entry in "${AVAILABLE_PACKAGES[@]}"; do
+      SELECTED_PACKAGES+=("$pkg_entry")
+    done
+  elif [ "$PACKAGES_FLAG" = "none" ]; then
+    SELECTED_PACKAGES=()
+  else
+    IFS=',' read -ra PKG_LIST <<< "$PACKAGES_FLAG"
+    for pkg_name in "${PKG_LIST[@]}"; do
+      pkg_name=$(echo "$pkg_name" | xargs) # trim whitespace
+      found=0
+      for pkg_entry in "${AVAILABLE_PACKAGES[@]}"; do
+        local_name=$(echo "$pkg_entry" | cut -d: -f2)
+        short_name=$(basename "$(echo "$pkg_entry" | cut -d: -f1)")
+        if [ "$pkg_name" = "$short_name" ] || [ "$pkg_name" = "$local_name" ]; then
+          SELECTED_PACKAGES+=("$pkg_entry")
+          found=1
+          break
+        fi
+      done
+      if [ "$found" -eq 0 ]; then
+        warn "Unknown package: $pkg_name (skipped)"
+      fi
+    done
+  fi
+elif [ "$ASSUME_YES" -eq 1 ]; then
+  SELECTED_PACKAGES=()
+else
+  echo ""
+  echo "${BOLD}Select packages to install:${RESET}"
+  echo "  0) All packages"
+  for i in "${!AVAILABLE_PACKAGES[@]}"; do
+    display_name=$(echo "${AVAILABLE_PACKAGES[$i]}" | cut -d: -f2)
+    echo "  $((i + 1))) $display_name"
+  done
+  echo ""
+  echo "  n) None (default)"
+  echo ""
+  read -r -p "Enter choices (comma-separated, e.g. 1,3,5), 0 for all, or n for none [n]: " PKG_CHOICE || PKG_CHOICE=""
+  PKG_CHOICE=${PKG_CHOICE:-n}
+
+  if [ "$PKG_CHOICE" = "n" ] || [ "$PKG_CHOICE" = "N" ]; then
+    SELECTED_PACKAGES=()
+  elif [ "$PKG_CHOICE" = "0" ]; then
+    for pkg_entry in "${AVAILABLE_PACKAGES[@]}"; do
+      SELECTED_PACKAGES+=("$pkg_entry")
+    done
+  else
+    IFS=',' read -ra CHOICES <<< "$PKG_CHOICE"
+    for choice in "${CHOICES[@]}"; do
+      choice=$(echo "$choice" | xargs) # trim whitespace
+      idx=$((choice - 1))
+      if [ "$idx" -ge 0 ] && [ "$idx" -lt "${#AVAILABLE_PACKAGES[@]}" ]; then
+        SELECTED_PACKAGES+=("${AVAILABLE_PACKAGES[$idx]}")
+      else
+        warn "Invalid choice: $choice (skipped)"
+      fi
+    done
+  fi
+fi
+
+if [ ${#SELECTED_PACKAGES[@]} -gt 0 ]; then
+  echo ""
+  info "Selected packages:"
+  for pkg_entry in "${SELECTED_PACKAGES[@]}"; do
+    display_name=$(echo "$pkg_entry" | cut -d: -f2)
+    echo "  ${DIM}- $display_name${RESET}"
+  done
+else
+  echo ""
+  warn "No packages selected. Skipping package installation."
+fi
 
 info "Preparing environment file"
 if [ ! -f .env ]; then
@@ -231,11 +318,6 @@ if [ ! -f .env ]; then
   fi
 else
   echo "  ${DIM}.env file already exists${RESET}"
-fi
-
-info "Generating application key"
-if ! php artisan key:generate --force 2>/dev/null; then
-  warn "Application key generation failed. This may be normal if key already exists."
 fi
 
 info "Setting permissions"
@@ -264,33 +346,118 @@ if [ -f database/database.sqlite ]; then
   chmod 664 database/database.sqlite || true
 fi
 
-info "Initializing git submodules"
-git submodule sync --quiet
-git submodule update --init --recursive
-if [ $? -eq 0 ]; then
-  success "Git submodules initialized successfully"
+# ── Add selected packages as submodules and composer dependencies ─────────────
+# Package registry: path|git-url|composer-name
+ALL_PACKAGES=(
+  "packages/laravelplus/global-settings|https://github.com/LaravelPlus/global-settings.git|laravelplus/global-settings"
+  "packages/laravelplus/localization|https://github.com/LaravelPlus/localization.git|laravelplus/localization"
+  "packages/laravelplus/tenants|https://github.com/LaravelPlus/tanants.git|laravelplus/tenants"
+  "packages/laravelplus/payment-gateway|https://github.com/LaravelPlus/payment-gateway.git|laravelplus/payment-gateway"
+  "packages/laravelplus/subscribe|https://github.com/LaravelPlus/subscribe.git|laravelplus/subscribe"
+)
+
+if [ ${#SELECTED_PACKAGES[@]} -gt 0 ]; then
+  info "Adding selected packages"
+
+  # Generate .gitmodules
+  : > .gitmodules
+  for pkg_entry in "${SELECTED_PACKAGES[@]}"; do
+    pkg_path=$(echo "$pkg_entry" | cut -d: -f1)
+    for pkg_def in "${ALL_PACKAGES[@]}"; do
+      def_path=$(echo "$pkg_def" | cut -d'|' -f1)
+      def_url=$(echo "$pkg_def" | cut -d'|' -f2)
+      if [ "$pkg_path" = "$def_path" ]; then
+        cat >> .gitmodules <<EOF
+[submodule "$pkg_path"]
+	path = $pkg_path
+	url = $def_url
+EOF
+        break
+      fi
+    done
+  done
+
+  # Init submodules
+  mkdir -p packages/laravelplus
+  git submodule sync --quiet
+  for pkg_entry in "${SELECTED_PACKAGES[@]}"; do
+    pkg_path=$(echo "$pkg_entry" | cut -d: -f1)
+    display_name=$(echo "$pkg_entry" | cut -d: -f2)
+    echo "  ${DIM}Cloning $display_name...${RESET}"
+    if [ ! -d "$pkg_path/.git" ]; then
+      git submodule update --init --recursive -- "$pkg_path" 2>/dev/null || \
+        git submodule add --force "$(git config -f .gitmodules --get "submodule.$pkg_path.url")" "$pkg_path" 2>/dev/null || \
+        warn "Failed to clone $display_name"
+    fi
+  done
+
+  # Add path repositories and require entries to composer.json
+  ADD_JSON="["
+  NEED_COMMA=0
+  for pkg_entry in "${SELECTED_PACKAGES[@]}"; do
+    pkg_path=$(echo "$pkg_entry" | cut -d: -f1)
+    for pkg_def in "${ALL_PACKAGES[@]}"; do
+      def_path=$(echo "$pkg_def" | cut -d'|' -f1)
+      def_composer=$(echo "$pkg_def" | cut -d'|' -f3)
+      if [ "$pkg_path" = "$def_path" ]; then
+        [ "$NEED_COMMA" -eq 1 ] && ADD_JSON+=","
+        ADD_JSON+="{\"path\":\"$def_path\",\"name\":\"$def_composer\"}"
+        NEED_COMMA=1
+        echo "  ${DIM}Adding $def_composer${RESET}"
+        break
+      fi
+    done
+  done
+  ADD_JSON+="]"
+
+  php -r "
+    \$add = json_decode('$ADD_JSON', true);
+    \$json = json_decode(file_get_contents('composer.json'), true);
+    if (!is_array(\$json['repositories'])) { \$json['repositories'] = []; }
+    \$existingUrls = array_column(\$json['repositories'], 'url');
+    foreach (\$add as \$pkg) {
+      if (!in_array(\$pkg['path'], \$existingUrls)) {
+        \$json['repositories'][] = ['type' => 'path', 'url' => \$pkg['path'], 'options' => ['symlink' => true]];
+      }
+      \$json['require'][\$pkg['name']] = '@dev';
+    }
+    file_put_contents('composer.json', json_encode(\$json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
+  "
+  success "Added $(echo "$ADD_JSON" | php -r 'echo count(json_decode(file_get_contents("php://stdin"), true));') package(s) to composer.json"
 else
-  error "Failed to initialize git submodules"
-  exit 1
+  info "No packages selected, continuing without optional packages"
+  : > .gitmodules
 fi
 
-info "Installing PHP dependencies (composer install)"
 if [ "$CLEAN_DEPS" -eq 1 ] && [ -d vendor ]; then
   echo "  ${DIM}Removing existing vendor directory${RESET}"
   rm -rf vendor
 fi
+
+info "Installing PHP dependencies"
 if [ "$IS_PROD" -eq 1 ]; then
   echo "  ${DIM}Production mode: Installing without dev dependencies${RESET}"
-  composer install --no-dev --classmap-authoritative --no-interaction --prefer-dist --ansi
+  composer update --no-dev --classmap-authoritative --no-interaction --prefer-dist --ansi
 else
   echo "  ${DIM}Development mode: Installing all dependencies${RESET}"
-  composer install --no-interaction --prefer-dist --ansi
+  composer update --no-interaction --prefer-dist --ansi
 fi
 if [ $? -eq 0 ]; then
   success "PHP dependencies installed successfully"
 else
   error "Failed to install PHP dependencies"
   exit 1
+fi
+
+info "Clearing Laravel caches"
+php artisan config:clear 2>/dev/null || true
+php artisan cache:clear 2>/dev/null || true
+php artisan route:clear 2>/dev/null || true
+php artisan view:clear 2>/dev/null || true
+
+info "Generating application key"
+if ! php artisan key:generate --force 2>/dev/null; then
+  warn "Application key generation failed. This may be normal if key already exists."
 fi
 
 info "Installing Node dependencies (npm)"

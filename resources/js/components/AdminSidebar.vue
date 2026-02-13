@@ -11,6 +11,7 @@ import {
     Languages,
     List,
     Package,
+    ScrollText,
     Settings,
     ShieldCheck,
     Users,
@@ -35,6 +36,7 @@ import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { dashboard } from '@/routes';
 import { index as auditLogsIndex } from '@/routes/admin/audit-logs';
 import { index as databaseIndex } from '@/routes/admin/database';
+import { index as logsIndex } from '@/routes/admin/logs';
 import { index as modulesIndex } from '@/routes/admin/modules';
 import { index as packagesIndex } from '@/routes/admin/packages';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
@@ -89,6 +91,11 @@ const navGroups = computed<NavGroup[]>(() => {
                     title: 'Audit Logs',
                     href: auditLogsIndex().url,
                     icon: ClipboardList,
+                },
+                {
+                    title: 'Application Logs',
+                    href: logsIndex().url,
+                    icon: ScrollText,
                 },
                 {
                     title: 'Packages',

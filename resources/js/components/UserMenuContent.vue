@@ -10,12 +10,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import UserInfo from '@/components/UserInfo.vue';
 import { useUserPermissions } from '@/composables/useUserPermissions';
+import type { User } from '@/types';
 import { logout } from '@/routes';
 import { index as adminIndex } from '@/routes/admin';
 import { edit } from '@/routes/profile';
 import { show as twoFactorShow } from '@/routes/two-factor';
 import { edit as passwordEdit } from '@/routes/user-password';
-import type { User } from '@/types';
 import ImpersonateModal from './ImpersonateModal.vue';
 
 type Props = {

@@ -45,21 +45,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Development Routes
-    |--------------------------------------------------------------------------
-    |
-    | Control access to development-only routes (quick-login, quick-register).
-    | These should only be enabled in local environments.
-    |
-    */
-
-    'dev_routes' => [
-        'enabled' => env('SECURITY_DEV_ROUTES_ENABLED', false),
-        'allowed_ips' => env('SECURITY_DEV_ROUTES_IPS', '127.0.0.1,::1'),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Database Browser
     |--------------------------------------------------------------------------
     |

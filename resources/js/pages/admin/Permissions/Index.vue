@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-
-import DataCard from '@/components/DataCard.vue';
 import Heading from '@/components/Heading.vue';
+import Pagination from '@/components/Pagination.vue';
 import SearchInput from '@/components/SearchInput.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 import { useDateFormat } from '@/composables/useDateFormat';
 import { useSearch } from '@/composables/useSearch';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { create, edit, index } from '@/routes/admin/permissions';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type PaginatedResponse } from '@/types';
 
 interface Permission {
     id: number;
@@ -21,8 +20,7 @@ interface Permission {
 }
 
 interface PermissionsPageProps {
-    permissions: Permission[];
-    groupedPermissions?: Record<string, Permission[]>;
+    permissions: PaginatedResponse<Permission>;
     status?: string;
     filters?: {
         search?: string;
@@ -47,7 +45,6 @@ const breadcrumbItems: BreadcrumbItem[] = [
         href: index().url,
     },
 ];
-
 </script>
 
 <template>
@@ -57,11 +54,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <Heading
-                        variant="small"
-                        title="Permissions"
-                        description="Manage application permissions"
-                    />
+                    <Heading variant="small" title="Permissions" description="Manage application permissions" />
                     <Link
                         :href="create().url"
                         class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
@@ -85,49 +78,36 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     @clear="clearSearch"
                 />
 
-                <div v-if="groupedPermissions" class="space-y-6">
-                    <div
-                        v-for="(group, groupName) in groupedPermissions"
-                        :key="groupName || 'ungrouped'"
-                        class="space-y-4"
-                    >
-                        <h2 class="text-lg font-semibold">
-                            {{ groupName || 'Ungrouped' }}
-                        </h2>
-                        <div class="space-y-4">
-                            <DataCard
-                                v-for="permission in group"
+                <div class="overflow-x-auto rounded-lg border">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b bg-muted/50">
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Name</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Group</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Roles</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Created</th>
+                                <th class="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="permission in permissions.data"
                                 :key="permission.id"
+                                class="border-b last:border-b-0"
                             >
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-base font-medium">
-                                        {{ permission.name }}
-                                    </h3>
-                                    <Link
-                                        :href="edit(permission.name).url"
-                                        class="text-sm text-primary hover:underline"
-                                    >
-                                        Edit
-                                    </Link>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span
-                                        class="text-sm font-medium text-muted-foreground"
-                                        >Roles:</span
-                                    >
-                                    <span class="text-sm">{{
-                                        permission.roles_count
-                                    }}</span>
-                                </div>
-                                <div
-                                    v-if="permission.roles.length > 0"
-                                    class="space-y-1"
-                                >
-                                    <span
-                                        class="text-sm font-medium text-muted-foreground"
-                                        >Assigned to roles:</span
-                                    >
-                                    <div class="flex flex-wrap gap-2">
+                                <td class="px-4 py-3 font-medium">
+                                    {{ permission.name }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <StatusBadge
+                                        v-if="permission.group_name"
+                                        :label="permission.group_name"
+                                        variant="default"
+                                    />
+                                    <span v-else class="text-sm text-muted-foreground">—</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div v-if="permission.roles.length > 0" class="flex flex-wrap gap-1">
                                         <StatusBadge
                                             v-for="role in permission.roles"
                                             :key="role"
@@ -135,75 +115,27 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             variant="info"
                                         />
                                     </div>
-                                </div>
-                                <p
-                                    class="text-xs text-muted-foreground"
-                                >
-                                    Created: {{ formatDate(permission.created_at) }}
-                                </p>
-                            </DataCard>
-                        </div>
-                    </div>
-                </div>
-                <div v-else class="space-y-4">
-                    <DataCard
-                        v-for="permission in permissions"
-                        :key="permission.id"
-                    >
-                        <div class="flex items-center gap-2">
-                            <h3 class="text-base font-medium">
-                                {{ permission.name }}
-                            </h3>
-                            <StatusBadge
-                                v-if="permission.group_name"
-                                :label="permission.group_name"
-                                variant="default"
-                            />
-                            <Link
-                                :href="edit(permission.name).url"
-                                class="text-sm text-primary hover:underline"
-                            >
-                                Edit
-                            </Link>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span
-                                class="text-sm font-medium text-muted-foreground"
-                                >Roles:</span
-                            >
-                            <span class="text-sm">{{
-                                permission.roles_count
-                            }}</span>
-                        </div>
-                        <div
-                            v-if="permission.roles.length > 0"
-                            class="space-y-1"
-                        >
-                            <span
-                                class="text-sm font-medium text-muted-foreground"
-                                >Assigned to roles:</span
-                            >
-                            <div class="flex flex-wrap gap-2">
-                                <StatusBadge
-                                    v-for="role in permission.roles"
-                                    :key="role"
-                                    :label="role"
-                                    variant="info"
-                                />
-                            </div>
-                        </div>
-                        <p class="text-xs text-muted-foreground">
-                            Created: {{ formatDate(permission.created_at) }}
-                        </p>
-                    </DataCard>
+                                    <span v-else class="text-sm text-muted-foreground">None</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-muted-foreground">
+                                    {{ formatDate(permission.created_at) }}
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <Link :href="edit(permission.name).url" class="text-sm text-primary hover:underline">
+                                        Edit
+                                    </Link>
+                                </td>
+                            </tr>
+                            <tr v-if="permissions.data.length === 0">
+                                <td colspan="5" class="px-4 py-8 text-center text-muted-foreground">
+                                    No permissions found.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div
-                    v-if="permissions.length === 0"
-                    class="rounded-lg border p-8 text-center"
-                >
-                    <p class="text-muted-foreground">No permissions found.</p>
-                </div>
+                <Pagination :pagination="permissions" />
             </div>
         </div>
     </AdminLayout>

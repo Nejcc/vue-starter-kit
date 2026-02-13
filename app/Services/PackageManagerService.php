@@ -6,6 +6,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Route;
 use LaravelPlus\GlobalSettings\Models\Setting;
+use RuntimeException;
 
 final class PackageManagerService
 {
@@ -30,7 +31,7 @@ final class PackageManagerService
             'name' => 'Payment Gateway',
             'description' => 'Payment processing, subscriptions, plans, and transaction management.',
             'icon' => 'CreditCard',
-            'package' => 'nejcc/payment-gateway',
+            'package' => 'laravelplus/payment-gateway',
             'configKey' => 'payment-gateway.admin.enabled',
             'settingsUrl' => '/admin/payments',
             'adminUrl' => '/admin/payments',
@@ -41,7 +42,7 @@ final class PackageManagerService
             'name' => 'Subscribers',
             'description' => 'Email subscriber lists, double opt-in flows, and subscriber management.',
             'icon' => 'Mail',
-            'package' => 'nejcc/subscribe',
+            'package' => 'laravelplus/subscribe',
             'configKey' => 'subscribe.admin.enabled',
             'settingsUrl' => '/admin/subscribers',
             'adminUrl' => '/admin/subscribers',
@@ -142,6 +143,10 @@ final class PackageManagerService
         // Prevent disabling required packages
         if (self::PACKAGES[$key]['required'] && !$enabled) {
             return;
+        }
+
+        if (!class_exists(Setting::class)) {
+            throw new RuntimeException('The global-settings package is required to toggle package state.');
         }
 
         Setting::set("package.{$key}.enabled", $enabled ? '1' : '0');

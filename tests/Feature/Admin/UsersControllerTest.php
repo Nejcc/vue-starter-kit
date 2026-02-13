@@ -53,8 +53,8 @@ final class UsersControllerTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('admin/Users/Index')
             ->has('users.data')
-            ->has('users.links')
-            ->has('users.meta')
+            ->has('users.current_page')
+            ->has('users.last_page')
             ->has('filters')
         );
     }

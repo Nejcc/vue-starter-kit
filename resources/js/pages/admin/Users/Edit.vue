@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useDateFormat } from '@/composables/useDateFormat';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
-import { destroy, index, update } from '@/routes/admin/users';
+import { destroy, index, permissions, update } from '@/routes/admin/users';
 import { type BreadcrumbItem } from '@/types';
 
 interface User {
@@ -149,6 +149,15 @@ const confirmDelete = () => {
                         label="Roles"
                         :error="errors.roles"
                     />
+
+                    <div>
+                        <Link
+                            :href="permissions(user.slug).url"
+                            class="text-sm text-primary hover:underline"
+                        >
+                            Manage Direct Permissions
+                        </Link>
+                    </div>
 
                     <div class="rounded-lg border border-muted bg-muted/50 p-4">
                         <h4 class="text-sm font-medium">User Information</h4>

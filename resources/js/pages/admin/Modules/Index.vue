@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import type { LucideIcon } from 'lucide-vue-next';
-import { Activity, Building2, CreditCard, Mail, Package, Settings } from 'lucide-vue-next';
+import { Activity, Building2, Check, ClipboardCopy, CreditCard, Mail, Package, Settings } from 'lucide-vue-next';
+import { ref } from 'vue';
 import Heading from '@/components/Heading.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
@@ -36,6 +37,20 @@ const iconMap: Record<string, LucideIcon> = {
 
 function getIcon(name: string): LucideIcon {
     return iconMap[name] ?? Package;
+}
+
+const copiedKey = ref<string | null>(null);
+
+async function copyInstallCommand(mod: Module) {
+    try {
+        await navigator.clipboard.writeText(`composer require ${mod.package}`);
+        copiedKey.value = mod.key;
+        setTimeout(() => {
+            copiedKey.value = null;
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy install command:', err);
+    }
 }
 </script>
 
@@ -86,6 +101,15 @@ function getIcon(name: string): LucideIcon {
                             >
                                 Manage &rarr;
                             </Link>
+                            <button
+                                v-else-if="!mod.installed"
+                                @click="copyInstallCommand(mod)"
+                                class="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
+                            >
+                                <component :is="copiedKey === mod.key ? Check : ClipboardCopy" class="h-3.5 w-3.5" />
+                                <span v-if="copiedKey === mod.key">Copied!</span>
+                                <span v-else>composer require {{ mod.package }}</span>
+                            </button>
                             <span v-else class="text-sm text-muted-foreground">Not available</span>
                         </div>
                     </div>

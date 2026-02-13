@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Contracts\Services\RoleServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRoleRequest;
+use App\Http\Requests\Admin\SyncRolePermissionsRequest;
 use App\Http\Requests\Admin\UpdateRoleRequest;
 use App\Models\Role;
 use Illuminate\Http\RedirectResponse;
@@ -27,7 +28,7 @@ final class RolesController extends Controller
         $search = $request->filled('search') ? $request->get('search') : null;
 
         return Inertia::render('admin/Roles/Index', [
-            'roles' => $this->roleService->getAll($search),
+            'roles' => $this->roleService->getPaginated($search),
             'status' => $request->session()->get('status'),
             'filters' => [
                 'search' => $request->get('search', ''),
@@ -104,5 +105,24 @@ final class RolesController extends Controller
         }
 
         return redirect()->route('admin.roles.index')->with('status', 'Role deleted successfully.');
+    }
+
+    public function permissions(Role $role): Response
+    {
+        return Inertia::render('admin/Roles/Permissions', [
+            'role' => $this->roleService->getPermissionsData($role),
+            'allPermissions' => $this->roleService->getAllPermissions(),
+        ]);
+    }
+
+    public function updatePermissions(SyncRolePermissionsRequest $request, Role $role): RedirectResponse
+    {
+        try {
+            $this->roleService->syncPermissions($role, $request->validated());
+        } catch (InvalidArgumentException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->back()->with('status', 'Permissions updated successfully.');
     }
 }

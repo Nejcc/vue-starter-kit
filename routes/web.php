@@ -22,20 +22,26 @@ Route::get('/', function () {
 
 Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
-// Quick login & register for development - only available in local environment
-if (config('security.dev_routes.enabled') && app()->environment('local')) {
-    Route::post('quick-login/{userId}', function (int $userId) {
-        $allowedIps = explode(',', config('security.dev_routes.allowed_ips', '127.0.0.1,::1'));
-        if (!in_array(request()->ip(), $allowedIps, true)) {
-            abort(403);
+// Quick login & register for development - only when APP_ENV=local
+if (app()->environment('local')) {
+    Route::post('quick-login/{role}', function (string $role) {
+        $allowedRoles = ['super-admin', 'admin', 'user'];
+
+        if (!in_array($role, $allowedRoles, true)) {
+            return back()->withErrors([
+                'role' => "Invalid role: {$role}.",
+            ]);
         }
 
-        $user = App\Models\User::find($userId);
+        $user = App\Models\User::role($role)->first();
 
         if (!$user) {
-            return back()->withErrors([
-                'email' => "User {$userId} does not exist.",
+            $user = App\Models\User::factory()->create([
+                'name' => ucfirst(str_replace('-', ' ', $role)),
+                'email' => $role . '@example.com',
+                'email_verified_at' => now(),
             ]);
+            $user->assignRole($role);
         }
 
         Illuminate\Support\Facades\Auth::login($user);
@@ -45,11 +51,6 @@ if (config('security.dev_routes.enabled') && app()->environment('local')) {
     })->name('quick-login');
 
     Route::post('quick-register/{role}', function (string $role) {
-        $allowedIps = explode(',', config('security.dev_routes.allowed_ips', '127.0.0.1,::1'));
-        if (!in_array(request()->ip(), $allowedIps, true)) {
-            abort(403);
-        }
-
         $allowedRoles = ['super-admin', 'admin', 'user'];
 
         if (!in_array($role, $allowedRoles, true)) {
@@ -117,12 +118,16 @@ Route::middleware(['auth', 'role:super-admin,admin'])->prefix('admin')->name('ad
     Route::get('users/{user}/edit', [App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('users.edit');
     Route::patch('users/{user}', [App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
     Route::delete('users/{user}', [App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy');
+    Route::get('users/{user}/permissions', [App\Http\Controllers\Admin\UsersController::class, 'permissions'])->name('users.permissions');
+    Route::patch('users/{user}/permissions', [App\Http\Controllers\Admin\UsersController::class, 'updatePermissions'])->name('users.permissions.update');
     Route::get('roles', [App\Http\Controllers\Admin\RolesController::class, 'index'])->name('roles.index');
     Route::get('roles/create', [App\Http\Controllers\Admin\RolesController::class, 'create'])->name('roles.create');
     Route::post('roles', [App\Http\Controllers\Admin\RolesController::class, 'store'])->name('roles.store');
     Route::get('roles/{role}/edit', [App\Http\Controllers\Admin\RolesController::class, 'edit'])->name('roles.edit');
     Route::patch('roles/{role}', [App\Http\Controllers\Admin\RolesController::class, 'update'])->name('roles.update');
     Route::delete('roles/{role}', [App\Http\Controllers\Admin\RolesController::class, 'destroy'])->name('roles.destroy');
+    Route::get('roles/{role}/permissions', [App\Http\Controllers\Admin\RolesController::class, 'permissions'])->name('roles.permissions');
+    Route::patch('roles/{role}/permissions', [App\Http\Controllers\Admin\RolesController::class, 'updatePermissions'])->name('roles.permissions.update');
     Route::get('permissions', [App\Http\Controllers\Admin\PermissionsController::class, 'index'])->name('permissions.index');
     Route::get('permissions/create', [App\Http\Controllers\Admin\PermissionsController::class, 'create'])->name('permissions.create');
     Route::post('permissions', [App\Http\Controllers\Admin\PermissionsController::class, 'store'])->name('permissions.store');
@@ -134,6 +139,7 @@ Route::middleware(['auth', 'role:super-admin,admin'])->prefix('admin')->name('ad
     Route::get('database/{connection}/{table}/{view}', [App\Http\Controllers\Admin\DatabaseController::class, 'show'])->name('database.connection.show.view');
     Route::get('databases', [App\Http\Controllers\Admin\DatabaseController::class, 'listConnections'])->name('databases.index');
     Route::get('audit-logs', [App\Http\Controllers\Admin\AuditLogsController::class, 'index'])->name('audit-logs.index');
+    Route::get('logs', [App\Http\Controllers\Admin\LogsController::class, 'index'])->name('logs.index');
     Route::get('modules', [App\Http\Controllers\Admin\ModulesController::class, 'index'])->name('modules.index');
     Route::get('packages', [App\Http\Controllers\Admin\PackagesController::class, 'index'])->name('packages.index');
     Route::patch('packages/{key}', [App\Http\Controllers\Admin\PackagesController::class, 'update'])->name('packages.update');

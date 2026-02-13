@@ -8,6 +8,7 @@ use App\Contracts\Services\RoleServiceInterface;
 use App\Contracts\Services\UserServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\SyncUserPermissionsRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -25,29 +26,19 @@ final class UsersController extends Controller
 
     public function index(Request $request): Response
     {
-        $users = $this->userService->getAdminPaginated($request->get('search'));
+        $users = $this->userService->getAdminPaginated($request->get('search'))
+            ->through(fn ($user) => [
+                'id' => $user->id,
+                'slug' => $user->slug,
+                'name' => $user->name,
+                'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at?->toIso8601String(),
+                'roles' => $user->roles->pluck('name')->toArray(),
+                'created_at' => $user->created_at->toIso8601String(),
+            ]);
 
         return Inertia::render('admin/Users/Index', [
-            'users' => [
-                'data' => $users->map(fn ($user) => [
-                    'id' => $user->id,
-                    'slug' => $user->slug,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'email_verified_at' => $user->email_verified_at?->toIso8601String(),
-                    'roles' => $user->roles->pluck('name')->toArray(),
-                    'created_at' => $user->created_at->toIso8601String(),
-                ])->toArray(),
-                'links' => $users->linkCollection()->toArray(),
-                'meta' => [
-                    'current_page' => $users->currentPage(),
-                    'from' => $users->firstItem(),
-                    'last_page' => $users->lastPage(),
-                    'per_page' => $users->perPage(),
-                    'to' => $users->lastItem(),
-                    'total' => $users->total(),
-                ],
-            ],
+            'users' => $users,
             'status' => $request->session()->get('status'),
             'filters' => [
                 'search' => $request->get('search', ''),
@@ -101,5 +92,20 @@ final class UsersController extends Controller
         }
 
         return redirect()->route('admin.users.index')->with('status', 'User deleted successfully.');
+    }
+
+    public function permissions(User $user): Response
+    {
+        return Inertia::render('admin/Users/Permissions', [
+            'user' => $this->userService->getPermissionsData($user),
+            'allPermissions' => $this->roleService->getAllPermissions(),
+        ]);
+    }
+
+    public function updatePermissions(SyncUserPermissionsRequest $request, User $user): RedirectResponse
+    {
+        $this->userService->syncPermissions($user, $request->validated());
+
+        return redirect()->back()->with('status', 'Permissions updated successfully.');
     }
 }

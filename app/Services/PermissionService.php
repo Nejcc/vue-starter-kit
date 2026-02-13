@@ -8,6 +8,7 @@ use App\Contracts\Repositories\PermissionRepositoryInterface;
 use App\Contracts\Services\PermissionServiceInterface;
 use App\Models\AuditLog;
 use App\Models\Permission;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
@@ -31,6 +32,21 @@ final class PermissionService extends AbstractService implements PermissionServi
     public function getAll(?string $search = null): Collection
     {
         return $this->getRepository()->getAllWithRoles($search)->map(fn ($permission) => [
+            'id' => $permission->id,
+            'name' => $permission->name,
+            'group_name' => $permission->group_name,
+            'roles' => $permission->roles->pluck('name'),
+            'roles_count' => $permission->roles()->count(),
+            'created_at' => $permission->created_at,
+        ]);
+    }
+
+    /**
+     * Get paginated permissions with roles and optional search.
+     */
+    public function getPaginated(?string $search = null, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->getRepository()->paginateWithRoles($search, $perPage)->through(fn ($permission) => [
             'id' => $permission->id,
             'name' => $permission->name,
             'group_name' => $permission->group_name,

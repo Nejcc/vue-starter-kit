@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import { Check } from 'lucide-vue-next';
-import { computed } from 'vue';
-import LocaleSwitchController from '@/actions/LaravelPlus/Localization/Http/Controllers/LocaleSwitchController';
+import { computed, ref, onMounted } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -16,14 +15,28 @@ const { locale, availableLocales } = useTranslation();
 
 const hasMultipleLocales = computed(() => availableLocales.value.length > 1);
 
+const switchUrl = ref<((code: string) => { url: string }) | null>(null);
+
+onMounted(async () => {
+    try {
+        const path = '/resources/js/actions/LaravelPlus/Localization/Http/Controllers/LocaleSwitchController';
+        const mod = await import(/* @vite-ignore */ path);
+        switchUrl.value = mod.default?.url ? mod.default : null;
+    } catch {
+        // Localization package not installed
+    }
+});
+
 function switchLocale(code: string) {
     if (code === locale.value) return;
-    router.post(LocaleSwitchController.url(code), {}, { preserveScroll: true });
+    if (switchUrl.value) {
+        router.post(switchUrl.value(code), {}, { preserveScroll: true });
+    }
 }
 </script>
 
 <template>
-    <DropdownMenu v-if="hasMultipleLocales">
+    <DropdownMenu v-if="hasMultipleLocales && switchUrl">
         <DropdownMenuTrigger as-child>
             <Button
                 variant="ghost"

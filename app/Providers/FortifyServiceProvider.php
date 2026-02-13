@@ -55,6 +55,7 @@ final class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(fn (Request $request) => Inertia::render('auth/Login', [
             'canResetPassword' => Features::enabled(Features::resetPasswords()) && $this->isEmailConfigured(),
             'canRegister' => $this->isRegistrationEnabled(),
+            'devQuickLogin' => $this->isDevQuickLoginEnabled(),
             'status' => $request->session()->get('status'),
             'error' => $request->session()->get('error'),
         ]));
@@ -86,7 +87,9 @@ final class FortifyServiceProvider extends ServiceProvider
                 return Redirect::route('login')->with('error', 'Registration is currently disabled. Please contact an administrator.');
             }
 
-            return Inertia::render('auth/Register');
+            return Inertia::render('auth/Register', [
+                'devQuickLogin' => $this->isDevQuickLoginEnabled(),
+            ]);
         });
 
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/TwoFactorChallenge'));
@@ -116,6 +119,14 @@ final class FortifyServiceProvider extends ServiceProvider
         RateLimiter::for('impersonate', fn (Request $request) => Limit::perMinute(
             (int) config('security.rate_limiting.impersonation', 5)
         )->by(auth()->id() ?? $request->ip()));
+    }
+
+    /**
+     * Check if dev quick login/register routes are available.
+     */
+    private function isDevQuickLoginEnabled(): bool
+    {
+        return app()->environment('local');
     }
 
     /**

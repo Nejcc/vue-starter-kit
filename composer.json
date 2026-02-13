@@ -9,41 +9,11 @@
     ],
     "license": "MIT",
     "repositories": [
-        {
-            "type": "path",
-            "url": "packages/nejcc/payment-gateway",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/nejcc/subscribe",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/laravelplus/global-settings",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/laravelplus/tenants",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/laravelplus/localization",
-            "options": {
-                "symlink": true
-            }
-        }
+        {"type": "path", "url": "packages/laravelplus/global-settings"},
+        {"type": "path", "url": "packages/laravelplus/localization"},
+        {"type": "path", "url": "packages/laravelplus/payment-gateway"},
+        {"type": "path", "url": "packages/laravelplus/subscribe"},
+        {"type": "path", "url": "packages/laravelplus/tenants"}
     ],
     "require": {
         "php": "^8.4",
@@ -55,9 +25,9 @@
         "laravel/wayfinder": "^0.1.13",
         "laravelplus/global-settings": "@dev",
         "laravelplus/localization": "@dev",
+        "laravelplus/payment-gateway": "@dev",
+        "laravelplus/subscribe": "@dev",
         "laravelplus/tenants": "@dev",
-        "nejcc/payment-gateway": "@dev",
-        "nejcc/subscribe": "@dev",
         "spatie/laravel-permission": "^6.24"
     },
     "require-dev": {

@@ -23,10 +23,17 @@ interface Setting {
     label: string | null;
     description: string | null;
     role: 'system' | 'user' | 'plugin';
+    group: string | null;
+}
+
+interface GroupOption {
+    value: string;
+    label: string;
 }
 
 interface EditSettingPageProps {
     setting: Setting;
+    groups: GroupOption[];
 }
 
 const props = defineProps<EditSettingPageProps>();
@@ -62,6 +69,7 @@ const formData = ref({
               props.setting.value === true
             : (props.setting.value ?? ''),
     role: props.setting.role,
+    group: props.setting.group ?? '',
 });
 
 const isSystemSetting = props.setting.role === 'system';
@@ -210,6 +218,22 @@ const deleteSetting = (): void => {
                         >
                             System settings cannot have their role changed
                         </p>
+                    </div>
+
+                    <div class="grid gap-2">
+                        <Label for="group">Group</Label>
+                        <select
+                            id="group"
+                            v-model="formData.group"
+                            name="group"
+                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <option value="">None</option>
+                            <option v-for="group in groups" :key="group.value" :value="group.value">
+                                {{ group.label }}
+                            </option>
+                        </select>
+                        <InputError :message="errors.group" />
                     </div>
 
                     <div v-if="fieldType === 'multioptions'" class="grid gap-2">

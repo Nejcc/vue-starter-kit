@@ -375,4 +375,54 @@ final class UserService extends AbstractService implements UserServiceInterface
     {
         return $this->getRepository()->getRecent($limit);
     }
+
+    /**
+     * Get user permissions data for the dedicated permissions page.
+     *
+     * @return array<string, mixed>
+     */
+    public function getPermissionsData(User $user): array
+    {
+        $user->load(['permissions', 'roles.permissions']);
+
+        $rolePermissions = $user->roles
+            ->flatMap(fn ($role) => $role->permissions->pluck('name'))
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
+
+        return [
+            'id' => $user->id,
+            'slug' => $user->slug,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name')->toArray(),
+            'direct_permissions' => $user->getDirectPermissions()->pluck('name')->toArray(),
+            'role_permissions' => $rolePermissions,
+        ];
+    }
+
+    /**
+     * Sync direct permissions on a user.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function syncPermissions(User $user, array $data): User
+    {
+        $oldPermissions = $user->getDirectPermissions()->pluck('name')->toArray();
+
+        return $this->transaction(function () use ($user, $data, $oldPermissions): User {
+            $user->syncPermissions($data['permissions'] ?? []);
+            $user->refresh();
+
+            AuditLog::log('user.permissions_synced', $user, [
+                'direct_permissions' => $oldPermissions,
+            ], [
+                'direct_permissions' => $user->getDirectPermissions()->pluck('name')->toArray(),
+            ]);
+
+            return $user;
+        });
+    }
 }
