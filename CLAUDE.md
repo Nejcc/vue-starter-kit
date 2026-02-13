@@ -75,7 +75,10 @@ Controllers → Services → Repositories → Models
 - `AuditLog` — Polymorphic audit trail (user, event, old/new values, IP, user agent)
 
 ### Custom Packages
-Two local symlinked packages in `packages/nejcc/`:
+Five git submodule packages in `packages/laravelplus/`:
+- `global-settings` — Key-value global settings with admin UI
+- `localization` — Multi-language translation management
+- `tenants` — Multi-tenant organization management
 - `payment-gateway` — Payment/billing features, provides `Billable` trait
 - `subscribe` — Subscriber management
 
@@ -113,7 +116,7 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.4.1
+- php - 8.5.2
 - inertiajs/inertia-laravel (INERTIA) - v2
 - laravel/fortify (FORTIFY) - v1
 - laravel/framework (LARAVEL) - v12
@@ -139,10 +142,6 @@ This project has domain-specific skills available. You MUST activate the relevan
 - `inertia-vue-development` — Develops Inertia.js v2 Vue client-side applications. Activates when creating Vue pages, forms, or navigation; using &lt;Link&gt;, &lt;Form&gt;, useForm, or router; working with deferred props, prefetching, or polling; or when user mentions Vue with Inertia, Vue pages, Vue forms, or Vue navigation.
 - `tailwindcss-development` — Styles applications using Tailwind CSS v4 utilities. Activates when adding styles, restyling components, working with gradients, spacing, layout, flex, grid, responsive design, dark mode, colors, typography, or borders; or when the user mentions CSS, styling, classes, Tailwind, restyle, hero section, cards, buttons, or any visual/UI changes.
 - `developing-with-fortify` — Laravel Fortify headless authentication backend development. Activate when implementing authentication features including login, registration, password reset, email verification, two-factor authentication (2FA/TOTP), profile updates, headless auth, authentication scaffolding, or auth guards in Laravel applications.
-- `payment-gateway-development` — Activate when working with the nejcc/payment-gateway package — using the Payment facade, Billable trait, creating payment drivers, managing transactions, subscriptions, plans, invoices, refunds, webhooks, or building admin pages under admin/payments.
-- `subscribe-development` — Activate when working with the nejcc/subscribe package — using the Subscribe facade, managing subscribers, subscription lists, email providers, double opt-in flows, or building admin pages under admin/subscribers.
-- `global-settings-development` — Activate when working with the laravelplus/global-settings package — using the GlobalSettings facade, Setting model, SettingRole enum, managing application settings, or building admin pages under admin/settings.
-- `laravelplus-starter-kit` — Activate when working on the core starter kit application — adding controllers, services, repositories, actions, models, admin pages, settings pages, middleware, Inertia pages, Vue components, composables, or modifying the architecture, navigation, shared props, or authentication flow.
 
 ## Conventions
 

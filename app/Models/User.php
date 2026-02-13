@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use App\Concerns\Billable;
+use App\Concerns\HasOrganizations;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-use LaravelPlus\Tenants\Traits\HasOrganizations;
-use Nejcc\PaymentGateway\Traits\Billable;
 use Spatie\Permission\Traits\HasRoles;
 
 final class User extends Authenticatable
