@@ -22,8 +22,8 @@ Route::get('/', function () {
 
 Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
-// Quick login & register for development - only available in local environment
-if (config('security.dev_routes.enabled') && app()->environment('local')) {
+// Quick login & register for development - never available in production
+if (config('security.dev_routes.enabled') && !app()->environment('production')) {
     Route::post('quick-login/{userId}', function (int $userId) {
         $allowedIps = explode(',', config('security.dev_routes.allowed_ips', '127.0.0.1,::1'));
         if (!in_array(request()->ip(), $allowedIps, true)) {

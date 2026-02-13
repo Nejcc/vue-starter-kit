@@ -21,6 +21,7 @@ export interface LoginPageProps {
     error?: string;
     canResetPassword: boolean;
     canRegister: boolean;
+    devQuickLogin: boolean;
 }
 
 /**
@@ -28,6 +29,7 @@ export interface LoginPageProps {
  */
 export interface RegisterPageProps {
     status?: string;
+    devQuickLogin: boolean;
 }
 
 /**

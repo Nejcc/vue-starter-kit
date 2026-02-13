@@ -54,7 +54,7 @@ return [
     */
 
     'dev_routes' => [
-        'enabled' => env('SECURITY_DEV_ROUTES_ENABLED', false),
+        'enabled' => env('SECURITY_DEV_ROUTES_ENABLED', true),
         'allowed_ips' => env('SECURITY_DEV_ROUTES_IPS', '127.0.0.1,::1'),
     ],
 

@@ -16,8 +16,6 @@ import type { RegisterPageProps } from '@/types';
 
 defineProps<RegisterPageProps>();
 
-const isDevelopment = import.meta.env.DEV;
-
 const quickRegister = (role: string): void => {
     router.post(`/quick-register/${role}`);
 };
@@ -145,7 +143,7 @@ const quickRegister = (role: string): void => {
                         Create account
                     </Button>
 
-                    <div v-if="isDevelopment" class="flex flex-col gap-2">
+                    <div v-if="devQuickLogin" class="flex flex-col gap-2">
                         <p class="text-center text-xs text-muted-foreground">
                             Development Quick Register
                         </p>
