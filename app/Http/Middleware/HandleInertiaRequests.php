@@ -43,6 +43,11 @@ final class HandleInertiaRequests extends Middleware
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         $user = $request->user();
+
+        if ($user) {
+            $user->loadMissing(['roles', 'permissions']);
+        }
+
         $isImpersonating = session()->has('impersonator_id');
         $impersonator = null;
 
