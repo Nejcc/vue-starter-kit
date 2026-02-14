@@ -22,7 +22,11 @@ import { useSearch } from '@/composables/useSearch';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem, type PaginatedResponse } from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useLocalizationNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useLocalizationNav();
 
 const page = usePage();
 
@@ -110,7 +114,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Translations" />
 
         <div class="container mx-auto py-8">

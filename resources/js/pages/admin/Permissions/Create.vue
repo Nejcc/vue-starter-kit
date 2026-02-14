@@ -63,7 +63,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         label="Group Name"
                         id="group_name"
                         :error="errors.group_name"
-                        description="Optional: Group permissions together (e.g., &quot;users&quot; for view users, create users, etc.)"
+                        description='Optional: Group permissions together (e.g., "users" for view users, create users, etc.)'
                     >
                         <Input
                             id="group_name"

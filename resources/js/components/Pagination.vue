@@ -8,7 +8,7 @@ interface Props {
     pagination: PaginatedResponse<unknown>;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 function goToPage(url: string | null): void {
     if (url) {

@@ -33,7 +33,11 @@ export function useSearch(options: UseSearchOptions) {
 
     function clearSearch(): void {
         searchQuery.value = '';
-        router.get(url, { ...(extraParams?.() ?? {}) }, { preserveState: false });
+        router.get(
+            url,
+            { ...(extraParams?.() ?? {}) },
+            { preserveState: false },
+        );
     }
 
     function initFromFilter(value?: string): void {

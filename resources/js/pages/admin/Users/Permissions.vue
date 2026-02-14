@@ -76,7 +76,9 @@ const selectedPermissions = ref<string[]>(props.user.direct_permissions);
                     class="rounded-lg border border-muted bg-muted/50 p-4"
                 >
                     <h4 class="text-sm font-medium">
-                        Permissions inherited via roles ({{ user.roles.join(', ') }})
+                        Permissions inherited via roles ({{
+                            user.roles.join(', ')
+                        }})
                     </h4>
                     <div class="mt-2 flex flex-wrap gap-2">
                         <StatusBadge
@@ -87,7 +89,8 @@ const selectedPermissions = ref<string[]>(props.user.direct_permissions);
                         />
                     </div>
                     <p class="mt-2 text-xs text-muted-foreground">
-                        These permissions are granted through role assignments and cannot be changed here.
+                        These permissions are granted through role assignments
+                        and cannot be changed here.
                     </p>
                 </div>
 

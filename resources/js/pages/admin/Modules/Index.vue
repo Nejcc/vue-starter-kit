@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import type { LucideIcon } from 'lucide-vue-next';
-import { Activity, Building2, Check, ClipboardCopy, CreditCard, Mail, Package, Settings } from 'lucide-vue-next';
+import {
+    Activity,
+    Building2,
+    Check,
+    ClipboardCopy,
+    CreditCard,
+    Mail,
+    Package,
+    Settings,
+} from 'lucide-vue-next';
 import { ref } from 'vue';
 import Heading from '@/components/Heading.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
@@ -60,7 +69,11 @@ async function copyInstallCommand(mod: Module) {
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col gap-8">
-                <Heading title="Modules" description="Installed packages and extensions" variant="small" />
+                <Heading
+                    title="Modules"
+                    description="Installed packages and extensions"
+                    variant="small"
+                />
 
                 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <div
@@ -78,20 +91,33 @@ async function copyInstallCommand(mod: Module) {
                                         'rounded-lg p-2.5',
                                     ]"
                                 >
-                                    <component :is="getIcon(mod.icon)" class="h-5 w-5" />
+                                    <component
+                                        :is="getIcon(mod.icon)"
+                                        class="h-5 w-5"
+                                    />
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold">{{ mod.name }}</h3>
-                                    <p class="text-xs text-muted-foreground">{{ mod.package }}</p>
+                                    <h3 class="font-semibold">
+                                        {{ mod.name }}
+                                    </h3>
+                                    <p class="text-xs text-muted-foreground">
+                                        {{ mod.package }}
+                                    </p>
                                 </div>
                             </div>
                             <StatusBadge
-                                :label="mod.installed ? 'Installed' : 'Not Installed'"
+                                :label="
+                                    mod.installed
+                                        ? 'Installed'
+                                        : 'Not Installed'
+                                "
                                 :variant="mod.installed ? 'success' : 'default'"
                             />
                         </div>
 
-                        <p class="text-sm text-muted-foreground">{{ mod.description }}</p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ mod.description }}
+                        </p>
 
                         <div class="mt-auto">
                             <Link
@@ -106,11 +132,24 @@ async function copyInstallCommand(mod: Module) {
                                 @click="copyInstallCommand(mod)"
                                 class="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
                             >
-                                <component :is="copiedKey === mod.key ? Check : ClipboardCopy" class="h-3.5 w-3.5" />
-                                <span v-if="copiedKey === mod.key">Copied!</span>
-                                <span v-else>composer require {{ mod.package }}</span>
+                                <component
+                                    :is="
+                                        copiedKey === mod.key
+                                            ? Check
+                                            : ClipboardCopy
+                                    "
+                                    class="h-3.5 w-3.5"
+                                />
+                                <span v-if="copiedKey === mod.key"
+                                    >Copied!</span
+                                >
+                                <span v-else
+                                    >composer require {{ mod.package }}</span
+                                >
                             </button>
-                            <span v-else class="text-sm text-muted-foreground">Not available</span>
+                            <span v-else class="text-sm text-muted-foreground"
+                                >Not available</span
+                            >
                         </div>
                     </div>
                 </div>

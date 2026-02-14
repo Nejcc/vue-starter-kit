@@ -13,9 +13,21 @@ export function useLocalizationNav(): ModuleNav {
         title: 'Localization',
         icon: Globe,
         items: [
-            { title: 'Languages', href: '/admin/localizations/languages', icon: Languages },
-            { title: 'Translations', href: '/admin/localizations/translations', icon: LayoutDashboard },
-            { title: 'Settings', href: '/admin/localizations/settings', icon: Settings },
+            {
+                title: 'Languages',
+                href: '/admin/localizations/languages',
+                icon: Languages,
+            },
+            {
+                title: 'Translations',
+                href: '/admin/localizations/translations',
+                icon: LayoutDashboard,
+            },
+            {
+                title: 'Settings',
+                href: '/admin/localizations/settings',
+                icon: Settings,
+            },
         ],
     };
 }

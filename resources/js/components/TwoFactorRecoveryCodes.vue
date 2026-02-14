@@ -125,7 +125,10 @@ onMounted(async () => {
                 ]"
             >
                 <div v-if="errors?.length" class="mt-6">
-                    <AlertMessage :messages="errors" title="Something went wrong." />
+                    <AlertMessage
+                        :messages="errors"
+                        title="Something went wrong."
+                    />
                 </div>
                 <div v-else class="mt-3 space-y-3">
                     <div

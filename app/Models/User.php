@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Concerns\Billable;
+use App\Concerns\HasOrganizations;
 use App\Traits\TracksLastLogin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
-use App\Concerns\Billable;
-use App\Concerns\HasOrganizations;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -69,6 +69,8 @@ final class User extends Authenticatable
         'data_processing_consent_given_at',
         'gdpr_ip_address',
         'last_login_at',
+        'suspended_at',
+        'suspended_reason',
     ];
 
     /**
@@ -101,6 +103,7 @@ final class User extends Authenticatable
             'data_processing_consent' => 'boolean',
             'data_processing_consent_given_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'suspended_at' => 'datetime',
         ];
     }
 
@@ -177,6 +180,58 @@ final class User extends Authenticatable
     public function getDisplayNameAttribute(): string
     {
         return $this->name ?: $this->email;
+    }
+
+    /**
+     * Scope: only active (not suspended) users.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
+    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->whereNull('suspended_at');
+    }
+
+    /**
+     * Scope: only suspended users.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
+    public function scopeSuspended(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->whereNotNull('suspended_at');
+    }
+
+    /**
+     * Scope: only email-verified users.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
+    public function scopeVerified(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->whereNotNull('email_verified_at');
+    }
+
+    /**
+     * Scope: only unverified users.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
+    public function scopeUnverified(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->whereNull('email_verified_at');
+    }
+
+    /**
+     * Check if user account is suspended.
+     */
+    public function isSuspended(): bool
+    {
+        return null !== $this->suspended_at;
     }
 
     /**

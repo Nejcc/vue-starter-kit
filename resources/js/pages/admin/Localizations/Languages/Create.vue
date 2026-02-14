@@ -9,7 +9,11 @@ import { useLocalizationNav } from '@/composables/useLocalizationNav';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useLocalizationNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useLocalizationNav();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     { title: 'Admin', href: '#' },
@@ -20,7 +24,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Add Language" />
 
         <div class="container mx-auto py-8">

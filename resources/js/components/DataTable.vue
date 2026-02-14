@@ -60,7 +60,11 @@ function getHideClass(hideBelow?: string): string {
                             getHideClass(col.hideBelow),
                         ]"
                     >
-                        <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]">
+                        <slot
+                            :name="`cell-${col.key}`"
+                            :row="row"
+                            :value="row[col.key]"
+                        >
                             {{ row[col.key] ?? '—' }}
                         </slot>
                     </td>

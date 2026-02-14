@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Constants\AuditEvent;
 use App\Constants\RoleNames;
 use App\Contracts\Repositories\RoleRepositoryInterface;
 use App\Contracts\Services\RoleServiceInterface;
+use App\Exceptions\RoleException;
 use App\Models\AuditLog;
 use App\Models\Role;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use InvalidArgumentException;
 
 /**
  * Role service implementation.
@@ -38,7 +39,7 @@ final class RoleService extends AbstractService implements RoleServiceInterface
             'name' => $role->name,
             'is_super_admin' => $role->name === RoleNames::SUPER_ADMIN,
             'permissions' => $role->permissions->pluck('name'),
-            'users_count' => $role->users()->count(),
+            'users_count' => $role->users_count ?? $role->users()->count(),
             'created_at' => $role->created_at,
         ]);
     }
@@ -53,7 +54,7 @@ final class RoleService extends AbstractService implements RoleServiceInterface
             'name' => $role->name,
             'is_super_admin' => $role->name === RoleNames::SUPER_ADMIN,
             'permissions' => $role->permissions->pluck('name'),
-            'users_count' => $role->users()->count(),
+            'users_count' => $role->users_count ?? $role->users()->count(),
             'created_at' => $role->created_at,
         ]);
     }
@@ -63,12 +64,12 @@ final class RoleService extends AbstractService implements RoleServiceInterface
      *
      * @param  array<string, mixed>  $data
      *
-     * @throws InvalidArgumentException If trying to create a super-admin role
+     * @throws RoleException If trying to create a super-admin role
      */
     public function create(array $data): Role
     {
         if ($data['name'] === RoleNames::SUPER_ADMIN) {
-            throw new InvalidArgumentException('The super-admin role cannot be created. It is a system role.');
+            throw RoleException::cannotCreateSuperAdmin();
         }
 
         return $this->transaction(function () use ($data): Role {
@@ -78,7 +79,7 @@ final class RoleService extends AbstractService implements RoleServiceInterface
                 $role->givePermissionTo($data['permissions']);
             }
 
-            AuditLog::log('role.created', $role, null, [
+            AuditLog::log(AuditEvent::ROLE_CREATED, $role, null, [
                 'name' => $role->name,
                 'permissions' => $role->permissions->pluck('name')->toArray(),
             ]);
@@ -92,16 +93,16 @@ final class RoleService extends AbstractService implements RoleServiceInterface
      *
      * @param  array<string, mixed>  $data
      *
-     * @throws InvalidArgumentException If renaming to/from super-admin
+     * @throws RoleException If renaming to/from super-admin
      */
     public function update(Role $role, array $data): Role
     {
         if ($role->name === RoleNames::SUPER_ADMIN && $data['name'] !== RoleNames::SUPER_ADMIN) {
-            throw new InvalidArgumentException('The super-admin role name cannot be changed.');
+            throw RoleException::cannotRenameSuperAdmin();
         }
 
         if ($role->name !== RoleNames::SUPER_ADMIN && $data['name'] === RoleNames::SUPER_ADMIN) {
-            throw new InvalidArgumentException('The super-admin role name cannot be used. It is a system role.');
+            throw RoleException::cannotUseSuperAdminName();
         }
 
         $oldValues = [
@@ -120,7 +121,7 @@ final class RoleService extends AbstractService implements RoleServiceInterface
 
             $role->refresh();
 
-            AuditLog::log('role.updated', $role, $oldValues, [
+            AuditLog::log(AuditEvent::ROLE_UPDATED, $role, $oldValues, [
                 'name' => $role->name,
                 'permissions' => $role->permissions->pluck('name')->toArray(),
             ]);
@@ -132,22 +133,20 @@ final class RoleService extends AbstractService implements RoleServiceInterface
     /**
      * Delete a role.
      *
-     * @throws InvalidArgumentException If trying to delete super-admin or role with assigned users
+     * @throws RoleException If trying to delete super-admin or role with assigned users
      */
     public function delete(Role $role): bool
     {
         if ($role->name === RoleNames::SUPER_ADMIN) {
-            throw new InvalidArgumentException('The super-admin role cannot be deleted. It is a system role with all permissions.');
+            throw RoleException::cannotDeleteSuperAdmin();
         }
 
         $usersCount = $role->users()->count();
         if ($usersCount > 0) {
-            throw new InvalidArgumentException(
-                "Cannot delete role \"{$role->name}\" because it is assigned to {$usersCount} user(s). Please remove all user assignments before deleting this role."
-            );
+            throw RoleException::cannotDeleteWithUsers($usersCount);
         }
 
-        AuditLog::log('role.deleted', $role, [
+        AuditLog::log(AuditEvent::ROLE_DELETED, $role, [
             'name' => $role->name,
         ]);
 
@@ -209,7 +208,7 @@ final class RoleService extends AbstractService implements RoleServiceInterface
             'name' => $role->name,
             'is_super_admin' => $role->name === RoleNames::SUPER_ADMIN,
             'permissions' => $role->permissions->pluck('name')->toArray(),
-            'users_count' => $role->users()->count(),
+            'users_count' => $role->users_count ?? $role->users()->count(),
         ];
     }
 
@@ -218,12 +217,12 @@ final class RoleService extends AbstractService implements RoleServiceInterface
      *
      * @param  array<string, mixed>  $data
      *
-     * @throws InvalidArgumentException If trying to modify super-admin permissions
+     * @throws RoleException If trying to modify super-admin permissions
      */
     public function syncPermissions(Role $role, array $data): Role
     {
         if ($role->name === RoleNames::SUPER_ADMIN) {
-            throw new InvalidArgumentException('The super-admin role has all permissions automatically. Permissions cannot be modified.');
+            throw RoleException::cannotModifySuperAdminPermissions();
         }
 
         $oldPermissions = $role->permissions->pluck('name')->toArray();
@@ -232,7 +231,7 @@ final class RoleService extends AbstractService implements RoleServiceInterface
             $role->syncPermissions($data['permissions'] ?? []);
             $role->refresh();
 
-            AuditLog::log('role.permissions_synced', $role, [
+            AuditLog::log(AuditEvent::ROLE_PERMISSIONS_SYNCED, $role, [
                 'permissions' => $oldPermissions,
             ], [
                 'permissions' => $role->permissions->pluck('name')->toArray(),

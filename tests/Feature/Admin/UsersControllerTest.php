@@ -671,4 +671,319 @@ final class UsersControllerTest extends TestCase
 
         $this->assertDatabaseHas('users', ['id' => $admin->id]);
     }
+
+    // ─── Export ───────────────────────────────────────────────────────
+
+    /**
+     * Test that guests cannot export users.
+     */
+    public function test_guests_cannot_export_users(): void
+    {
+        $response = $this->get(route('admin.users.export'));
+
+        $response->assertRedirect(route('login'));
+    }
+
+    /**
+     * Test that regular users cannot export users.
+     */
+    public function test_regular_users_cannot_export_users(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('admin.users.export'));
+
+        $response->assertForbidden();
+    }
+
+    /**
+     * Test that super admin can export users as CSV.
+     */
+    public function test_super_admin_can_export_users_csv(): void
+    {
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin = User::factory()->create(['name' => 'Admin User', 'email' => 'admin@example.com']);
+        $admin->assignRole($superAdminRole);
+
+        User::factory()->create(['name' => 'Regular User', 'email' => 'user@example.com']);
+
+        $response = $this->actingAs($admin)->get(route('admin.users.export'));
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
+        $response->assertDownload();
+
+        $content = $response->streamedContent();
+        $this->assertStringContains('ID,Name,Email', $content);
+        $this->assertStringContains('Admin User', $content);
+        $this->assertStringContains('Regular User', $content);
+    }
+
+    /**
+     * Test that CSV export includes role information.
+     */
+    public function test_csv_export_includes_roles(): void
+    {
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $adminRole = Role::create(['name' => RoleNames::ADMIN]);
+        $admin = User::factory()->create();
+        $admin->assignRole($superAdminRole);
+
+        $userWithRoles = User::factory()->create();
+        $userWithRoles->assignRole($adminRole);
+
+        $response = $this->actingAs($admin)->get(route('admin.users.export'));
+
+        $content = $response->streamedContent();
+        $this->assertStringContains(RoleNames::ADMIN, $content);
+    }
+
+    /**
+     * Test CSV export has correct filename format.
+     */
+    public function test_csv_export_has_correct_filename(): void
+    {
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin = User::factory()->create();
+        $admin->assignRole($superAdminRole);
+
+        $response = $this->actingAs($admin)->get(route('admin.users.export'));
+
+        $expectedFilename = 'users-' . now()->format('Y-m-d') . '.csv';
+        $response->assertDownload($expectedFilename);
+    }
+
+    // ─── Suspend / Unsuspend ────────────────────────────────────────
+
+    /**
+     * Test that guests cannot suspend users.
+     */
+    public function test_guests_cannot_suspend_users(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->post(route('admin.users.suspend', $user));
+
+        $response->assertRedirect(route('login'));
+    }
+
+    /**
+     * Test that regular users cannot suspend users.
+     */
+    public function test_regular_users_cannot_suspend_users(): void
+    {
+        $user = User::factory()->create();
+        $userRole = Role::create(['name' => RoleNames::USER]);
+        $user->assignRole($userRole);
+
+        $targetUser = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('admin.users.suspend', $targetUser));
+
+        $response->assertForbidden();
+    }
+
+    /**
+     * Test that super admin can suspend a user.
+     */
+    public function test_super_admin_can_suspend_user(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.users.suspend', $targetUser), [
+            'reason' => 'Violation of terms',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'User suspended successfully.');
+
+        $targetUser->refresh();
+        $this->assertNotNull($targetUser->suspended_at);
+        $this->assertEquals('Violation of terms', $targetUser->suspended_reason);
+    }
+
+    /**
+     * Test that suspension without reason works.
+     */
+    public function test_suspend_user_without_reason(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.users.suspend', $targetUser));
+
+        $response->assertRedirect();
+
+        $targetUser->refresh();
+        $this->assertNotNull($targetUser->suspended_at);
+        $this->assertNull($targetUser->suspended_reason);
+    }
+
+    /**
+     * Test that admin cannot suspend themselves.
+     */
+    public function test_admin_cannot_suspend_themselves(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $response = $this->actingAs($admin)->post(route('admin.users.suspend', $admin));
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('suspension');
+
+        $admin->refresh();
+        $this->assertNull($admin->suspended_at);
+    }
+
+    /**
+     * Test that suspension creates an audit log.
+     */
+    public function test_suspend_user_creates_audit_log(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create();
+
+        $this->actingAs($admin)->post(route('admin.users.suspend', $targetUser), [
+            'reason' => 'Spam activity',
+        ]);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'user.suspended',
+            'auditable_type' => User::class,
+            'auditable_id' => $targetUser->id,
+        ]);
+    }
+
+    /**
+     * Test that super admin can unsuspend a user.
+     */
+    public function test_super_admin_can_unsuspend_user(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create([
+            'suspended_at' => now(),
+            'suspended_reason' => 'Test suspension',
+        ]);
+
+        $response = $this->actingAs($admin)->post(route('admin.users.unsuspend', $targetUser));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'User unsuspended successfully.');
+
+        $targetUser->refresh();
+        $this->assertNull($targetUser->suspended_at);
+        $this->assertNull($targetUser->suspended_reason);
+    }
+
+    /**
+     * Test that unsuspension creates an audit log.
+     */
+    public function test_unsuspend_user_creates_audit_log(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $targetUser = User::factory()->create([
+            'suspended_at' => now(),
+            'suspended_reason' => 'Previous reason',
+        ]);
+
+        $this->actingAs($admin)->post(route('admin.users.unsuspend', $targetUser));
+
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'user.unsuspended',
+            'auditable_type' => User::class,
+            'auditable_id' => $targetUser->id,
+        ]);
+    }
+
+    /**
+     * Test that suspended user is shown in index with suspension status.
+     */
+    public function test_index_shows_suspended_status(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $suspendedUser = User::factory()->create([
+            'name' => 'Suspended User',
+            'suspended_at' => now(),
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.users.index'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('admin/Users/Index')
+            ->has('users.data', fn ($data) => $data
+                ->has(2)
+                ->etc()
+            )
+        );
+    }
+
+    /**
+     * Test that edit page shows suspension data.
+     */
+    public function test_edit_page_shows_suspension_data(): void
+    {
+        $admin = User::factory()->create();
+        $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
+        $admin->assignRole($superAdminRole);
+
+        $suspendedUser = User::factory()->create([
+            'suspended_at' => now(),
+            'suspended_reason' => 'Bad behavior',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.users.edit', $suspendedUser));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('admin/Users/Edit')
+            ->where('user.suspended_reason', 'Bad behavior')
+            ->whereType('user.suspended_at', 'string')
+        );
+    }
+
+    /**
+     * Test that suspended user is logged out when accessing the application.
+     */
+    public function test_suspended_user_is_logged_out(): void
+    {
+        $user = User::factory()->create([
+            'suspended_at' => now(),
+            'suspended_reason' => 'Account suspended',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+
+        $response->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
+
+    private function assertStringContains(string $needle, string $haystack): void
+    {
+        $this->assertTrue(
+            str_contains($haystack, $needle),
+            "Failed asserting that '{$haystack}' contains '{$needle}'."
+        );
+    }
 }

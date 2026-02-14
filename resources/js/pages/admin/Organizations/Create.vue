@@ -10,7 +10,11 @@ import { useOrganizationNav } from '@/composables/useOrganizationNav';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useOrganizationNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useOrganizationNav();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     { title: 'Admin', href: '#' },
@@ -20,7 +24,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Create Organization" />
 
         <div class="container mx-auto py-8">
@@ -37,7 +46,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
-                    <FormField label="Name" id="name" :error="errors.name" required>
+                    <FormField
+                        label="Name"
+                        id="name"
+                        :error="errors.name"
+                        required
+                    >
                         <Input
                             id="name"
                             name="name"
@@ -47,7 +61,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         />
                     </FormField>
 
-                    <FormField label="Slug" id="slug" :error="errors.slug" description="Leave blank to auto-generate from name.">
+                    <FormField
+                        label="Slug"
+                        id="slug"
+                        :error="errors.slug"
+                        description="Leave blank to auto-generate from name."
+                    >
                         <Input
                             id="slug"
                             name="slug"
@@ -56,7 +75,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         />
                     </FormField>
 
-                    <FormField label="Description" id="description" :error="errors.description">
+                    <FormField
+                        label="Description"
+                        id="description"
+                        :error="errors.description"
+                    >
                         <Textarea
                             id="description"
                             name="description"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import Heading from '@/components/Heading.vue';
 import Pagination from '@/components/Pagination.vue';
 import SearchInput from '@/components/SearchInput.vue';
@@ -21,9 +21,11 @@ interface Permission {
 
 interface PermissionsPageProps {
     permissions: PaginatedResponse<Permission>;
+    groups: string[];
     status?: string;
     filters?: {
         search?: string;
+        group?: string;
     };
 }
 
@@ -34,6 +36,17 @@ const { searchQuery, handleSearch, clearSearch } = useSearch({
     url: index().url,
 });
 searchQuery.value = props.filters?.search ?? '';
+
+function filterByGroup(group: string): void {
+    router.get(
+        index().url,
+        {
+            search: props.filters?.search || undefined,
+            group: group || undefined,
+        },
+        { preserveState: true },
+    );
+}
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -54,7 +67,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <Heading variant="small" title="Permissions" description="Manage application permissions" />
+                    <Heading
+                        variant="small"
+                        title="Permissions"
+                        description="Manage application permissions"
+                    />
                     <Link
                         :href="create().url"
                         class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
@@ -70,23 +87,66 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     {{ status }}
                 </div>
 
-                <SearchInput
-                    v-model="searchQuery"
-                    placeholder="Search permissions by name or group..."
-                    :show-clear="!!filters?.search"
-                    @search="handleSearch"
-                    @clear="clearSearch"
-                />
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div class="flex-1">
+                        <SearchInput
+                            v-model="searchQuery"
+                            placeholder="Search permissions by name or group..."
+                            :show-clear="!!filters?.search"
+                            @search="handleSearch"
+                            @clear="clearSearch"
+                        />
+                    </div>
+                    <select
+                        v-if="groups.length > 0"
+                        :value="filters?.group ?? ''"
+                        class="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        @change="
+                            filterByGroup(
+                                ($event.target as HTMLSelectElement).value,
+                            )
+                        "
+                    >
+                        <option value="">All Groups</option>
+                        <option
+                            v-for="group in groups"
+                            :key="group"
+                            :value="group"
+                        >
+                            {{ group }}
+                        </option>
+                    </select>
+                </div>
 
                 <div class="overflow-x-auto rounded-lg border">
                     <table class="w-full">
                         <thead>
                             <tr class="border-b bg-muted/50">
-                                <th class="px-4 py-3 text-left text-sm font-semibold">Name</th>
-                                <th class="px-4 py-3 text-left text-sm font-semibold">Group</th>
-                                <th class="px-4 py-3 text-left text-sm font-semibold">Roles</th>
-                                <th class="px-4 py-3 text-left text-sm font-semibold">Created</th>
-                                <th class="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                                <th
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Name
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Group
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Roles
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Created
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-right text-sm font-semibold"
+                                >
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -104,10 +164,17 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         :label="permission.group_name"
                                         variant="default"
                                     />
-                                    <span v-else class="text-sm text-muted-foreground">—</span>
+                                    <span
+                                        v-else
+                                        class="text-sm text-muted-foreground"
+                                        >—</span
+                                    >
                                 </td>
                                 <td class="px-4 py-3">
-                                    <div v-if="permission.roles.length > 0" class="flex flex-wrap gap-1">
+                                    <div
+                                        v-if="permission.roles.length > 0"
+                                        class="flex flex-wrap gap-1"
+                                    >
                                         <StatusBadge
                                             v-for="role in permission.roles"
                                             :key="role"
@@ -115,19 +182,31 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             variant="info"
                                         />
                                     </div>
-                                    <span v-else class="text-sm text-muted-foreground">None</span>
+                                    <span
+                                        v-else
+                                        class="text-sm text-muted-foreground"
+                                        >None</span
+                                    >
                                 </td>
-                                <td class="px-4 py-3 text-sm text-muted-foreground">
+                                <td
+                                    class="px-4 py-3 text-sm text-muted-foreground"
+                                >
                                     {{ formatDate(permission.created_at) }}
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <Link :href="edit(permission.name).url" class="text-sm text-primary hover:underline">
+                                    <Link
+                                        :href="edit(permission.name).url"
+                                        class="text-sm text-primary hover:underline"
+                                    >
                                         Edit
                                     </Link>
                                 </td>
                             </tr>
                             <tr v-if="permissions.data.length === 0">
-                                <td colspan="5" class="px-4 py-8 text-center text-muted-foreground">
+                                <td
+                                    colspan="5"
+                                    class="px-4 py-8 text-center text-muted-foreground"
+                                >
                                     No permissions found.
                                 </td>
                             </tr>

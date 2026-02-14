@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Constants\AuditEvent;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Contracts\Services\UserServiceInterface;
+use App\Exceptions\UserException;
 use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -13,7 +15,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-use InvalidArgumentException;
 
 /**
  * User service implementation.
@@ -102,18 +103,22 @@ final class UserService extends AbstractService implements UserServiceInterface
         $originalEmail = $user->email;
 
         return $this->transaction(function () use ($user, $validated, $originalEmail) {
-            // Update the user
+            $oldValues = ['name' => $user->name, 'email' => $user->email];
+
             $this->getRepository()->updateUser($user->id, $validated);
 
-            // Reset email verification and send new verification email if email changed
             if ($originalEmail !== $validated['email']) {
                 $user->email_verified_at = null;
                 $user->save();
                 $user->sendEmailVerificationNotification();
             }
 
-            // Refresh the user to get updated data
             $user->refresh();
+
+            AuditLog::log(AuditEvent::USER_PROFILE_UPDATED, $user, $oldValues, [
+                'name' => $user->name,
+                'email' => $user->email,
+            ]);
 
             return $user;
         });
@@ -158,7 +163,13 @@ final class UserService extends AbstractService implements UserServiceInterface
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
-        return $this->transaction(fn () => $this->getRepository()->updatePassword($user->id, Hash::make($validated['password'])));
+        return $this->transaction(function () use ($user, $validated): bool {
+            $result = $this->getRepository()->updatePassword($user->id, Hash::make($validated['password']));
+
+            AuditLog::log(AuditEvent::USER_PASSWORD_CHANGED, $user);
+
+            return $result;
+        });
     }
 
     /**
@@ -192,7 +203,11 @@ final class UserService extends AbstractService implements UserServiceInterface
         }
 
         return $this->transaction(function () use ($user) {
-            // Logout the user if they're currently authenticated
+            AuditLog::log(AuditEvent::USER_ACCOUNT_DELETED, $user, [
+                'name' => $user->name,
+                'email' => $user->email,
+            ]);
+
             if (Auth::id() === $user->id) {
                 Auth::logout();
             }
@@ -281,7 +296,7 @@ final class UserService extends AbstractService implements UserServiceInterface
                 $user->assignRole($data['roles']);
             }
 
-            AuditLog::log('user.created', $user, null, [
+            AuditLog::log(AuditEvent::USER_CREATED, $user, null, [
                 'name' => $user->name,
                 'email' => $user->email,
                 'roles' => $user->roles->pluck('name')->toArray(),
@@ -328,7 +343,7 @@ final class UserService extends AbstractService implements UserServiceInterface
 
             $user->refresh();
 
-            AuditLog::log('user.updated', $user, $oldValues, [
+            AuditLog::log(AuditEvent::USER_UPDATED, $user, $oldValues, [
                 'name' => $user->name,
                 'email' => $user->email,
                 'roles' => $user->roles->pluck('name')->toArray(),
@@ -350,10 +365,10 @@ final class UserService extends AbstractService implements UserServiceInterface
         }
 
         if ($user->id === Auth::id()) {
-            throw new InvalidArgumentException('You cannot delete your own account.');
+            throw UserException::cannotDeleteOwnAccount();
         }
 
-        AuditLog::log('user.deleted', $user, [
+        AuditLog::log(AuditEvent::USER_DELETED, $user, [
             'name' => $user->name,
             'email' => $user->email,
         ]);
@@ -416,11 +431,84 @@ final class UserService extends AbstractService implements UserServiceInterface
             $user->syncPermissions($data['permissions'] ?? []);
             $user->refresh();
 
-            AuditLog::log('user.permissions_synced', $user, [
+            AuditLog::log(AuditEvent::USER_PERMISSIONS_SYNCED, $user, [
                 'direct_permissions' => $oldPermissions,
             ], [
                 'direct_permissions' => $user->getDirectPermissions()->pluck('name')->toArray(),
             ]);
+
+            return $user;
+        });
+    }
+
+    /**
+     * Get all users with roles for CSV export.
+     *
+     * @return Collection<int, User>
+     */
+    public function getAllForExport(): Collection
+    {
+        return User::query()
+            ->with('roles')
+            ->orderBy('id')
+            ->get();
+    }
+
+    /**
+     * Suspend a user account.
+     */
+    public function suspend(int $userId, ?string $reason = null): User
+    {
+        $user = $this->getRepository()->findById($userId);
+
+        if (!$user) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException('User not found.');
+        }
+
+        if ($user->id === Auth::id()) {
+            throw UserException::cannotSuspendOwnAccount();
+        }
+
+        return $this->transaction(function () use ($user, $reason): User {
+            $user->update([
+                'suspended_at' => now(),
+                'suspended_reason' => $reason,
+            ]);
+
+            AuditLog::log(AuditEvent::USER_SUSPENDED, $user, null, [
+                'reason' => $reason,
+            ]);
+
+            $user->refresh();
+
+            return $user;
+        });
+    }
+
+    /**
+     * Unsuspend a user account.
+     */
+    public function unsuspend(int $userId): User
+    {
+        $user = $this->getRepository()->findById($userId);
+
+        if (!$user) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException('User not found.');
+        }
+
+        return $this->transaction(function () use ($user): User {
+            $previousReason = $user->suspended_reason;
+
+            $user->update([
+                'suspended_at' => null,
+                'suspended_reason' => null,
+            ]);
+
+            AuditLog::log(AuditEvent::USER_UNSUSPENDED, $user, [
+                'suspended_reason' => $previousReason,
+            ]);
+
+            $user->refresh();
 
             return $user;
         });

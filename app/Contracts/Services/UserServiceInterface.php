@@ -98,4 +98,21 @@ interface UserServiceInterface
      * @param  array<string, mixed>  $data
      */
     public function syncPermissions(User $user, array $data): User;
+
+    /**
+     * Get all users with roles for CSV export.
+     *
+     * @return Collection<int, User>
+     */
+    public function getAllForExport(): Collection;
+
+    /**
+     * Suspend a user account.
+     */
+    public function suspend(int $userId, ?string $reason = null): User;
+
+    /**
+     * Unsuspend a user account.
+     */
+    public function unsuspend(int $userId): User;
 }

@@ -10,7 +10,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useDateFormat } from '@/composables/useDateFormat';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
-import { destroy, index, permissions, update } from '@/routes/admin/users';
+import {
+    destroy,
+    index,
+    permissions,
+    suspend,
+    unsuspend,
+    update,
+} from '@/routes/admin/users';
 import { type BreadcrumbItem } from '@/types';
 
 interface User {
@@ -20,6 +27,8 @@ interface User {
     email: string;
     email_verified_at: string | null;
     roles: string[];
+    suspended_at: string | null;
+    suspended_reason: string | null;
     created_at: string;
 }
 
@@ -47,6 +56,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
 ];
 
 const selectedRoles = ref<string[]>(props.user.roles);
+const suspendReason = ref('');
+const showSuspendForm = ref(false);
 
 const confirmDelete = () => {
     if (
@@ -55,6 +66,18 @@ const confirmDelete = () => {
         )
     ) {
         router.delete(destroy(props.user.slug).url);
+    }
+};
+
+const handleSuspend = () => {
+    router.post(suspend(props.user.slug).url, {
+        reason: suspendReason.value || null,
+    });
+};
+
+const handleUnsuspend = () => {
+    if (confirm('Are you sure you want to unsuspend this user?')) {
+        router.post(unsuspend(props.user.slug).url);
     }
 };
 </script>
@@ -159,6 +182,88 @@ const confirmDelete = () => {
                         </Link>
                     </div>
 
+                    <!-- Suspension Section -->
+                    <div
+                        v-if="user.suspended_at"
+                        class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20"
+                    >
+                        <h4
+                            class="text-sm font-medium text-red-800 dark:text-red-400"
+                        >
+                            Account Suspended
+                        </h4>
+                        <p
+                            class="mt-1 text-sm text-red-600 dark:text-red-400/80"
+                        >
+                            Suspended on
+                            {{ formatDate(user.suspended_at) }}
+                        </p>
+                        <p
+                            v-if="user.suspended_reason"
+                            class="mt-1 text-sm text-red-600 dark:text-red-400/80"
+                        >
+                            Reason: {{ user.suspended_reason }}
+                        </p>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="mt-3"
+                            @click="handleUnsuspend"
+                        >
+                            Unsuspend User
+                        </Button>
+                    </div>
+                    <div v-else class="flex flex-col gap-2">
+                        <Button
+                            v-if="!showSuspendForm"
+                            variant="outline"
+                            size="sm"
+                            class="w-fit text-red-600 hover:text-red-700 dark:text-red-400"
+                            @click="showSuspendForm = true"
+                        >
+                            Suspend User
+                        </Button>
+                        <div
+                            v-if="showSuspendForm"
+                            class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20"
+                        >
+                            <h4
+                                class="text-sm font-medium text-red-800 dark:text-red-400"
+                            >
+                                Suspend User Account
+                            </h4>
+                            <p
+                                class="mt-1 text-sm text-red-600 dark:text-red-400/80"
+                            >
+                                The user will be logged out and unable to access
+                                the application.
+                            </p>
+                            <div class="mt-3">
+                                <Input
+                                    v-model="suspendReason"
+                                    placeholder="Reason for suspension (optional)"
+                                    class="mb-3"
+                                />
+                                <div class="flex items-center gap-2">
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        @click="handleSuspend"
+                                    >
+                                        Confirm Suspension
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        @click="showSuspendForm = false"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="rounded-lg border border-muted bg-muted/50 p-4">
                         <h4 class="text-sm font-medium">User Information</h4>
                         <dl
@@ -173,7 +278,9 @@ const confirmDelete = () => {
                                 <dd>
                                     <StatusBadge
                                         v-if="user.email_verified_at"
-                                        :label="formatDate(user.email_verified_at)"
+                                        :label="
+                                            formatDate(user.email_verified_at)
+                                        "
                                         variant="success"
                                     />
                                     <StatusBadge

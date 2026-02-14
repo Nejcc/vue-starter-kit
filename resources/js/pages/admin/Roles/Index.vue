@@ -53,7 +53,9 @@ const roleToDelete = ref<{ name: string } | null>(null);
 
 const deleteRole = (roleName: string, isSuperAdmin: boolean): void => {
     if (isSuperAdmin) {
-        alert('The super-admin role cannot be deleted. It is a system role with all permissions.');
+        alert(
+            'The super-admin role cannot be deleted. It is a system role with all permissions.',
+        );
         return;
     }
 
@@ -88,7 +90,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <Heading variant="small" title="Roles" description="Manage application roles" />
+                    <Heading
+                        variant="small"
+                        title="Roles"
+                        description="Manage application roles"
+                    />
                     <Link
                         :href="create().url"
                         class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
@@ -104,7 +110,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     {{ status }}
                 </div>
 
-                <FormErrors :errors="page.props.errors as Record<string, string>" />
+                <FormErrors
+                    :errors="page.props.errors as Record<string, string>"
+                />
 
                 <SearchInput
                     v-model="searchQuery"
@@ -118,26 +126,62 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     <table class="w-full">
                         <thead>
                             <tr class="border-b bg-muted/50">
-                                <th class="px-4 py-3 text-left text-sm font-semibold">Name</th>
-                                <th class="px-4 py-3 text-left text-sm font-semibold">Permissions</th>
-                                <th class="px-4 py-3 text-center text-sm font-semibold">Users</th>
-                                <th class="px-4 py-3 text-left text-sm font-semibold">Created</th>
-                                <th class="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                                <th
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Name
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Permissions
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-center text-sm font-semibold"
+                                >
+                                    Users
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Created
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-right text-sm font-semibold"
+                                >
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="role in roles.data" :key="role.id" class="border-b last:border-b-0">
+                            <tr
+                                v-for="role in roles.data"
+                                :key="role.id"
+                                class="border-b last:border-b-0"
+                            >
                                 <td class="px-4 py-3">
                                     <div class="flex items-center gap-2">
-                                        <span class="font-medium">{{ role.name }}</span>
-                                        <StatusBadge v-if="role.is_super_admin" label="System" variant="danger" />
+                                        <span class="font-medium">{{
+                                            role.name
+                                        }}</span>
+                                        <StatusBadge
+                                            v-if="role.is_super_admin"
+                                            label="System"
+                                            variant="danger"
+                                        />
                                     </div>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span v-if="role.is_super_admin" class="text-sm text-muted-foreground italic">
+                                    <span
+                                        v-if="role.is_super_admin"
+                                        class="text-sm text-muted-foreground italic"
+                                    >
                                         All (auto-granted)
                                     </span>
-                                    <div v-else-if="role.permissions.length > 0" class="flex flex-wrap gap-1">
+                                    <div
+                                        v-else-if="role.permissions.length > 0"
+                                        class="flex flex-wrap gap-1"
+                                    >
                                         <StatusBadge
                                             v-for="permission in role.permissions"
                                             :key="permission"
@@ -145,16 +189,24 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                             variant="purple"
                                         />
                                     </div>
-                                    <span v-else class="text-sm text-muted-foreground">None</span>
+                                    <span
+                                        v-else
+                                        class="text-sm text-muted-foreground"
+                                        >None</span
+                                    >
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     {{ role.users_count }}
                                 </td>
-                                <td class="px-4 py-3 text-sm text-muted-foreground">
+                                <td
+                                    class="px-4 py-3 text-sm text-muted-foreground"
+                                >
                                     {{ formatDate(role.created_at) }}
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end gap-3">
+                                    <div
+                                        class="flex items-center justify-end gap-3"
+                                    >
                                         <Link
                                             v-if="!role.is_super_admin"
                                             :href="edit(role.name).url"
@@ -162,17 +214,29 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         >
                                             Edit
                                         </Link>
-                                        <span v-else class="text-sm text-muted-foreground" title="Super-admin role cannot be edited">
+                                        <span
+                                            v-else
+                                            class="text-sm text-muted-foreground"
+                                            title="Super-admin role cannot be edited"
+                                        >
                                             Edit
                                         </span>
                                         <button
                                             type="button"
                                             :disabled="role.is_super_admin"
                                             :class="{
-                                                'text-sm text-destructive hover:underline': !role.is_super_admin,
-                                                'cursor-not-allowed text-sm text-muted-foreground': role.is_super_admin,
+                                                'text-sm text-destructive hover:underline':
+                                                    !role.is_super_admin,
+                                                'cursor-not-allowed text-sm text-muted-foreground':
+                                                    role.is_super_admin,
                                             }"
-                                            @click="deleteRole(role.name, role.is_super_admin ?? false)"
+                                            @click="
+                                                deleteRole(
+                                                    role.name,
+                                                    role.is_super_admin ??
+                                                        false,
+                                                )
+                                            "
                                         >
                                             Delete
                                         </button>
@@ -180,7 +244,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 </td>
                             </tr>
                             <tr v-if="roles.data.length === 0">
-                                <td colspan="5" class="px-4 py-8 text-center text-muted-foreground">No roles found.</td>
+                                <td
+                                    colspan="5"
+                                    class="px-4 py-8 text-center text-muted-foreground"
+                                >
+                                    No roles found.
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -195,12 +264,18 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 <DialogHeader>
                     <DialogTitle>Are you sure?</DialogTitle>
                     <DialogDescription>
-                        This will permanently delete the role "{{ roleToDelete?.name }}". This action cannot be undone.
+                        This will permanently delete the role "{{
+                            roleToDelete?.name
+                        }}". This action cannot be undone.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter class="gap-2">
-                    <Button variant="outline" @click="showDeleteDialog = false">Cancel</Button>
-                    <Button variant="destructive" @click="confirmDelete">Delete</Button>
+                    <Button variant="outline" @click="showDeleteDialog = false"
+                        >Cancel</Button
+                    >
+                    <Button variant="destructive" @click="confirmDelete"
+                        >Delete</Button
+                    >
                 </DialogFooter>
             </DialogContent>
         </Dialog>

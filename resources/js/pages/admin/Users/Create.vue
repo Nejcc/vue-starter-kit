@@ -15,7 +15,7 @@ interface CreateUserPageProps {
     roles: string[];
 }
 
-const props = defineProps<CreateUserPageProps>();
+defineProps<CreateUserPageProps>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {

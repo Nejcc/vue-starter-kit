@@ -23,7 +23,11 @@ import { useSearch } from '@/composables/useSearch';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem, type PaginatedResponse } from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useLocalizationNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useLocalizationNav();
 
 const page = usePage();
 
@@ -93,7 +97,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Languages" />
 
         <div class="container mx-auto py-8">
@@ -123,11 +132,16 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 </div>
 
                 <!-- Fallback locale info -->
-                <div class="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400">
+                <div
+                    class="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400"
+                >
                     <Globe class="h-4 w-4 shrink-0" />
                     <span>
                         Fallback locale: <strong>{{ fallbackLocale }}</strong>
-                        <span class="text-blue-600 dark:text-blue-500"> &mdash; used when a translation is missing in the active language.</span>
+                        <span class="text-blue-600 dark:text-blue-500">
+                            &mdash; used when a translation is missing in the
+                            active language.</span
+                        >
                     </span>
                 </div>
 
@@ -169,7 +183,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 variant="success"
                             />
                             <StatusBadge
-                                v-if="language.code === fallbackLocale && !language.is_default"
+                                v-if="
+                                    language.code === fallbackLocale &&
+                                    !language.is_default
+                                "
                                 label="Fallback"
                                 variant="purple"
                             />
@@ -225,7 +242,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 >
                     <div class="mx-auto flex flex-col items-center gap-3">
                         <Globe class="h-10 w-10 text-muted-foreground" />
-                        <p class="text-muted-foreground">No languages configured yet.</p>
+                        <p class="text-muted-foreground">
+                            No languages configured yet.
+                        </p>
                         <Button variant="outline" @click="seedCommon">
                             <Zap class="mr-2 h-4 w-4" />
                             Add Common Languages

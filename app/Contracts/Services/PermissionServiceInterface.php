@@ -18,9 +18,16 @@ interface PermissionServiceInterface
     public function getAll(?string $search = null): Collection;
 
     /**
-     * Get paginated permissions with roles and optional search.
+     * Get paginated permissions with roles and optional search/group filter.
      */
-    public function getPaginated(?string $search = null, int $perPage = 15): LengthAwarePaginator;
+    public function getPaginated(?string $search = null, int $perPage = 15, ?string $group = null): LengthAwarePaginator;
+
+    /**
+     * Get all distinct group names.
+     *
+     * @return Collection<int, string>
+     */
+    public function getGroupNames(): Collection;
 
     /**
      * Get permissions grouped by group_name.
@@ -49,6 +56,11 @@ interface PermissionServiceInterface
      * @return array<string, mixed>
      */
     public function getForEdit(Permission $permission): array;
+
+    /**
+     * Delete a permission.
+     */
+    public function delete(Permission $permission): void;
 
     /**
      * Get total number of permissions.

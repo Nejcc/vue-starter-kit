@@ -10,7 +10,11 @@ import { useLocalizationNav } from '@/composables/useLocalizationNav';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useLocalizationNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useLocalizationNav();
 
 interface Language {
     id: number;
@@ -44,7 +48,12 @@ const useCustomGroup = ref(false);
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Add Translation" />
 
         <div class="container mx-auto py-8">

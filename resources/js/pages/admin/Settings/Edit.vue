@@ -12,7 +12,11 @@ import { useSettingsNav } from '@/composables/useSettingsNav';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useSettingsNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useSettingsNav();
 
 interface Setting {
     id: number;
@@ -91,7 +95,12 @@ const deleteSetting = (): void => {
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Edit Setting" />
 
         <div class="container mx-auto py-8">
@@ -229,7 +238,11 @@ const deleteSetting = (): void => {
                             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <option value="">None</option>
-                            <option v-for="group in groups" :key="group.value" :value="group.value">
+                            <option
+                                v-for="group in groups"
+                                :key="group.value"
+                                :value="group.value"
+                            >
                                 {{ group.label }}
                             </option>
                         </select>

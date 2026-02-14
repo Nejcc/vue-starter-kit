@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
-import { Building2, Mail, Trash2, Users } from 'lucide-vue-next';
+import { Head, Link } from '@inertiajs/vue3';
+import { Mail, Users } from 'lucide-vue-next';
 
 import DataCard from '@/components/DataCard.vue';
 import Heading from '@/components/Heading.vue';
@@ -9,9 +9,17 @@ import { Button } from '@/components/ui/button';
 import { useDateFormat } from '@/composables/useDateFormat';
 import { useOrganizationNav } from '@/composables/useOrganizationNav';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
-import { type BreadcrumbItem, type Organization, type OrganizationInvitation } from '@/types';
+import {
+    type BreadcrumbItem,
+    type Organization,
+    type OrganizationInvitation,
+} from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useOrganizationNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useOrganizationNav();
 
 interface ShowOrganizationPageProps {
     organization: Organization & {
@@ -48,7 +56,12 @@ const roleVariant = (role: string) => {
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head :title="organization.name" />
 
         <div class="container mx-auto py-8">
@@ -59,7 +72,9 @@ const roleVariant = (role: string) => {
                         :title="organization.name"
                         :description="organization.description ?? undefined"
                     />
-                    <Link :href="`/admin/organizations/${organization.slug}/edit`">
+                    <Link
+                        :href="`/admin/organizations/${organization.slug}/edit`"
+                    >
                         <Button variant="outline">Edit Organization</Button>
                     </Link>
                 </div>
@@ -73,15 +88,30 @@ const roleVariant = (role: string) => {
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Owner</p>
-                            <p class="font-medium">{{ organization.owner?.name ?? 'None' }}</p>
+                            <p class="font-medium">
+                                {{ organization.owner?.name ?? 'None' }}
+                            </p>
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Type</p>
-                            <StatusBadge :label="organization.is_personal ? 'Personal' : 'Team'" :variant="organization.is_personal ? 'info' : 'default'" />
+                            <StatusBadge
+                                :label="
+                                    organization.is_personal
+                                        ? 'Personal'
+                                        : 'Team'
+                                "
+                                :variant="
+                                    organization.is_personal
+                                        ? 'info'
+                                        : 'default'
+                                "
+                            />
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Created</p>
-                            <p class="font-medium">{{ formatDateTime(organization.created_at) }}</p>
+                            <p class="font-medium">
+                                {{ formatDateTime(organization.created_at) }}
+                            </p>
                         </div>
                     </div>
                 </DataCard>
@@ -91,11 +121,21 @@ const roleVariant = (role: string) => {
                     <template #actions>
                         <div class="flex items-center gap-2">
                             <Users class="h-5 w-5 text-muted-foreground" />
-                            <h3 class="text-lg font-medium">Members ({{ organization.members?.length ?? 0 }})</h3>
+                            <h3 class="text-lg font-medium">
+                                Members ({{
+                                    organization.members?.length ?? 0
+                                }})
+                            </h3>
                         </div>
                     </template>
 
-                    <div v-if="organization.members && organization.members.length > 0" class="space-y-3">
+                    <div
+                        v-if="
+                            organization.members &&
+                            organization.members.length > 0
+                        "
+                        class="space-y-3"
+                    >
                         <div
                             v-for="member in organization.members"
                             :key="member.id"
@@ -103,25 +143,40 @@ const roleVariant = (role: string) => {
                         >
                             <div>
                                 <p class="font-medium">{{ member.name }}</p>
-                                <p class="text-sm text-muted-foreground">{{ member.email }}</p>
+                                <p class="text-sm text-muted-foreground">
+                                    {{ member.email }}
+                                </p>
                             </div>
                             <div class="flex items-center gap-2">
-                                <StatusBadge :label="member.pivot.role" :variant="roleVariant(member.pivot.role)" />
+                                <StatusBadge
+                                    :label="member.pivot.role"
+                                    :variant="roleVariant(member.pivot.role)"
+                                />
                                 <span class="text-xs text-muted-foreground">
-                                    Joined {{ formatDate(member.pivot.joined_at) }}
+                                    Joined
+                                    {{ formatDate(member.pivot.joined_at) }}
                                 </span>
                             </div>
                         </div>
                     </div>
-                    <p v-else class="text-sm text-muted-foreground">No members.</p>
+                    <p v-else class="text-sm text-muted-foreground">
+                        No members.
+                    </p>
                 </DataCard>
 
                 <!-- Pending Invitations -->
-                <DataCard v-if="organization.invitations && organization.invitations.length > 0">
+                <DataCard
+                    v-if="
+                        organization.invitations &&
+                        organization.invitations.length > 0
+                    "
+                >
                     <template #actions>
                         <div class="flex items-center gap-2">
                             <Mail class="h-5 w-5 text-muted-foreground" />
-                            <h3 class="text-lg font-medium">Pending Invitations</h3>
+                            <h3 class="text-lg font-medium">
+                                Pending Invitations
+                            </h3>
                         </div>
                     </template>
 
@@ -132,12 +187,18 @@ const roleVariant = (role: string) => {
                             class="flex items-center justify-between rounded border p-3"
                         >
                             <div>
-                                <p class="text-sm font-medium">{{ invitation.email }}</p>
+                                <p class="text-sm font-medium">
+                                    {{ invitation.email }}
+                                </p>
                                 <p class="text-xs text-muted-foreground">
-                                    Expires {{ formatDate(invitation.expires_at) }}
+                                    Expires
+                                    {{ formatDate(invitation.expires_at) }}
                                 </p>
                             </div>
-                            <StatusBadge :label="invitation.role" variant="default" />
+                            <StatusBadge
+                                :label="invitation.role"
+                                variant="default"
+                            />
                         </div>
                     </div>
                 </DataCard>

@@ -13,8 +13,16 @@ export function useSubscriberNav(): ModuleNav {
         title: 'Subscribers',
         icon: Mail,
         items: [
-            { title: 'Dashboard', href: '/admin/subscribers', icon: LayoutDashboard },
-            { title: 'Subscribers', href: '/admin/subscribers/subscribers', icon: Users },
+            {
+                title: 'Dashboard',
+                href: '/admin/subscribers',
+                icon: LayoutDashboard,
+            },
+            {
+                title: 'Subscribers',
+                href: '/admin/subscribers/subscribers',
+                icon: Users,
+            },
             { title: 'Lists', href: '/admin/subscribers/lists', icon: List },
         ],
     };

@@ -82,7 +82,8 @@ const selectedPermissions = ref<string[]>(props.role.permissions);
                         <StatusBadge label="System Role" variant="danger" />
                     </div>
                     <p class="mt-2 text-sm text-muted-foreground italic">
-                        The super-admin role has all permissions automatically granted. Permissions cannot be modified.
+                        The super-admin role has all permissions automatically
+                        granted. Permissions cannot be modified.
                     </p>
                 </div>
 

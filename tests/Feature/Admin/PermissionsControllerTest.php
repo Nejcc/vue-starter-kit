@@ -343,4 +343,99 @@ final class PermissionsControllerTest extends TestCase
             'group_name' => null,
         ]);
     }
+
+    // ─── Delete ──────────────────────────────────────────────────────
+
+    public function test_guests_cannot_delete_permissions(): void
+    {
+        $permission = Permission::create(['name' => 'test-permission']);
+
+        $response = $this->delete(route('admin.permissions.destroy', $permission));
+
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_regular_users_cannot_delete_permissions(): void
+    {
+        $user = User::factory()->create();
+        $permission = Permission::create(['name' => 'test-permission']);
+
+        $response = $this->actingAs($user)->delete(route('admin.permissions.destroy', $permission));
+
+        $response->assertForbidden();
+    }
+
+    public function test_admin_can_delete_permission(): void
+    {
+        $permission = Permission::create(['name' => 'deletable-permission']);
+
+        $response = $this->actingAs($this->admin)->delete(route('admin.permissions.destroy', $permission));
+
+        $response->assertRedirect(route('admin.permissions.index'));
+        $response->assertSessionHas('status', 'Permission deleted successfully.');
+        $this->assertDatabaseMissing('permissions', ['name' => 'deletable-permission']);
+    }
+
+    public function test_cannot_delete_permission_assigned_to_roles(): void
+    {
+        $permission = Permission::create(['name' => 'assigned-permission']);
+        $role = Role::create(['name' => 'test-role']);
+        $role->givePermissionTo($permission);
+
+        $response = $this->actingAs($this->admin)->delete(route('admin.permissions.destroy', $permission));
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('permission_deletion');
+        $this->assertDatabaseHas('permissions', ['name' => 'assigned-permission']);
+    }
+
+    public function test_delete_permission_creates_audit_log(): void
+    {
+        $permission = Permission::create(['name' => 'audited-permission']);
+
+        $this->actingAs($this->admin)->delete(route('admin.permissions.destroy', $permission));
+
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'permission.deleted',
+            'auditable_type' => Permission::class,
+            'auditable_id' => $permission->id,
+        ]);
+    }
+
+    // ─── Group Filter ────────────────────────────────────────────────
+
+    public function test_index_returns_groups_list(): void
+    {
+        Permission::create(['name' => 'view-users', 'group_name' => 'Users']);
+        Permission::create(['name' => 'view-posts', 'group_name' => 'Posts']);
+        Permission::create(['name' => 'ungrouped']);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.permissions.index'));
+
+        $response->assertInertia(fn ($page) => $page
+            ->has('groups', 2)
+        );
+    }
+
+    public function test_index_can_filter_by_group(): void
+    {
+        Permission::create(['name' => 'view-users', 'group_name' => 'Users']);
+        Permission::create(['name' => 'edit-users', 'group_name' => 'Users']);
+        Permission::create(['name' => 'view-posts', 'group_name' => 'Posts']);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.permissions.index', ['group' => 'Users']));
+
+        $response->assertInertia(fn ($page) => $page
+            ->has('permissions.data', 2)
+        );
+    }
+
+    public function test_index_filter_preserves_group_in_filters(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.permissions.index', ['group' => 'Users']));
+
+        $response->assertInertia(fn ($page) => $page
+            ->where('filters.group', 'Users')
+        );
+    }
 }

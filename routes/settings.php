@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Settings\ActivityController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\SessionsController;
 use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,7 +17,7 @@ Route::middleware('auth')->group(function (): void {
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('settings/password', [PasswordController::class, 'edit'])->name('user-password.edit');
@@ -30,4 +32,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('two-factor.show');
 
     Route::get('settings/cookie-preferences', fn () => Inertia::render('settings/CookiePreferences'))->name('cookie-preferences.edit');
+
+    Route::get('settings/activity', [ActivityController::class, 'index'])->name('activity.index');
+
+    Route::get('settings/sessions', [SessionsController::class, 'index'])->name('sessions.index');
+    Route::delete('settings/sessions/{session}', [SessionsController::class, 'destroy'])->name('sessions.destroy');
+    Route::delete('settings/sessions', [SessionsController::class, 'destroyAll'])->name('sessions.destroyAll');
 });

@@ -67,8 +67,8 @@ export function useErrorHandler() {
     const handleValidationErrors = (
         errors: Record<string, string | string[]>,
     ) => {
-        const errorMessages = Object.entries(errors)
-            .map(([field, messages]) => {
+        const errorMessages = Object.values(errors)
+            .map((messages) => {
                 const messageArray = Array.isArray(messages)
                     ? messages
                     : [messages];

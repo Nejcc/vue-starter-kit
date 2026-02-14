@@ -23,33 +23,53 @@ interface OrgItem {
 
 const page = usePage();
 
-const currentOrganization = computed<OrgItem | null>(() => page.props.currentOrganization as OrgItem | null);
-const organizations = computed<OrgItem[]>(() => (page.props.organizations as OrgItem[]) ?? []);
+const currentOrganization = computed<OrgItem | null>(
+    () => page.props.currentOrganization as OrgItem | null,
+);
+const organizations = computed<OrgItem[]>(
+    () => (page.props.organizations as OrgItem[]) ?? [],
+);
 
 function switchOrganization(org: OrgItem) {
     if (org.id === currentOrganization.value?.id) {
         return;
     }
-    router.post(`/organizations/switch/${org.slug}`, {}, {
-        preserveState: false,
-    });
+    router.post(
+        `/organizations/switch/${org.slug}`,
+        {},
+        {
+            preserveState: false,
+        },
+    );
 }
 </script>
 
 <template>
     <DropdownMenu>
         <DropdownMenuTrigger as-child>
-            <SidebarMenuButton size="lg" class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-                <div class="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                    <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
+            <SidebarMenuButton
+                size="lg"
+                class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+                <div
+                    class="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"
+                >
+                    <AppLogoIcon
+                        class="size-5 fill-current text-white dark:text-black"
+                    />
                 </div>
                 <div class="ml-1 grid flex-1 text-left text-sm leading-tight">
-                    <span class="truncate font-semibold">{{ currentOrganization?.name ?? 'Select Organization' }}</span>
+                    <span class="truncate font-semibold">{{
+                        currentOrganization?.name ?? 'Select Organization'
+                    }}</span>
                 </div>
                 <ChevronsUpDown class="ml-auto h-4 w-4 shrink-0" />
             </SidebarMenuButton>
         </DropdownMenuTrigger>
-        <DropdownMenuContent class="w-[--reka-dropdown-menu-trigger-width] min-w-56" align="start">
+        <DropdownMenuContent
+            class="w-[--reka-dropdown-menu-trigger-width] min-w-56"
+            align="start"
+        >
             <DropdownMenuLabel>Organizations</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -60,7 +80,9 @@ function switchOrganization(org: OrgItem) {
             >
                 <div class="flex w-full items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <Building2 class="h-4 w-4 shrink-0 text-muted-foreground" />
+                        <Building2
+                            class="h-4 w-4 shrink-0 text-muted-foreground"
+                        />
                         <span class="truncate">{{ org.name }}</span>
                     </div>
                     <Check
@@ -71,7 +93,10 @@ function switchOrganization(org: OrgItem) {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem as-child>
-                <Link href="/organizations/create" class="flex cursor-pointer items-center gap-2">
+                <Link
+                    href="/organizations/create"
+                    class="flex cursor-pointer items-center gap-2"
+                >
                     <Plus class="h-4 w-4" />
                     <span>Create Organization</span>
                 </Link>

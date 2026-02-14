@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Constants\AuditEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdatePackageRequest;
 use App\Models\AuditLog;
@@ -42,7 +43,7 @@ final class PackagesController extends Controller
         $this->packageManager->setEnabled($key, $enabled);
 
         AuditLog::log(
-            'package.toggled',
+            AuditEvent::PACKAGE_TOGGLED,
             null,
             ['enabled' => $oldEnabled],
             ['enabled' => $enabled, 'package' => $key],

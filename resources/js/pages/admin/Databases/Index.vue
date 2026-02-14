@@ -21,7 +21,7 @@ interface DatabasesIndexPageProps {
     connections: ConnectionInfo[];
 }
 
-const props = defineProps<DatabasesIndexPageProps>();
+defineProps<DatabasesIndexPageProps>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {

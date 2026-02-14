@@ -37,9 +37,11 @@ const primaryRole = computed(() => {
 
     <div class="grid flex-1 text-left text-sm leading-tight">
         <span class="truncate font-medium">{{ user.name }}</span>
-        <span v-if="primaryRole && !showEmail" class="truncate text-xs capitalize text-muted-foreground">{{
-            primaryRole
-        }}</span>
+        <span
+            v-if="primaryRole && !showEmail"
+            class="truncate text-xs text-muted-foreground capitalize"
+            >{{ primaryRole }}</span
+        >
         <span v-if="showEmail" class="truncate text-xs text-muted-foreground">{{
             user.email
         }}</span>

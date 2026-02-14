@@ -2,10 +2,14 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     Activity,
+    AlertTriangle,
+    Bell,
     Building2,
     ClipboardList,
     CreditCard,
     Database,
+    HardDrive,
+    HeartPulse,
     Home,
     Key,
     Languages,
@@ -35,9 +39,13 @@ import {
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { dashboard } from '@/routes';
 import { index as auditLogsIndex } from '@/routes/admin/audit-logs';
+import { index as cacheIndex } from '@/routes/admin/cache';
 import { index as databaseIndex } from '@/routes/admin/database';
+import { index as failedJobsIndex } from '@/routes/admin/failed-jobs';
+import { index as healthIndex } from '@/routes/admin/health';
 import { index as logsIndex } from '@/routes/admin/logs';
 import { index as modulesIndex } from '@/routes/admin/modules';
+import { index as notificationsIndex } from '@/routes/admin/notifications';
 import { index as packagesIndex } from '@/routes/admin/packages';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as rolesIndex } from '@/routes/admin/roles';
@@ -96,6 +104,26 @@ const navGroups = computed<NavGroup[]>(() => {
                     title: 'Application Logs',
                     href: logsIndex().url,
                     icon: ScrollText,
+                },
+                {
+                    title: 'Notifications',
+                    href: notificationsIndex().url,
+                    icon: Bell,
+                },
+                {
+                    title: 'System Health',
+                    href: healthIndex().url,
+                    icon: HeartPulse,
+                },
+                {
+                    title: 'Failed Jobs',
+                    href: failedJobsIndex().url,
+                    icon: AlertTriangle,
+                },
+                {
+                    title: 'Cache & Maintenance',
+                    href: cacheIndex().url,
+                    icon: HardDrive,
                 },
                 {
                     title: 'Packages',

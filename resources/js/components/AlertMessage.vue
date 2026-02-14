@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { AlertCircle, AlertTriangle, CheckCircle2, Info, X } from 'lucide-vue-next';
+import {
+    AlertCircle,
+    AlertTriangle,
+    CheckCircle2,
+    Info,
+    X,
+} from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -87,7 +93,10 @@ function dismiss(): void {
                     <template v-if="normalizedMessages.length === 1">
                         {{ normalizedMessages[0] }}
                     </template>
-                    <ul v-else-if="normalizedMessages.length > 1" class="list-inside list-disc text-sm">
+                    <ul
+                        v-else-if="normalizedMessages.length > 1"
+                        class="list-inside list-disc text-sm"
+                    >
                         <li v-for="(msg, idx) in normalizedMessages" :key="idx">
                             {{ msg }}
                         </li>

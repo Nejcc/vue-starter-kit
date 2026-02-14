@@ -19,7 +19,8 @@ const switchUrl = ref<((code: string) => { url: string }) | null>(null);
 
 onMounted(async () => {
     try {
-        const path = '/resources/js/actions/LaravelPlus/Localization/Http/Controllers/LocaleSwitchController';
+        const path =
+            '/resources/js/actions/LaravelPlus/Localization/Http/Controllers/LocaleSwitchController';
         const mod = await import(/* @vite-ignore */ path);
         switchUrl.value = mod.default?.url ? mod.default : null;
     } catch {
@@ -43,7 +44,10 @@ function switchLocale(code: string) {
                 size="icon"
                 class="group h-9 w-9 cursor-pointer"
             >
-                <span class="text-xs font-semibold uppercase opacity-80 group-hover:opacity-100">{{ locale }}</span>
+                <span
+                    class="text-xs font-semibold uppercase opacity-80 group-hover:opacity-100"
+                    >{{ locale }}</span
+                >
             </Button>
         </DropdownMenuTrigger>
 
@@ -54,7 +58,10 @@ function switchLocale(code: string) {
                 class="cursor-pointer gap-2"
                 @select="switchLocale(lang.code)"
             >
-                <span class="w-6 text-xs font-medium uppercase text-muted-foreground">{{ lang.code }}</span>
+                <span
+                    class="w-6 text-xs font-medium text-muted-foreground uppercase"
+                    >{{ lang.code }}</span
+                >
                 <span class="flex-1">{{ lang.native_name }}</span>
                 <Check v-if="lang.code === locale" class="size-4" />
             </DropdownMenuItem>

@@ -170,7 +170,7 @@ function formatModelType(type: string | null): string {
                 <DataTable
                     v-if="logs.data.length > 0"
                     :columns="columns"
-                    :rows="(logs.data as Record<string, unknown>[])"
+                    :rows="logs.data as Record<string, unknown>[]"
                     row-key="id"
                 >
                     <template #cell-event="{ row }">
@@ -199,14 +199,26 @@ function formatModelType(type: string | null): string {
                             v-if="row.auditable_type"
                             class="text-muted-foreground"
                         >
-                            {{ formatModelType(row.auditable_type as string | null) }}
-                            <span v-if="row.auditable_id">#{{ row.auditable_id }}</span>
+                            {{
+                                formatModelType(
+                                    row.auditable_type as string | null,
+                                )
+                            }}
+                            <span v-if="row.auditable_id"
+                                >#{{ row.auditable_id }}</span
+                            >
                         </span>
-                        <span v-else class="text-muted-foreground">&mdash;</span>
+                        <span v-else class="text-muted-foreground"
+                            >&mdash;</span
+                        >
                     </template>
                     <template #cell-ip_address="{ row }">
-                        <code v-if="row.ip_address" class="text-xs">{{ row.ip_address }}</code>
-                        <span v-else class="text-muted-foreground">&mdash;</span>
+                        <code v-if="row.ip_address" class="text-xs">{{
+                            row.ip_address
+                        }}</code>
+                        <span v-else class="text-muted-foreground"
+                            >&mdash;</span
+                        >
                     </template>
                     <template #cell-created_at="{ row }">
                         <span class="text-muted-foreground">

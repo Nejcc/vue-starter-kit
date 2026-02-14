@@ -28,7 +28,11 @@ import { useSettingsNav } from '@/composables/useSettingsNav';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem, type PaginatedResponse } from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useSettingsNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useSettingsNav();
 
 interface Setting {
     id: number;
@@ -139,7 +143,9 @@ const isChecked = (value: string | null): boolean => {
 
 const truncateValue = (value: string | null, maxLength = 40): string => {
     if (!value) return 'N/A';
-    return value.length > maxLength ? value.substring(0, maxLength) + '...' : value;
+    return value.length > maxLength
+        ? value.substring(0, maxLength) + '...'
+        : value;
 };
 
 const deleteSetting = (settingKey: string, role: string): void => {
@@ -148,14 +154,21 @@ const deleteSetting = (settingKey: string, role: string): void => {
         return;
     }
 
-    if (confirm(`Are you sure you want to delete the setting "${settingKey}"?`)) {
+    if (
+        confirm(`Are you sure you want to delete the setting "${settingKey}"?`)
+    ) {
         router.delete(`/admin/settings/${settingKey}`);
     }
 };
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head :title="pageTitle" />
 
         <div class="container mx-auto py-8">
@@ -193,23 +206,58 @@ const deleteSetting = (settingKey: string, role: string): void => {
                     <table class="w-full">
                         <thead>
                             <tr class="border-b bg-muted/50">
-                                <th class="px-4 py-3 text-left text-sm font-semibold">Label</th>
-                                <th class="px-4 py-3 text-left text-sm font-semibold">Key</th>
-                                <th v-if="!currentGroup" class="px-4 py-3 text-left text-sm font-semibold">Group</th>
-                                <th class="px-4 py-3 text-left text-sm font-semibold">Value</th>
-                                <th class="px-4 py-3 text-center text-sm font-semibold">Role</th>
-                                <th class="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                                <th
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Label
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Key
+                                </th>
+                                <th
+                                    v-if="!currentGroup"
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Group
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-sm font-semibold"
+                                >
+                                    Value
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-center text-sm font-semibold"
+                                >
+                                    Role
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-right text-sm font-semibold"
+                                >
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="setting in settings.data" :key="setting.id" class="border-b last:border-b-0">
+                            <tr
+                                v-for="setting in settings.data"
+                                :key="setting.id"
+                                class="border-b last:border-b-0"
+                            >
                                 <td class="px-4 py-3 font-medium">
                                     {{ setting.label }}
                                 </td>
                                 <td class="px-4 py-3">
-                                    <code class="rounded bg-muted px-1.5 py-0.5 text-xs">{{ setting.key }}</code>
+                                    <code
+                                        class="rounded bg-muted px-1.5 py-0.5 text-xs"
+                                        >{{ setting.key }}</code
+                                    >
                                 </td>
-                                <td v-if="!currentGroup" class="px-4 py-3 text-sm text-muted-foreground">
+                                <td
+                                    v-if="!currentGroup"
+                                    class="px-4 py-3 text-sm text-muted-foreground"
+                                >
                                     <Link
                                         v-if="setting.group"
                                         :href="`/admin/settings/group/${setting.group}`"
@@ -229,9 +277,16 @@ const deleteSetting = (settingKey: string, role: string): void => {
                                                 : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
                                         ]"
                                     >
-                                        {{ isChecked(setting.value) ? 'Enabled' : 'Disabled' }}
+                                        {{
+                                            isChecked(setting.value)
+                                                ? 'Enabled'
+                                                : 'Disabled'
+                                        }}
                                     </span>
-                                    <span v-else class="text-sm text-foreground">
+                                    <span
+                                        v-else
+                                        class="text-sm text-foreground"
+                                    >
                                         {{ truncateValue(setting.value) }}
                                     </span>
                                 </td>
@@ -242,11 +297,14 @@ const deleteSetting = (settingKey: string, role: string): void => {
                                                 <span
                                                     :class="{
                                                         'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400':
-                                                            setting.role === 'system',
+                                                            setting.role ===
+                                                            'system',
                                                         'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400':
-                                                            setting.role === 'user',
+                                                            setting.role ===
+                                                            'user',
                                                         'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400':
-                                                            setting.role === 'plugin',
+                                                            setting.role ===
+                                                            'plugin',
                                                     }"
                                                     class="cursor-help rounded-full px-2 py-0.5 text-xs font-medium capitalize"
                                                 >
@@ -254,24 +312,48 @@ const deleteSetting = (settingKey: string, role: string): void => {
                                                 </span>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p v-if="setting.role === 'system'">Core application settings (cannot be deleted)</p>
-                                                <p v-else-if="setting.role === 'user'">User-configurable settings</p>
-                                                <p v-else>Plugin-specific settings</p>
+                                                <p
+                                                    v-if="
+                                                        setting.role ===
+                                                        'system'
+                                                    "
+                                                >
+                                                    Core application settings
+                                                    (cannot be deleted)
+                                                </p>
+                                                <p
+                                                    v-else-if="
+                                                        setting.role === 'user'
+                                                    "
+                                                >
+                                                    User-configurable settings
+                                                </p>
+                                                <p v-else>
+                                                    Plugin-specific settings
+                                                </p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end gap-2">
+                                    <div
+                                        class="flex items-center justify-end gap-2"
+                                    >
                                         <TooltipProvider>
                                             <Tooltip>
                                                 <TooltipTrigger as-child>
                                                     <button
                                                         type="button"
-                                                        @click="openEditModal(setting)"
+                                                        @click="
+                                                            openEditModal(
+                                                                setting,
+                                                            )
+                                                        "
                                                         class="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                                                     >
-                                                        <Pencil class="h-3.5 w-3.5" />
+                                                        <Pencil
+                                                            class="h-3.5 w-3.5"
+                                                        />
                                                     </button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
@@ -286,7 +368,9 @@ const deleteSetting = (settingKey: string, role: string): void => {
                                                         :href="`/admin/settings/${setting.key}/edit`"
                                                         class="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                                                     >
-                                                        <Settings2 class="h-3.5 w-3.5" />
+                                                        <Settings2
+                                                            class="h-3.5 w-3.5"
+                                                        />
                                                     </Link>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
@@ -296,11 +380,20 @@ const deleteSetting = (settingKey: string, role: string): void => {
                                         </TooltipProvider>
                                         <button
                                             type="button"
-                                            :disabled="setting.role === 'system'"
-                                            @click="deleteSetting(setting.key, setting.role)"
+                                            :disabled="
+                                                setting.role === 'system'
+                                            "
+                                            @click="
+                                                deleteSetting(
+                                                    setting.key,
+                                                    setting.role,
+                                                )
+                                            "
                                             :class="{
-                                                'text-xs text-destructive hover:underline': setting.role !== 'system',
-                                                'cursor-not-allowed text-xs text-muted-foreground/50': setting.role === 'system',
+                                                'text-xs text-destructive hover:underline':
+                                                    setting.role !== 'system',
+                                                'cursor-not-allowed text-xs text-muted-foreground/50':
+                                                    setting.role === 'system',
                                             }"
                                         >
                                             Delete
@@ -309,7 +402,10 @@ const deleteSetting = (settingKey: string, role: string): void => {
                                 </td>
                             </tr>
                             <tr v-if="settings.data.length === 0">
-                                <td :colspan="currentGroup ? 5 : 6" class="px-4 py-8 text-center text-muted-foreground">
+                                <td
+                                    :colspan="currentGroup ? 5 : 6"
+                                    class="px-4 py-8 text-center text-muted-foreground"
+                                >
                                     No settings found.
                                 </td>
                             </tr>
@@ -330,15 +426,17 @@ const deleteSetting = (settingKey: string, role: string): void => {
                         <span v-if="editingSetting.description">
                             {{ editingSetting.description }}
                         </span>
-                        <span v-else>
-                            Update the value for this setting
-                        </span>
+                        <span v-else> Update the value for this setting </span>
                     </DialogDescription>
                 </DialogHeader>
 
                 <div class="space-y-4 py-4">
-                    <div class="flex items-center gap-2 text-xs text-muted-foreground">
-                        <code class="rounded bg-muted px-1.5 py-0.5">{{ editingSetting.key }}</code>
+                    <div
+                        class="flex items-center gap-2 text-xs text-muted-foreground"
+                    >
+                        <code class="rounded bg-muted px-1.5 py-0.5">{{
+                            editingSetting.key
+                        }}</code>
                         <span
                             :class="{
                                 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400':
@@ -366,34 +464,49 @@ const deleteSetting = (settingKey: string, role: string): void => {
                                 type="button"
                                 @click="
                                     editFormValue =
-                                        editFormValue === '1' || editFormValue === 'true' ? '0' : '1'
+                                        editFormValue === '1' ||
+                                        editFormValue === 'true'
+                                            ? '0'
+                                            : '1'
                                 "
                                 :class="[
                                     'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none',
-                                    editFormValue === '1' || editFormValue === 'true'
+                                    editFormValue === '1' ||
+                                    editFormValue === 'true'
                                         ? 'bg-primary'
                                         : 'bg-muted',
                                 ]"
                                 role="switch"
-                                :aria-checked="editFormValue === '1' || editFormValue === 'true'"
+                                :aria-checked="
+                                    editFormValue === '1' ||
+                                    editFormValue === 'true'
+                                "
                             >
                                 <span
                                     :class="[
                                         'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                                        editFormValue === '1' || editFormValue === 'true'
+                                        editFormValue === '1' ||
+                                        editFormValue === 'true'
                                             ? 'translate-x-5'
                                             : 'translate-x-0',
                                     ]"
                                 />
                             </button>
                             <span class="text-sm">
-                                {{ editFormValue === '1' || editFormValue === 'true' ? 'Enabled' : 'Disabled' }}
+                                {{
+                                    editFormValue === '1' ||
+                                    editFormValue === 'true'
+                                        ? 'Enabled'
+                                        : 'Disabled'
+                                }}
                             </span>
                         </div>
 
                         <!-- Multi-options select in modal -->
                         <select
-                            v-else-if="editingSetting.field_type === 'multioptions'"
+                            v-else-if="
+                                editingSetting.field_type === 'multioptions'
+                            "
                             v-model="editFormValue"
                             class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
                         >

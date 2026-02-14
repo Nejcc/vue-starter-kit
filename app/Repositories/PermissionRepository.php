@@ -32,12 +32,26 @@ final class PermissionRepository extends BaseRepository implements PermissionRep
         return $this->buildPermissionsQuery($search)->get();
     }
 
-    public function paginateWithRoles(?string $search = null, int $perPage = 15): LengthAwarePaginator
+    public function paginateWithRoles(?string $search = null, int $perPage = 15, ?string $group = null): LengthAwarePaginator
     {
-        return $this->buildPermissionsQuery($search)->paginate($perPage);
+        return $this->buildPermissionsQuery($search, $group)->paginate($perPage);
     }
 
-    private function buildPermissionsQuery(?string $search = null): Builder
+    /**
+     * Get all distinct group names.
+     *
+     * @return Collection<int, string>
+     */
+    public function getGroupNames(): Collection
+    {
+        return $this->query()
+            ->whereNotNull('group_name')
+            ->distinct()
+            ->orderBy('group_name')
+            ->pluck('group_name');
+    }
+
+    private function buildPermissionsQuery(?string $search = null, ?string $group = null): Builder
     {
         $query = $this->query()->with('roles');
 
@@ -46,6 +60,14 @@ final class PermissionRepository extends BaseRepository implements PermissionRep
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('group_name', 'like', "%{$search}%");
             });
+        }
+
+        if ($group !== null) {
+            if ($group === '') {
+                $query->whereNull('group_name');
+            } else {
+                $query->where('group_name', $group);
+            }
         }
 
         return $query->latest();

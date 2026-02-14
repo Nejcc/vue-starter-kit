@@ -3,18 +3,26 @@ import { Head, Link } from '@inertiajs/vue3';
 
 import {
     Activity,
+    AlertTriangle,
+    CheckCircle,
     Database,
+    HardDrive,
     Key,
     Settings,
     Shield,
     UserCheck,
     Users,
+    XCircle,
 } from 'lucide-vue-next';
 import Heading from '@/components/Heading.vue';
 import StatCard from '@/components/StatCard.vue';
+import { Badge } from '@/components/ui/badge';
 import { useDateFormat } from '@/composables/useDateFormat';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
+import { index as cacheIndex } from '@/routes/admin/cache';
 import { index as databasesIndex } from '@/routes/admin/databases';
+import { index as failedJobsIndex } from '@/routes/admin/failed-jobs';
+import { index as healthIndex } from '@/routes/admin/health';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as usersIndex } from '@/routes/admin/users';
@@ -47,6 +55,14 @@ interface DashboardProps {
         verifiedUsers: number;
         totalRoles: number;
         totalPermissions: number;
+    };
+    systemStats: {
+        failedJobs: number;
+        cacheDriver: string;
+        cacheWorking: boolean;
+        maintenanceMode: boolean;
+        phpVersion: string;
+        laravelVersion: string;
     };
     recentUsers: RecentUser[];
     recentActivity: AuditEntry[];
@@ -101,6 +117,13 @@ const quickLinks = [
         href: '/admin/settings',
         icon: Settings,
         color: 'bg-gray-500 dark:bg-gray-600',
+    },
+    {
+        title: 'Cache',
+        description: 'Cache & maintenance',
+        href: cacheIndex().url,
+        icon: HardDrive,
+        color: 'bg-teal-500 dark:bg-teal-600',
     },
 ];
 
@@ -163,6 +186,108 @@ function formatEventName(event: string): string {
                         :icon-color="stat.iconColor"
                         :icon-bg="stat.iconBg"
                     />
+                </div>
+
+                <!-- System Status -->
+                <div class="rounded-lg border">
+                    <div
+                        class="flex items-center justify-between border-b px-4 py-3"
+                    >
+                        <h3 class="font-semibold">System Status</h3>
+                        <Link
+                            :href="healthIndex().url"
+                            class="text-sm text-primary hover:underline"
+                        >
+                            View details
+                        </Link>
+                    </div>
+                    <div class="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div class="flex items-center gap-3">
+                            <component
+                                :is="
+                                    systemStats.cacheWorking
+                                        ? CheckCircle
+                                        : XCircle
+                                "
+                                :class="[
+                                    'h-5 w-5',
+                                    systemStats.cacheWorking
+                                        ? 'text-green-500'
+                                        : 'text-red-500',
+                                ]"
+                            />
+                            <div>
+                                <p class="text-sm font-medium">Cache</p>
+                                <p class="text-xs text-muted-foreground">
+                                    {{ systemStats.cacheDriver }}
+                                    {{
+                                        systemStats.cacheWorking
+                                            ? '(working)'
+                                            : '(error)'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+                        <Link
+                            :href="failedJobsIndex().url"
+                            class="flex items-center gap-3 rounded-md transition-colors hover:bg-muted/50"
+                        >
+                            <component
+                                :is="
+                                    systemStats.failedJobs === 0
+                                        ? CheckCircle
+                                        : AlertTriangle
+                                "
+                                :class="[
+                                    'h-5 w-5',
+                                    systemStats.failedJobs === 0
+                                        ? 'text-green-500'
+                                        : 'text-red-500',
+                                ]"
+                            />
+                            <div>
+                                <p class="text-sm font-medium">Failed Jobs</p>
+                                <p class="text-xs text-muted-foreground">
+                                    {{ systemStats.failedJobs }} failed
+                                </p>
+                            </div>
+                        </Link>
+                        <div class="flex items-center gap-3">
+                            <component
+                                :is="
+                                    !systemStats.maintenanceMode
+                                        ? CheckCircle
+                                        : AlertTriangle
+                                "
+                                :class="[
+                                    'h-5 w-5',
+                                    !systemStats.maintenanceMode
+                                        ? 'text-green-500'
+                                        : 'text-yellow-500',
+                                ]"
+                            />
+                            <div>
+                                <p class="text-sm font-medium">App Status</p>
+                                <p class="text-xs text-muted-foreground">
+                                    {{
+                                        systemStats.maintenanceMode
+                                            ? 'Maintenance mode'
+                                            : 'Live'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <Badge variant="outline" class="text-xs">
+                                PHP {{ systemStats.phpVersion }}
+                            </Badge>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <Badge variant="outline" class="text-xs">
+                                Laravel {{ systemStats.laravelVersion }}
+                            </Badge>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-2">

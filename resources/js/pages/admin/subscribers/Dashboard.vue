@@ -18,7 +18,11 @@ import { useSubscriberNav } from '@/composables/useSubscriberNav';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useSubscriberNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useSubscriberNav();
 
 interface Subscriber {
     id: number;
@@ -75,7 +79,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Subscriber Dashboard" />
 
         <div class="container mx-auto py-8">

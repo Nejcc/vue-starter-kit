@@ -14,9 +14,17 @@ import { useDateFormat } from '@/composables/useDateFormat';
 import { useOrganizationNav } from '@/composables/useOrganizationNav';
 import { useSearch } from '@/composables/useSearch';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
-import { type BreadcrumbItem, type Organization, type PaginatedResponse } from '@/types';
+import {
+    type BreadcrumbItem,
+    type Organization,
+    type PaginatedResponse,
+} from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useOrganizationNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useOrganizationNav();
 
 interface OrganizationsPageProps {
     organizations: PaginatedResponse<
@@ -53,13 +61,22 @@ function deleteOrganization(slug: string) {
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Organizations" />
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <Heading variant="small" title="Organizations" description="Manage organizations and their members" />
+                    <Heading
+                        variant="small"
+                        title="Organizations"
+                        description="Manage organizations and their members"
+                    />
                     <Link href="/admin/organizations/create">
                         <Button>
                             <Plus class="mr-2 h-4 w-4" />
@@ -84,8 +101,12 @@ function deleteOrganization(slug: string) {
                         >
                             <div class="flex items-start justify-between">
                                 <div class="flex items-start gap-3">
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                                        <Building2 class="h-5 w-5 text-primary" />
+                                    <div
+                                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10"
+                                    >
+                                        <Building2
+                                            class="h-5 w-5 text-primary"
+                                        />
                                     </div>
                                     <div>
                                         <Link
@@ -94,39 +115,68 @@ function deleteOrganization(slug: string) {
                                         >
                                             {{ org.name }}
                                         </Link>
-                                        <p class="text-sm text-muted-foreground">
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
                                             {{ org.slug }}
                                         </p>
-                                        <p v-if="org.description" class="mt-1 text-sm text-muted-foreground">
+                                        <p
+                                            v-if="org.description"
+                                            class="mt-1 text-sm text-muted-foreground"
+                                        >
                                             {{ org.description }}
                                         </p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <StatusBadge v-if="org.is_personal" label="Personal" variant="info" />
-                                    <StatusBadge v-if="org.owner" :label="org.owner.name" variant="purple" />
+                                    <StatusBadge
+                                        v-if="org.is_personal"
+                                        label="Personal"
+                                        variant="info"
+                                    />
+                                    <StatusBadge
+                                        v-if="org.owner"
+                                        :label="org.owner.name"
+                                        variant="purple"
+                                    />
                                 </div>
                             </div>
 
                             <template #footer>
                                 <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4 text-sm text-muted-foreground">
+                                    <div
+                                        class="flex items-center gap-4 text-sm text-muted-foreground"
+                                    >
                                         <span class="flex items-center gap-1">
                                             <Users class="h-4 w-4" />
-                                            {{ org.members_count ?? 0 }} member(s)
+                                            {{
+                                                org.members_count ?? 0
+                                            }}
+                                            member(s)
                                         </span>
-                                        <span>Created {{ formatDate(org.created_at) }}</span>
+                                        <span
+                                            >Created
+                                            {{
+                                                formatDate(org.created_at)
+                                            }}</span
+                                        >
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <Link :href="`/admin/organizations/${org.slug}/edit`">
-                                            <Button variant="outline" size="sm">Edit</Button>
+                                        <Link
+                                            :href="`/admin/organizations/${org.slug}/edit`"
+                                        >
+                                            <Button variant="outline" size="sm"
+                                                >Edit</Button
+                                            >
                                         </Link>
                                         <Button
                                             v-if="!org.is_personal"
                                             variant="outline"
                                             size="sm"
                                             class="text-destructive hover:text-destructive"
-                                            @click="deleteOrganization(org.slug)"
+                                            @click="
+                                                deleteOrganization(org.slug)
+                                            "
                                         >
                                             <Trash2 class="h-4 w-4" />
                                         </Button>

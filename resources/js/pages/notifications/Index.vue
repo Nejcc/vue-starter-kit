@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import {
     Bell,
     Check,
@@ -23,7 +23,7 @@ import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 import type { NotificationsPageProps } from '@/types/pages';
 
-const props = defineProps<NotificationsPageProps>();
+defineProps<NotificationsPageProps>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     { title: 'Dashboard', href: dashboard().url },
@@ -37,27 +37,18 @@ const filters = [
 ];
 
 function applyFilter(filter: string) {
-    router.get(
-        index.url(),
-        filter === 'all' ? {} : { filter },
-        { preserveState: true, preserveScroll: true },
-    );
+    router.get(index.url(), filter === 'all' ? {} : { filter }, {
+        preserveState: true,
+        preserveScroll: true,
+    });
 }
 
 function markAsRead(id: string) {
-    router.patch(
-        markAsReadAction.url(id),
-        {},
-        { preserveScroll: true },
-    );
+    router.patch(markAsReadAction.url(id), {}, { preserveScroll: true });
 }
 
 function markAllAsRead() {
-    router.post(
-        markAllAsReadAction.url(),
-        {},
-        { preserveScroll: true },
-    );
+    router.post(markAllAsReadAction.url(), {}, { preserveScroll: true });
 }
 
 function deleteNotification(id: string) {

@@ -45,7 +45,7 @@ final class RoleRepository extends BaseRepository implements RoleRepositoryInter
 
     private function buildRolesQuery(?string $search = null): Builder
     {
-        $query = $this->query()->with('permissions');
+        $query = $this->query()->with('permissions')->withCount('users');
 
         if ($search) {
             $query->where('name', 'like', "%{$search}%");

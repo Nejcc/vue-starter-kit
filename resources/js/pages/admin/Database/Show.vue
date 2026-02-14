@@ -4,7 +4,7 @@ import { ArrowLeft, Database } from 'lucide-vue-next';
 import Heading from '@/components/Heading.vue';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import connection from '@/routes/admin/database/connection';
-import { view } from '@/routes/admin/database/connection/show';
+import { view as showView } from '@/routes/admin/database/connection/show';
 import { index as databasesIndex } from '@/routes/admin/databases';
 
 import { type BreadcrumbItem } from '@/types';
@@ -41,7 +41,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
     {
         title: props.table.name,
         href: props.view
-            ? view({
+            ? showView({
                   connection: props.currentConnection,
                   table: props.table.name,
                   view: props.view,

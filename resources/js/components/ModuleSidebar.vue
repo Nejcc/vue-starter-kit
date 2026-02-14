@@ -40,7 +40,9 @@ const { isCurrentUrl } = useCurrentUrl();
                         <Link :href="backHref" prefetch>
                             <div class="flex items-center gap-2">
                                 <ArrowLeft class="size-4 shrink-0" />
-                                <span class="truncate text-sm font-medium">Back to Admin</span>
+                                <span class="truncate text-sm font-medium"
+                                    >Back to Admin</span
+                                >
                             </div>
                         </Link>
                     </SidebarMenuButton>

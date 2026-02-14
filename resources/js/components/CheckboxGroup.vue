@@ -23,11 +23,10 @@ const emit = defineEmits<{
 }>();
 
 const allSelected = computed(() => {
-    return props.options.length > 0 && props.modelValue.length === props.options.length;
-});
-
-const someSelected = computed(() => {
-    return props.modelValue.length > 0 && props.modelValue.length < props.options.length;
+    return (
+        props.options.length > 0 &&
+        props.modelValue.length === props.options.length
+    );
 });
 
 function toggleAll(): void {
@@ -68,7 +67,10 @@ const gridClass = computed(() => {
                 {{ allSelected ? 'Deselect all' : 'Select all' }}
             </button>
         </div>
-        <div class="max-h-60 space-y-2 overflow-y-auto rounded-md border p-4" :class="gridClass">
+        <div
+            class="max-h-60 space-y-2 overflow-y-auto rounded-md border p-4"
+            :class="gridClass"
+        >
             <div
                 v-for="option in options"
                 :key="option"

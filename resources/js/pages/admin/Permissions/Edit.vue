@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Head, Link } from '@inertiajs/vue3';
+import { Form, Head, Link, router } from '@inertiajs/vue3';
 import { ArrowLeft } from 'lucide-vue-next';
 import { ref } from 'vue';
 
@@ -8,7 +8,7 @@ import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
-import { index, update } from '@/routes/admin/permissions';
+import { destroy, index, update } from '@/routes/admin/permissions';
 import { type BreadcrumbItem } from '@/types';
 
 interface Permission {
@@ -44,7 +44,13 @@ const formData = ref({
 });
 
 const deletePermission = (): void => {
-    alert('Delete functionality is not yet implemented.');
+    if (
+        !confirm(
+            `Are you sure you want to delete the permission "${props.permission.name}"?`,
+        )
+    )
+        return;
+    router.delete(destroy(props.permission.name).url);
 };
 </script>
 

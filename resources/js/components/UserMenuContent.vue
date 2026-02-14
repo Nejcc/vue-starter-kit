@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
-import { KeyRound, LogOut, Settings, Shield, ShieldCheck, UserRound } from 'lucide-vue-next';
+import {
+    KeyRound,
+    LogOut,
+    Settings,
+    Shield,
+    ShieldCheck,
+    UserRound,
+} from 'lucide-vue-next';
 import { computed, nextTick, ref } from 'vue';
 import {
     DropdownMenuGroup,
@@ -26,7 +33,9 @@ defineProps<Props>();
 
 const { isAdmin, isSuperAdmin, hasPermission } = useUserPermissions();
 
-const canImpersonate = computed(() => isSuperAdmin.value || hasPermission('impersonate'));
+const canImpersonate = computed(
+    () => isSuperAdmin.value || hasPermission('impersonate'),
+);
 
 const isModalOpen = ref(false);
 const users = ref<
@@ -84,13 +93,21 @@ const handleLogout = () => {
             </Link>
         </DropdownMenuItem>
         <DropdownMenuItem :as-child="true">
-            <Link class="block w-full cursor-pointer" :href="passwordEdit()" prefetch>
+            <Link
+                class="block w-full cursor-pointer"
+                :href="passwordEdit()"
+                prefetch
+            >
                 <KeyRound class="mr-2 h-4 w-4" />
                 Password
             </Link>
         </DropdownMenuItem>
         <DropdownMenuItem :as-child="true">
-            <Link class="block w-full cursor-pointer" :href="twoFactorShow()" prefetch>
+            <Link
+                class="block w-full cursor-pointer"
+                :href="twoFactorShow()"
+                prefetch
+            >
                 <ShieldCheck class="mr-2 h-4 w-4" />
                 Security
             </Link>

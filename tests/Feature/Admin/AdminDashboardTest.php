@@ -138,4 +138,45 @@ final class AdminDashboardTest extends TestCase
             ->has('recentActivity', 0)
         );
     }
+
+    public function test_admin_dashboard_returns_system_stats(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.index'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->has('systemStats')
+            ->has('systemStats.failedJobs')
+            ->has('systemStats.cacheDriver')
+            ->has('systemStats.cacheWorking')
+            ->has('systemStats.maintenanceMode')
+            ->has('systemStats.phpVersion')
+            ->has('systemStats.laravelVersion')
+        );
+    }
+
+    public function test_admin_dashboard_system_stats_has_correct_types(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.index'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->where('systemStats.failedJobs', 0)
+            ->where('systemStats.cacheDriver', config('cache.default'))
+            ->where('systemStats.maintenanceMode', false)
+            ->whereType('systemStats.phpVersion', 'string')
+            ->whereType('systemStats.laravelVersion', 'string')
+        );
+    }
+
+    public function test_admin_role_can_access_dashboard(): void
+    {
+        $adminRole = Role::create(['name' => RoleNames::ADMIN]);
+        $admin = User::factory()->create();
+        $admin->assignRole($adminRole);
+
+        $response = $this->actingAs($admin)->get(route('admin.index'));
+
+        $response->assertStatus(200);
+    }
 }

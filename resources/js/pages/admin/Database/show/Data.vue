@@ -14,7 +14,7 @@ interface Props {
     currentConnection: string;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 </script>
 
 <template>

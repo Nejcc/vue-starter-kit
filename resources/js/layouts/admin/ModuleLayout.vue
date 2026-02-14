@@ -23,7 +23,12 @@ withDefaults(defineProps<Props>(), {
 
 <template>
     <AppShell variant="sidebar">
-        <ModuleSidebar :title="moduleTitle" :icon="moduleIcon" :items="moduleItems" :back-href="backHref" />
+        <ModuleSidebar
+            :title="moduleTitle"
+            :icon="moduleIcon"
+            :items="moduleItems"
+            :back-href="backHref"
+        />
         <AppContent variant="sidebar" class="overflow-x-hidden">
             <ImpersonationBanner />
             <AppSidebarHeader :breadcrumbs="breadcrumbs" />

@@ -44,7 +44,8 @@ onMounted(() => {
     });
 });
 
-const installCommand = 'git clone https://github.com/aspect-dev/vue-starter-kit.git && cd vue-starter-kit && composer run setup';
+const installCommand =
+    'git clone https://github.com/aspect-dev/vue-starter-kit.git && cd vue-starter-kit && composer run setup';
 const copied = ref(false);
 function copyCommand() {
     navigator.clipboard.writeText(installCommand);
@@ -66,7 +67,7 @@ function copyCommand() {
     >
         <!-- Background grid pattern -->
         <div
-            class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#8881_1px,transparent_1px),linear-gradient(to_bottom,#8881_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)] dark:bg-[linear-gradient(to_right,#fff1_1px,transparent_1px),linear-gradient(to_bottom,#fff1_1px,transparent_1px)]"
+            class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#8881_1px,transparent_1px),linear-gradient(to_bottom,#8881_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)] bg-[size:4rem_4rem] dark:bg-[linear-gradient(to_right,#fff1_1px,transparent_1px),linear-gradient(to_bottom,#fff1_1px,transparent_1px)]"
         />
 
         <!-- Gradient orbs -->
@@ -106,7 +107,7 @@ function copyCommand() {
                 </div>
 
                 <h1
-                    class="text-5xl leading-[1.08] font-extrabold tracking-tight transition-all duration-700 delay-100 sm:text-6xl lg:text-7xl"
+                    class="text-5xl leading-[1.08] font-extrabold tracking-tight transition-all delay-100 duration-700 sm:text-6xl lg:text-7xl"
                     :class="
                         visible
                             ? 'translate-y-0 opacity-100'
@@ -127,7 +128,7 @@ function copyCommand() {
                 </h1>
 
                 <p
-                    class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-[#706f6c] transition-all duration-700 delay-200 sm:mt-8 sm:text-lg dark:text-[#A1A09A]"
+                    class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-[#706f6c] transition-all delay-200 duration-700 sm:mt-8 sm:text-lg dark:text-[#A1A09A]"
                     :class="
                         visible
                             ? 'translate-y-0 opacity-100'
@@ -141,7 +142,7 @@ function copyCommand() {
 
                 <!-- Terminal command -->
                 <div
-                    class="mx-auto mt-8 max-w-2xl transition-all duration-700 delay-300 sm:mt-10"
+                    class="mx-auto mt-8 max-w-2xl transition-all delay-300 duration-700 sm:mt-10"
                     :class="
                         visible
                             ? 'translate-y-0 opacity-100'
@@ -167,8 +168,8 @@ function copyCommand() {
                             >
                             <span class="text-[#706f6c]">&&</span> cd
                             vue-starter-kit
-                            <span class="text-[#706f6c]">&&</span> composer
-                            run setup
+                            <span class="text-[#706f6c]">&&</span> composer run
+                            setup
                         </code>
                         <span
                             class="flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-colors duration-200 sm:px-4 sm:py-3"
@@ -192,7 +193,7 @@ function copyCommand() {
                 </div>
 
                 <div
-                    class="mt-6 flex flex-col items-center justify-center gap-3 transition-all duration-700 delay-[400ms] sm:mt-8 sm:flex-row sm:gap-4"
+                    class="mt-6 flex flex-col items-center justify-center gap-3 transition-all delay-[400ms] duration-700 sm:mt-8 sm:flex-row sm:gap-4"
                     :class="
                         visible
                             ? 'translate-y-0 opacity-100'
@@ -239,16 +240,14 @@ function copyCommand() {
         >
             <div class="mx-auto max-w-6xl">
                 <div
-                    class="mb-10 text-center transition-all duration-700 delay-400 sm:mb-14"
+                    class="mb-10 text-center transition-all delay-400 duration-700 sm:mb-14"
                     :class="
                         visible
                             ? 'translate-y-0 opacity-100'
                             : 'translate-y-6 opacity-0'
                     "
                 >
-                    <h2
-                        class="text-2xl font-bold tracking-tight sm:text-3xl"
-                    >
+                    <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
                         Everything you need to launch
                     </h2>
                     <p
@@ -285,9 +284,7 @@ function copyCommand() {
                             >
                                 <Shield :size="20" :stroke-width="1.75" />
                             </div>
-                            <h3
-                                class="mb-2 text-lg font-bold tracking-tight"
-                            >
+                            <h3 class="mb-2 text-lg font-bold tracking-tight">
                                 Authentication & 2FA
                             </h3>
                             <p
@@ -333,7 +330,7 @@ function copyCommand() {
 
                     <!-- 2. Payments — 2 cols wide (fills row 1 right half) -->
                     <div
-                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all duration-500 delay-75 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:col-span-2 sm:p-8 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
+                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all delay-75 duration-500 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:col-span-2 sm:p-8 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
                         :class="
                             visible
                                 ? 'translate-y-0 opacity-100'
@@ -347,22 +344,17 @@ function copyCommand() {
                             <div
                                 class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF2D20]/10 to-[#FF2D20]/5 text-[#FF2D20] ring-1 ring-[#FF2D20]/10 transition-shadow duration-300 group-hover:shadow-md group-hover:shadow-[#FF2D20]/10"
                             >
-                                <CreditCard
-                                    :size="20"
-                                    :stroke-width="1.75"
-                                />
+                                <CreditCard :size="20" :stroke-width="1.75" />
                             </div>
-                            <h3
-                                class="mb-2 text-lg font-bold tracking-tight"
-                            >
+                            <h3 class="mb-2 text-lg font-bold tracking-tight">
                                 Payment Gateway
                             </h3>
                             <p
                                 class="text-sm leading-relaxed text-[#706f6c] dark:text-[#A1A09A]"
                             >
-                                Multi-provider billing with Stripe, PayPal,
-                                and crypto. Subscriptions, invoices, refunds,
-                                and customer management built in.
+                                Multi-provider billing with Stripe, PayPal, and
+                                crypto. Subscriptions, invoices, refunds, and
+                                customer management built in.
                             </p>
                             <!-- Provider pills -->
                             <div class="mt-5 flex flex-wrap gap-2">
@@ -386,7 +378,7 @@ function copyCommand() {
 
                     <!-- 3. RBAC — 1x1 (fills row 2 col 3) -->
                     <div
-                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all duration-500 delay-150 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
+                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all delay-150 duration-500 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
                         :class="
                             visible
                                 ? 'translate-y-0 opacity-100'
@@ -418,7 +410,7 @@ function copyCommand() {
 
                     <!-- 4. Notifications — 1x1 (fills row 2 col 4) -->
                     <div
-                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all duration-500 delay-200 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
+                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all delay-200 duration-500 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
                         :class="
                             visible
                                 ? 'translate-y-0 opacity-100'
@@ -450,7 +442,7 @@ function copyCommand() {
 
                     <!-- 5. Admin Panel — 2 cols wide (row 3 left) -->
                     <div
-                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all duration-500 delay-300 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:col-span-2 sm:p-8 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
+                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all delay-300 duration-500 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:col-span-2 sm:p-8 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
                         :class="
                             visible
                                 ? 'translate-y-0 opacity-100'
@@ -466,9 +458,7 @@ function copyCommand() {
                             >
                                 <Users :size="20" :stroke-width="1.75" />
                             </div>
-                            <h3
-                                class="mb-2 text-lg font-bold tracking-tight"
-                            >
+                            <h3 class="mb-2 text-lg font-bold tracking-tight">
                                 Admin Panel
                             </h3>
                             <p
@@ -478,9 +468,7 @@ function copyCommand() {
                                 inspector, settings, and impersonation.
                             </p>
                             <!-- Mock sidebar nav -->
-                            <div
-                                class="mt-auto flex flex-wrap gap-1.5"
-                            >
+                            <div class="mt-auto flex flex-wrap gap-1.5">
                                 <span
                                     v-for="(item, idx) in [
                                         'Dashboard',
@@ -507,7 +495,7 @@ function copyCommand() {
 
                     <!-- 6. Subscriber Management — 2 cols wide (row 3 right) -->
                     <div
-                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all duration-500 delay-[350ms] hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:col-span-2 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
+                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all delay-[350ms] duration-500 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:col-span-2 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
                         :class="
                             visible
                                 ? 'translate-y-0 opacity-100'
@@ -531,17 +519,16 @@ function copyCommand() {
                             <p
                                 class="text-[13px] leading-relaxed text-[#706f6c] sm:text-sm dark:text-[#A1A09A]"
                             >
-                                Mailing lists with Mailchimp, Brevo,
-                                MailerLite, ConvertKit, and HubSpot
-                                integrations. Double opt-in and list
-                                management included.
+                                Mailing lists with Mailchimp, Brevo, MailerLite,
+                                ConvertKit, and HubSpot integrations. Double
+                                opt-in and list management included.
                             </p>
                         </div>
                     </div>
 
                     <!-- 7. Audit Logs — 1x1 (row 4 col 1) -->
                     <div
-                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all duration-500 delay-[400ms] hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
+                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all delay-[400ms] duration-500 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
                         :class="
                             visible
                                 ? 'translate-y-0 opacity-100'
@@ -555,10 +542,7 @@ function copyCommand() {
                             <div
                                 class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF2D20]/10 to-[#FF2D20]/5 text-[#FF2D20] ring-1 ring-[#FF2D20]/10 transition-shadow duration-300 group-hover:shadow-md group-hover:shadow-[#FF2D20]/10"
                             >
-                                <ScrollText
-                                    :size="18"
-                                    :stroke-width="1.75"
-                                />
+                                <ScrollText :size="18" :stroke-width="1.75" />
                             </div>
                             <h3
                                 class="mb-1.5 text-sm font-bold tracking-tight sm:text-base"
@@ -576,7 +560,7 @@ function copyCommand() {
 
                     <!-- 8. Database Inspector — 1x1 (row 4 col 2) -->
                     <div
-                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all duration-500 delay-[450ms] hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
+                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all delay-[450ms] duration-500 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
                         :class="
                             visible
                                 ? 'translate-y-0 opacity-100'
@@ -600,15 +584,15 @@ function copyCommand() {
                             <p
                                 class="text-[13px] leading-relaxed text-[#706f6c] sm:text-sm dark:text-[#A1A09A]"
                             >
-                                Browse tables, columns, indexes, and data
-                                across multiple connections from the admin UI.
+                                Browse tables, columns, indexes, and data across
+                                multiple connections from the admin UI.
                             </p>
                         </div>
                     </div>
 
                     <!-- 9. Dark Mode — 1x1 (row 4 col 3) -->
                     <div
-                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all duration-500 delay-500 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
+                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all delay-500 duration-500 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
                         :class="
                             visible
                                 ? 'translate-y-0 opacity-100'
@@ -632,15 +616,15 @@ function copyCommand() {
                             <p
                                 class="text-[13px] leading-relaxed text-[#706f6c] sm:text-sm dark:text-[#A1A09A]"
                             >
-                                System-aware theming across every component
-                                with seamless toggling.
+                                System-aware theming across every component with
+                                seamless toggling.
                             </p>
                         </div>
                     </div>
 
                     <!-- 10. GDPR / Cookie Consent — 1x1 (row 4 col 4) -->
                     <div
-                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all duration-500 delay-[550ms] hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
+                        class="group relative overflow-hidden rounded-2xl border border-[#e3e3e0]/80 bg-white/60 p-6 backdrop-blur-sm transition-all delay-[550ms] duration-500 hover:border-[#FF2D20]/20 hover:shadow-xl hover:shadow-[#FF2D20]/5 sm:p-7 dark:border-[#2a2a28] dark:bg-white/[0.03] dark:hover:border-[#FF2D20]/20"
                         :class="
                             visible
                                 ? 'translate-y-0 opacity-100'
@@ -664,9 +648,8 @@ function copyCommand() {
                             <p
                                 class="text-[13px] leading-relaxed text-[#706f6c] sm:text-sm dark:text-[#A1A09A]"
                             >
-                                Cookie consent banner, per-category
-                                preferences, consent audit trail, and privacy
-                                policies.
+                                Cookie consent banner, per-category preferences,
+                                consent audit trail, and privacy policies.
                             </p>
                         </div>
                     </div>

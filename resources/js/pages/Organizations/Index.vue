@@ -37,7 +37,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
                 <div class="flex items-center justify-between">
-                    <Heading variant="small" title="Organizations" description="Manage your organizations" />
+                    <Heading
+                        variant="small"
+                        title="Organizations"
+                        description="Manage your organizations"
+                    />
                     <Link href="/organizations/create">
                         <Button>
                             <Plus class="mr-2 h-4 w-4" />
@@ -48,14 +52,15 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
                 <template v-if="organizations.length > 0">
                     <div class="grid gap-4">
-                        <DataCard
-                            v-for="org in organizations"
-                            :key="org.id"
-                        >
+                        <DataCard v-for="org in organizations" :key="org.id">
                             <div class="flex items-start justify-between">
                                 <div class="flex items-start gap-3">
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                                        <Building2 class="h-5 w-5 text-primary" />
+                                    <div
+                                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10"
+                                    >
+                                        <Building2
+                                            class="h-5 w-5 text-primary"
+                                        />
                                     </div>
                                     <div>
                                         <Link
@@ -64,32 +69,61 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         >
                                             {{ org.name }}
                                         </Link>
-                                        <p class="text-sm text-muted-foreground">
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
                                             {{ org.slug }}
                                         </p>
-                                        <p v-if="org.description" class="mt-1 text-sm text-muted-foreground">
+                                        <p
+                                            v-if="org.description"
+                                            class="mt-1 text-sm text-muted-foreground"
+                                        >
                                             {{ org.description }}
                                         </p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <StatusBadge v-if="org.is_personal" label="Personal" variant="info" />
-                                    <StatusBadge v-else label="Team" variant="default" />
-                                    <StatusBadge v-if="org.pivot?.role" :label="org.pivot.role" variant="purple" />
+                                    <StatusBadge
+                                        v-if="org.is_personal"
+                                        label="Personal"
+                                        variant="info"
+                                    />
+                                    <StatusBadge
+                                        v-else
+                                        label="Team"
+                                        variant="default"
+                                    />
+                                    <StatusBadge
+                                        v-if="org.pivot?.role"
+                                        :label="org.pivot.role"
+                                        variant="purple"
+                                    />
                                 </div>
                             </div>
 
                             <template #footer>
                                 <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4 text-sm text-muted-foreground">
+                                    <div
+                                        class="flex items-center gap-4 text-sm text-muted-foreground"
+                                    >
                                         <span class="flex items-center gap-1">
                                             <Users class="h-4 w-4" />
-                                            {{ org.members_count ?? 0 }} member(s)
+                                            {{
+                                                org.members_count ?? 0
+                                            }}
+                                            member(s)
                                         </span>
-                                        <span>Created {{ formatDate(org.created_at) }}</span>
+                                        <span
+                                            >Created
+                                            {{
+                                                formatDate(org.created_at)
+                                            }}</span
+                                        >
                                     </div>
                                     <Link :href="`/organizations/${org.slug}`">
-                                        <Button variant="outline" size="sm">View</Button>
+                                        <Button variant="outline" size="sm"
+                                            >View</Button
+                                        >
                                     </Link>
                                 </div>
                             </template>

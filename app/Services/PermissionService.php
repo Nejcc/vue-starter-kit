@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Constants\AuditEvent;
 use App\Contracts\Repositories\PermissionRepositoryInterface;
 use App\Contracts\Services\PermissionServiceInterface;
+use App\Exceptions\PermissionException;
 use App\Models\AuditLog;
 use App\Models\Permission;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -36,22 +38,22 @@ final class PermissionService extends AbstractService implements PermissionServi
             'name' => $permission->name,
             'group_name' => $permission->group_name,
             'roles' => $permission->roles->pluck('name'),
-            'roles_count' => $permission->roles()->count(),
+            'roles_count' => $permission->roles->count(),
             'created_at' => $permission->created_at,
         ]);
     }
 
     /**
-     * Get paginated permissions with roles and optional search.
+     * Get paginated permissions with roles and optional search/group filter.
      */
-    public function getPaginated(?string $search = null, int $perPage = 15): LengthAwarePaginator
+    public function getPaginated(?string $search = null, int $perPage = 15, ?string $group = null): LengthAwarePaginator
     {
-        return $this->getRepository()->paginateWithRoles($search, $perPage)->through(fn ($permission) => [
+        return $this->getRepository()->paginateWithRoles($search, $perPage, $group)->through(fn ($permission) => [
             'id' => $permission->id,
             'name' => $permission->name,
             'group_name' => $permission->group_name,
             'roles' => $permission->roles->pluck('name'),
-            'roles_count' => $permission->roles()->count(),
+            'roles_count' => $permission->roles->count(),
             'created_at' => $permission->created_at,
         ]);
     }
@@ -69,6 +71,16 @@ final class PermissionService extends AbstractService implements PermissionServi
     }
 
     /**
+     * Get all distinct group names.
+     *
+     * @return Collection<int, string>
+     */
+    public function getGroupNames(): Collection
+    {
+        return $this->getRepository()->getGroupNames();
+    }
+
+    /**
      * Create a new permission.
      *
      * @param  array<string, mixed>  $data
@@ -80,7 +92,7 @@ final class PermissionService extends AbstractService implements PermissionServi
             'group_name' => $data['group_name'] ?? null,
         ]);
 
-        AuditLog::log('permission.created', $permission, null, [
+        AuditLog::log(AuditEvent::PERMISSION_CREATED, $permission, null, [
             'name' => $permission->name,
             'group_name' => $permission->group_name,
         ]);
@@ -107,12 +119,33 @@ final class PermissionService extends AbstractService implements PermissionServi
 
         $permission->refresh();
 
-        AuditLog::log('permission.updated', $permission, $oldValues, [
+        AuditLog::log(AuditEvent::PERMISSION_UPDATED, $permission, $oldValues, [
             'name' => $permission->name,
             'group_name' => $permission->group_name,
         ]);
 
         return $permission;
+    }
+
+    /**
+     * Delete a permission.
+     *
+     * @throws PermissionException If the permission is assigned to roles
+     */
+    public function delete(Permission $permission): void
+    {
+        $rolesCount = $permission->roles()->count();
+
+        if ($rolesCount > 0) {
+            throw PermissionException::cannotDeleteAssignedToRoles($rolesCount);
+        }
+
+        AuditLog::log(AuditEvent::PERMISSION_DELETED, $permission, [
+            'name' => $permission->name,
+            'group_name' => $permission->group_name,
+        ], null);
+
+        $this->getRepository()->delete($permission->id);
     }
 
     /**

@@ -110,7 +110,8 @@ const quickRegister = (role: string): void => {
                                     for="data_processing_consent"
                                     class="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                 >
-                                    I agree to the processing of my personal data
+                                    I agree to the processing of my personal
+                                    data
                                 </Label>
                                 <p class="text-xs text-muted-foreground">
                                     By creating an account, you agree to our
@@ -127,9 +128,7 @@ const quickRegister = (role: string): void => {
                                 </p>
                             </div>
                         </div>
-                        <InputError
-                            :message="errors.data_processing_consent"
-                        />
+                        <InputError :message="errors.data_processing_consent" />
                     </div>
 
                     <Button

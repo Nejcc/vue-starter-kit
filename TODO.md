@@ -2,11 +2,11 @@
 
 > **Vue Starter Kit** - Todo list for updates, fixes, and new features
 
-**Last Updated**: 2026-01-27 (Session 10 completed)
+**Last Updated**: 2026-02-14 (Session 16 completed)
 
 ## Progress Overview
 
-📊 **Overall Progress**: 53 items completed, 147+ items remaining
+📊 **Overall Progress**: 75+ items completed, 120+ items remaining
 
 **By Category**:
 - ✅ **Critical Issues**: 10/10 completed (100%) 🎉
@@ -15,10 +15,11 @@
 - ✅ **Bug Fixes (Backend)**: 6/6 completed (100%) 🎉
 - ✅ **Bug Fixes (Frontend)**: 7/7 completed (100%) 🎉
 - ✅ **Frontend Improvements**: 7/8 completed (87%)
-- ✅ **Bug Fixes (Testing)**: 3/6 completed (50%)
-- 🔨 **Improvements**: 3/40 started
-- 🚀 **New Features**: 2/100 started (Users Edit, Payment Gateway)
-- 🧪 **Testing**: 248 tests passing (900+ assertions)
+- ✅ **Bug Fixes (Testing)**: 6/6 completed (100%) 🎉
+- ✅ **ESLint Errors**: 20/20 fixed (100%) 🎉
+- 🔨 **Improvements**: 10/40 started
+- 🚀 **New Features**: 16/100 started (Users Edit+Export, Payment Gateway, Log Viewer, Notifications, Health, Failed Jobs, Cache/Maintenance, Permission Delete+Filter, User Suspension, Sessions, Activity Log, Auth Event Logging, Query Execution, Table Export)
+- 🧪 **Testing**: 828 tests passing (3987 assertions)
 
 **Completed Sessions**:
 - ✅ Session 1: 5 High Priority Critical Issues (2026-01-22)
@@ -31,17 +32,351 @@
 - ✅ Session 8: 7 Frontend Improvements - Components, error handling, toasts (2026-01-23)
 - ✅ Session 9: Users Edit feature, Admin tests, Upstream merge (2026-01-27)
 - ✅ Session 10: Payment Gateway Package - Multi-provider payment system (2026-01-27)
-- 🎯 **All Critical Issues, Quick Wins, Backend Bugs, Frontend Bugs Complete!**
+- ✅ Session 11: Log Viewer, ESLint fixes, daily logging, seeders (2026-02-13)
+- ✅ Session 12: Admin Notifications, System Health, Failed Jobs, comprehensive tests (2026-02-13)
+- ✅ Session 13: Comprehensive test coverage expansion, Dashboard system stats (2026-02-13)
+- ✅ Session 14: User suspension, 2FA full flow tests, LogViewerService tests, TODO audit (2026-02-14)
+- ✅ Session 15: User sessions management, activity log page, auth event logging (2026-02-14)
+- ✅ Session 16: Query execution, table export, domain exceptions, indexes, N+1 optimizations (2026-02-14)
+- 🎯 **All Critical Issues, Quick Wins, Backend Bugs, Frontend Bugs, ESLint Errors Complete!**
 
 **Recommended Next Steps**:
-1. Add [Tests](#testing) for remaining controllers (Permissions, Database)
-2. Build Admin Dashboard with real stats
-3. Add Activity/Audit logging UI
-4. Consider [New Features](#new-features) based on project needs
+1. Consider [New Features](#new-features) based on project needs
+2. Add [Improvements](#improvements--refactoring) for architecture and code quality
+3. Consider [Security Enhancements](#security-enhancements) for hardening
+4. Add [Performance Optimizations](#performance-optimizations) if needed
 
 ---
 
 ## Recent Progress
+
+### ✅ Completed (2026-02-14)
+
+#### Code Quality, Database Features, Performance - Session 16
+- ✅ **Read-only SQL Query Execution** (`POST /admin/database/query`):
+  - Added `query()` method to `DatabaseController` for admin SQL queries
+  - Whitelist-based approach: only SELECT, SHOW, EXPLAIN, DESCRIBE, PRAGMA allowed
+  - Blocks dangerous patterns: INTO OUTFILE, INTO DUMPFILE, LOAD_FILE
+  - Returns columns, rows (max 1000), timing, truncation flag
+  - Audit logging for all executed queries
+  - 18 tests: auth, SELECT/INSERT/UPDATE/DELETE/DROP rejection, dangerous patterns, EXPLAIN, PRAGMA, validation, empty results
+- ✅ **Table Data Export to CSV** (`GET /admin/database/{connection}/{table}/export`):
+  - Streamed CSV download with chunked processing (1000 rows at a time)
+  - Sensitive column masking (password, etc.) in exports
+  - Audit logging for all exports
+  - 7 tests: auth, CSV content/headers, sensitive masking, 404 for missing tables
+- ✅ **User Model Query Scopes** - 4 Eloquent scopes for User model:
+  - `scopeActive()` - Non-suspended users
+  - `scopeSuspended()` - Suspended users only
+  - `scopeVerified()` - Email-verified users only
+  - `scopeUnverified()` - Unverified users only
+  - 7 tests: each scope, chaining, edge cases
+- ✅ **Domain Exception Classes** - Replaced generic exceptions with domain-specific ones:
+  - `RoleException` (6 static factory methods: cannotCreateSuperAdmin, cannotRenameSuperAdmin, etc.)
+  - `PermissionException` (1 method: cannotDeleteAssignedToRoles)
+  - `UserException` (2 methods: cannotDeleteOwnAccount, cannotSuspendOwnAccount)
+  - Updated RoleService, PermissionService, UserService to use domain exceptions
+  - Updated RolesController, PermissionsController, UsersController catch blocks
+  - Updated RoleServiceInterface contract
+  - Updated RoleServiceTest expectations
+- ✅ **AuditEvent Constants** - Centralized all audit event strings:
+  - Created `app/Constants/AuditEvent.php` with 29 constants
+  - Updated 8 files: LogAuthenticationEvent, UserService, RoleService, PermissionService, ImpersonationService, ActivityController, DatabaseController, PackagesController
+- ✅ **Admin Action Audit Logging** - Added logging to remaining admin controllers:
+  - CacheController: 6 actions (clear cache/views/routes/config/all, maintenance toggle)
+  - FailedJobsController: 4 actions (retry, retryAll, destroy, destroyAll)
+- ✅ **CSP Security Headers** - Content Security Policy support:
+  - Vite nonce integration for script-src
+  - Report-only mode support
+  - Disabled by default (opt-in via `SECURITY_CSP_ENABLED`)
+  - 11 tests: all header types, enable/disable, report-only, nonce validation
+- ✅ **Performance Indexes Migration** - Added missing database indexes:
+  - `audit_logs.event` - For event type filtering
+  - `users.suspended_at` - For scope queries
+  - `users.created_at` - For admin listing
+  - `notifications.read_at` - For unread filtering
+  - `notifications.created_at` - For ordering
+- ✅ **N+1 Query Optimizations**:
+  - RoleRepository: Added `withCount('users')` to avoid per-role COUNT queries
+  - RoleService: Uses `users_count` attribute from withCount
+  - PermissionService: Changed `->roles()->count()` to `->roles->count()` (uses loaded collection)
+
+**Files Created**: 8
+- `app/Constants/AuditEvent.php`
+- `app/Exceptions/RoleException.php`
+- `app/Exceptions/PermissionException.php`
+- `app/Exceptions/UserException.php`
+- `tests/Feature/SecurityHeadersTest.php`
+- `tests/Unit/UserScopeTest.php`
+- `database/migrations/2026_02_14_085701_add_performance_indexes.php`
+
+**Files Modified**: 20
+- `app/Http/Controllers/Admin/DatabaseController.php` - Query execution + export methods
+- `app/Http/Controllers/Admin/CacheController.php` - Audit logging
+- `app/Http/Controllers/Admin/FailedJobsController.php` - Audit logging
+- `app/Http/Controllers/Admin/PackagesController.php` - AuditEvent constants
+- `app/Http/Controllers/Admin/RolesController.php` - RoleException catch blocks
+- `app/Http/Controllers/Admin/PermissionsController.php` - PermissionException catch blocks
+- `app/Http/Controllers/Admin/UsersController.php` - UserException catch blocks
+- `app/Http/Controllers/Settings/ActivityController.php` - AuditEvent constants
+- `app/Http/Middleware/SecurityHeaders.php` - CSP headers with Vite nonce
+- `app/Listeners/LogAuthenticationEvent.php` - AuditEvent constants, FK safety
+- `app/Models/User.php` - 4 query scopes
+- `app/Services/RoleService.php` - RoleException, AuditEvent constants
+- `app/Services/PermissionService.php` - PermissionException, N+1 fix
+- `app/Services/UserService.php` - UserException, AuditEvent constants
+- `app/Services/ImpersonationService.php` - AuditEvent constants
+- `app/Contracts/Services/RoleServiceInterface.php` - RoleException reference
+- `app/Repositories/RoleRepository.php` - withCount('users')
+- `config/security.php` - CSP configuration
+- `routes/web.php` - Query + export routes
+- `tests/Feature/Admin/DatabaseControllerTest.php` - 26 new tests
+
+**Tests**: 828 passed (3987 assertions), 24 pre-existing failures in global-settings package
+
+#### User Sessions, Activity Log, Auth Event Logging - Session 15
+- ✅ **User Sessions Management** (`/settings/sessions`) - View and revoke active sessions:
+  - Created `SessionsController` with index, destroy (individual), destroyAll (bulk)
+  - Regex-based UA parsing (browser, platform, desktop/mobile detection)
+  - Password confirmation required for all destructive actions
+  - Sessions scoped to authenticated user only
+  - Created `Sessions.vue` with device icons, "This device" badge, IP, last active time
+  - Revoke individual sessions with password confirmation dialog
+  - "Log out other browser sessions" bulk action
+  - Added to settings sidebar with Monitor icon
+  - 23 tests (235 assertions): guest access, session listing, UA parsing (Chrome/Linux, Firefox/Windows, Safari/macOS, iOS, Edge, unknown), revoke, bulk revoke, user isolation
+- ✅ **Authentication Event Logging** - Automatic audit trail for auth events:
+  - Created `LogAuthenticationEvent` listener with `ShouldHandleEventsAfterCommit`
+  - Handles 6 events: Login, Logout, Registered, PasswordReset, Verified, Failed
+  - Graceful handling of deleted users in logout events (FK safety)
+  - Registered event listeners in `AppServiceProvider`
+  - Added audit logging to `UserService`: profile updates (with old/new values), password changes, account deletion
+  - 9 tests (25 assertions): all 6 auth events, profile update, password change, account deletion
+- ✅ **User Activity Log** (`/settings/activity`) - View personal activity history:
+  - Created `ActivityController` with paginated audit logs for authenticated user
+  - Human-readable event descriptions via match expression (11 event types)
+  - Created `Activity.vue` with per-event icons and color coding
+  - Pagination with prev/next navigation, empty state
+  - Added to settings sidebar with Activity icon
+  - 10 tests (110 assertions): guest access, log display, user isolation, ordering, field structure, descriptions, pagination, empty state
+
+**Files Created**: 6
+- `app/Http/Controllers/Settings/SessionsController.php`
+- `resources/js/pages/settings/Sessions.vue`
+- `app/Listeners/LogAuthenticationEvent.php`
+- `app/Http/Controllers/Settings/ActivityController.php`
+- `resources/js/pages/settings/Activity.vue`
+- `tests/Feature/Settings/SessionsControllerTest.php`
+- `tests/Feature/Settings/ActivityControllerTest.php`
+- `tests/Feature/Auth/AuthEventLoggingTest.php`
+
+**Files Modified**: 4
+- `routes/settings.php` - Added sessions and activity routes
+- `resources/js/layouts/settings/Layout.vue` - Added Sessions and Activity nav items
+- `app/Providers/AppServiceProvider.php` - Registered 6 auth event listeners
+- `app/Services/UserService.php` - Added audit logging to profile/password/delete
+
+**Tests**: 784 passed (3886 assertions), 24 pre-existing failures in global-settings package
+
+#### User Suspension, 2FA Tests, LogViewerService Tests - Session 14
+- ✅ **User Suspension Feature** - Full user account suspension system:
+  - Migration: `suspended_at` (datetime) and `suspended_reason` (text) columns on users table
+  - User model: Added `isSuspended()` method, fillable fields, casts
+  - `EnsureUserIsNotSuspended` middleware: Logs out suspended users and redirects to login
+  - Middleware registered in `bootstrap/app.php` web middleware stack
+  - `UserService`: Added `suspend()` and `unsuspend()` methods with audit logging
+  - `UsersController`: Added `suspend` and `unsuspend` actions
+  - Routes: POST `admin.users.suspend` and `admin.users.unsuspend`
+  - Users/Index.vue: Shows "Suspended" badge on suspended users
+  - Users/Edit.vue: Suspension panel with reason input, suspend/unsuspend buttons
+  - 11 new tests: auth, suspend, unsuspend, self-suspension prevention, audit logs, middleware
+- ✅ **2FA Full Flow Integration Test** - 21 tests (77 assertions):
+  - Enable 2FA, get QR code, get secret key, get recovery codes
+  - Confirm with valid/invalid TOTP code
+  - Full login flow: credentials → challenge → TOTP code → authenticated
+  - Login with recovery code, invalid code/recovery code failures
+  - Regenerate recovery codes, disable 2FA
+  - Guest access prevention (5 auth tests)
+  - Password confirmation requirement checks
+  - Idempotent enable and force-enable with new secret
+- ✅ **LogViewerService Unit Tests** - 39 tests (108 assertions):
+  - Parsing: single-line, multi-line with stack traces
+  - Filtering: by level (case-insensitive), by search in messages/context
+  - Log file listing: single, daily, size/lastModified, non-log exclusion
+  - Pagination: pages, partial last page, beyond last page clamping
+  - Path traversal protection, filename pattern validation
+  - Response structure, entry fields, ordering (newest first), sequential IDs
+  - Context splitting (JSON/array/null), timestamp parsing, default per_page
+- ✅ **TODO Audit** - Marked already-completed items:
+  - RoleService and PermissionService (architecture section)
+  - AuditLogService (architecture section)
+  - Unit tests for RoleService, PermissionService, ImpersonationService, AuditLogService
+
+**Files Created**: 3
+- `tests/Feature/Auth/TwoFactorFullFlowTest.php`
+- `tests/Unit/Services/LogViewerServiceTest.php`
+- `database/migrations/2026_02_14_075723_add_suspension_fields_to_users_table.php`
+- `app/Http/Middleware/EnsureUserIsNotSuspended.php`
+
+**Files Modified**: 8
+- `app/Models/User.php` - Added suspension fields, isSuspended method
+- `bootstrap/app.php` - Registered EnsureUserIsNotSuspended middleware
+- `app/Contracts/Services/UserServiceInterface.php` - Added suspend/unsuspend
+- `app/Services/UserService.php` - Added suspend/unsuspend methods
+- `app/Http/Controllers/Admin/UsersController.php` - Added suspend/unsuspend actions, suspension data in edit/index
+- `routes/web.php` - Added suspend/unsuspend routes
+- `resources/js/pages/admin/Users/Index.vue` - Suspension badge
+- `resources/js/pages/admin/Users/Edit.vue` - Suspension panel with suspend/unsuspend UI
+- `tests/Feature/Admin/UsersControllerTest.php` - Added 11 suspension tests
+
+**Tests**: 742 passed (3516 assertions), 24 pre-existing failures in global-settings package
+
+---
+
+### ✅ Completed (2026-02-13)
+
+#### Comprehensive Tests, Features & Improvements - Session 13
+- ✅ **Permission Delete** - Full delete flow:
+  - Added `delete()` to PermissionService with role assignment check
+  - Added `destroy()` to PermissionsController with error handling
+  - Added DELETE route `admin.permissions.destroy`
+  - Updated Edit.vue from `alert()` to proper confirm + `router.delete()`
+  - 5 new tests: auth, deletion, role-assigned prevention, audit logging
+- ✅ **Permission Group Filter** - Filter permissions by group:
+  - Added group filter parameter to repository, service, and controller
+  - Added `getGroupNames()` to fetch distinct groups
+  - Added group dropdown filter on Permissions Index page
+  - 3 new tests: groups list, filter by group, filter preservation
+- ✅ **User Export to CSV** - Export user list as CSV:
+  - Added `export()` to UsersController with streamed CSV download
+  - Added `getAllForExport()` to UserService
+  - Added export route `admin.users.export`
+  - Added "Export CSV" button on Users Index page
+  - 5 new tests: auth, CSV content, roles in export, filename format
+- ✅ **AppearanceController Tests** - 7 tests (17 assertions): Theme page rendering, auth, method restrictions
+- ✅ **AboutController Tests** - 7 tests (45 assertions): Page rendering, auth, route validation
+- ✅ **AdminDashboardTest Enhancement** - 3 new tests: systemStats prop structure, types, admin role access (12 total)
+- ✅ **QuickLoginTest** - 7 tests (12 assertions): Route availability in non-local env, named routes
+- ✅ **ModulesControllerTest** - 7 tests (39 assertions): Auth, rendering, Horizon module entry
+- ✅ **DashboardControllerTest** - 9 tests (18 assertions): Auth, verified users, method restrictions
+- ✅ **WelcomePageTest** - 7 tests (52 assertions): Page rendering, canRegister prop, guest/auth access
+- ✅ **Integration test audit** - Marked existing tests as covering integration flows
+
+**Files Created**: 5
+- `tests/Feature/QuickLoginTest.php`
+- `tests/Feature/Admin/ModulesControllerTest.php`
+- `tests/Feature/DashboardControllerTest.php`
+- `tests/Feature/WelcomePageTest.php`
+- `tests/Feature/Settings/AppearanceControllerTest.php`
+
+**Files Modified**: 12
+- `app/Http/Controllers/Admin/PermissionsController.php` - Added destroy, group filter
+- `app/Contracts/Services/PermissionServiceInterface.php` - Added delete, getGroupNames, group param
+- `app/Services/PermissionService.php` - Added delete, getGroupNames methods
+- `app/Contracts/Repositories/PermissionRepositoryInterface.php` - Added group filter, getGroupNames
+- `app/Repositories/PermissionRepository.php` - Added group filter, getGroupNames
+- `resources/js/pages/admin/Permissions/Index.vue` - Added group filter dropdown
+- `resources/js/pages/admin/Permissions/Edit.vue` - Fixed delete to use router.delete
+- `app/Http/Controllers/Admin/UsersController.php` - Added export method
+- `app/Contracts/Services/UserServiceInterface.php` - Added getAllForExport
+- `app/Services/UserService.php` - Added getAllForExport
+- `resources/js/pages/admin/Users/Index.vue` - Added Export CSV button
+- `routes/web.php` - Added permissions.destroy and users.export routes
+- `tests/Feature/Admin/AdminDashboardTest.php` - Added systemStats tests
+- `tests/Feature/Admin/PermissionsControllerTest.php` - Added 8 delete + group filter tests
+- `tests/Feature/Admin/UsersControllerTest.php` - Added 5 export tests
+
+**Tests**: 671 passed (3270 assertions), 24 pre-existing failures in global-settings package
+
+#### Admin Notifications, System Health, Failed Jobs, Tests - Session 12
+- ✅ **Admin Notifications Page** (`/admin/notifications`) - Admin notification management page
+- ✅ **System Health Page** (`/admin/health`) - System health dashboard:
+  - Created `HealthController` with 5 health checks: Database, Cache, Storage, Queue, Scheduler
+  - Database query driver-aware (SQLite, MySQL, PostgreSQL)
+  - Shows system info (PHP version, Laravel version, environment, debug mode)
+  - Created `Health/Index.vue` with color-coded health status cards and system info
+  - Added "System Health" to admin sidebar under System group
+  - 13 tests passing (auth, health check structure, status validation, system info)
+- ✅ **Failed Jobs Viewer** (`/admin/failed-jobs`) - Full failed queue job management:
+  - Created `FailedJobsController` with index, show, retry, retryAll, destroy, destroyAll
+  - Index page with search, queue filter, stats cards, data table, pagination
+  - Show page with job info, exception trace, formatted payload
+  - Retry/delete individual jobs or bulk retry-all/flush-all
+  - 18 tests passing (auth, CRUD, search, filtering, job name extraction)
+- ✅ **PermissionsController Tests** - 24 tests (137 assertions):
+  - Full CRUD coverage, authorization, validation, search, pagination
+- ✅ **DatabaseController Tests** - 48 tests (652 assertions):
+  - All 5 database routes covered, auth, table views, data masking, audit logging
+- ✅ **HealthController Tests** - 13 tests covering all health check endpoints
+- ✅ **FailedJobsController Tests** - 18 tests covering all failed job operations
+- ✅ **Cache & Maintenance Page** (`/admin/cache`) - Combined cache management and maintenance mode:
+  - Created `CacheController` with clear cache/views/routes/config/all, maintenance toggle
+  - Cache stats for database driver (item count, expired, active)
+  - Cache item browser showing keys, sizes, expiration times
+  - Maintenance mode toggle with optional secret bypass
+  - 18 tests passing (auth, cache clearing, maintenance toggle)
+- ✅ **CookieConsentController Tests** - 52 tests (147 assertions):
+  - Guest/authenticated consent flows, accept/reject/custom preferences
+  - Validation, session/database persistence, audit logging, edge cases
+
+**Files Created**: 12
+- `app/Http/Controllers/Admin/HealthController.php`
+- `resources/js/pages/admin/Health/Index.vue`
+- `app/Http/Controllers/Admin/FailedJobsController.php`
+- `resources/js/pages/admin/FailedJobs/Index.vue`
+- `resources/js/pages/admin/FailedJobs/Show.vue`
+- `app/Http/Controllers/Admin/CacheController.php`
+- `resources/js/pages/admin/Cache/Index.vue`
+- `tests/Feature/Admin/HealthControllerTest.php`
+- `tests/Feature/Admin/DatabaseControllerTest.php`
+- `tests/Feature/Admin/FailedJobsControllerTest.php`
+- `tests/Feature/Admin/CacheControllerTest.php`
+- `tests/Feature/CookieConsentControllerTest.php`
+
+**Files Modified**: 3
+- `resources/js/components/AdminSidebar.vue` - Added Health, Failed Jobs, Cache nav items
+- `routes/web.php` - Added health, failed-jobs, and cache routes
+
+**Tests**: 583 passed (3007 assertions), 24 pre-existing failures in global-settings package
+
+#### Log Viewer, ESLint Fixes, Daily Logging, Seeders - Session 11
+- ✅ **Application Log Viewer** (`/admin/logs`) - Full admin log viewer page:
+  - Created `LogViewerService` with streaming file parsing (handles large files via `fseek`/`fgets`, max 10MB read)
+  - Supports single (`laravel.log`) and daily (`laravel-YYYY-MM-DD.log`) log files
+  - Created `LogsController` with search, level filter, file selector, and pagination
+  - Created `Logs/Index.vue` with color-coded log levels, expandable stack traces, search, and filters
+  - Added "Application Logs" to admin sidebar under System group
+  - Path traversal protection in log file resolution
+  - 11 tests passing (auth, rendering, filtering, search, file listing, path traversal)
+- ✅ **Fixed all 20 ESLint errors** across 16 files:
+  - Removed unused imports (`router`, `Trash2`, `Building2`, `Pause`, `Edit`, `Link`, `UserPlus`)
+  - Removed unused `const props =` assignments (changed to bare `defineProps<>()`)
+  - Fixed `vue/no-dupe-keys` in `Roles/Edit.vue` (renamed `permissions` route import to `permissionsRoute`)
+  - Removed unused computed `_someSelected` in `CheckboxGroup.vue`
+  - Fixed unused destructured var in `useErrorHandler.ts` (switched to `Object.values()`)
+- ✅ **Switched logging to daily channel** - Changed `LOG_STACK` default from `single` to `daily` in `config/logging.php`
+- ✅ **Added production-safe seeders**:
+  - Added `LanguageSeeder` to `DatabaseSeeder` (10 languages with English as default)
+  - Created `SubscriptionListSeeder` with 4 default lists (Newsletter, Product Updates, Promotions, Beta Testers)
+  - Both use `class_exists` guards and `updateOrCreate` for idempotency
+
+**Files Created**: 5
+- `app/Services/LogViewerService.php`
+- `app/Http/Controllers/Admin/LogsController.php`
+- `resources/js/pages/admin/Logs/Index.vue`
+- `tests/Feature/Admin/LogsControllerTest.php`
+- `database/seeders/SubscriptionListSeeder.php`
+
+**Files Modified**: 18
+- `routes/web.php` - Added logs route
+- `resources/js/components/AdminSidebar.vue` - Added Application Logs nav item
+- `config/logging.php` - Switched default to daily
+- `database/seeders/DatabaseSeeder.php` - Added LanguageSeeder + SubscriptionListSeeder
+- 14 Vue/TS files with ESLint fixes
+
+**Tests**: 259 passed (11 new log viewer tests)
+
+---
 
 ### ✅ Completed (2026-01-27)
 
@@ -545,9 +880,9 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 - [x] **Add tests for Admin/SettingsController** ✅ - 29 tests (136 assertions) - Full CRUD + bulk update
 - [x] **Add tests for Admin/UsersController** ✅ - 33 tests (162 assertions) - Full CRUD + authorization
 - [x] **Add tests for Admin/RolesController** ✅ - Tests added for role management
-- [ ] **Add tests for Admin/PermissionsController** - No tests exist for permission management
-- [ ] **Add tests for Admin/DatabaseController** - No tests exist for database browser
-- [ ] **Add tests for CookieConsentController** - Test all consent scenarios
+- [x] **Add tests for Admin/PermissionsController** ✅ - 24 tests (137 assertions) - Full CRUD + authorization (Session 12)
+- [x] **Add tests for Admin/DatabaseController** ✅ - 48 tests (652 assertions) - All views, actions, data masking (Session 12)
+- [x] **Add tests for CookieConsentController** ✅ - 52 tests (147 assertions) - All consent scenarios (Session 12)
 
 ---
 
@@ -558,17 +893,17 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 - [x] **Extract impersonation to dedicated service** ✅ - Moved logic from controller to `ImpersonationService`
 - [x] **Create SettingsService** ✅ - Extracted settings logic from repository to service layer
 - [x] **Add SettingsRepositoryInterface** ✅ - Interface already existed
-- [ ] **Create RoleService and PermissionService** - Add service layer for role/permission management
-- [ ] **Add audit log service** - Centralized audit logging for sensitive operations
+- [x] **Create RoleService and PermissionService** ✅ - Both services exist with full CRUD, audit logging, and unit tests
+- [x] **Add audit log service** ✅ - `AuditLogService` exists with filtered pagination, event types, and unit tests
 - [ ] **Extract 2FA logic to dedicated action** - Move 2FA setup/verification to actions
 
 ### Code Quality
 
 - [ ] **Add PHPDoc blocks to all public methods** - Improve code documentation
 - [ ] **Add type hints to config files** - Use typed arrays where possible
-- [ ] **Extract magic strings to constants** - Create constants for repeated strings
+- [x] **Extract magic strings to constants** ✅ - Created `AuditEvent` constants class with 29 constants, updated 8 files (Session 16)
 - [ ] **Add validation rules to dedicated classes** - Extract complex validation to rule classes
-- [ ] **Standardize exception handling** - Create custom exceptions for domain-specific errors
+- [x] **Standardize exception handling** ✅ - Created `RoleException`, `PermissionException`, `UserException` with static factory methods (Session 16)
 - [ ] **Add request DTOs** - Consider Data Transfer Objects for complex requests
 
 ### Repository Pattern
@@ -576,7 +911,7 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 - [ ] **Add pagination helper** - Standardize pagination across repositories
 - [ ] **Add sorting helper** - Standardize sorting across repositories
 - [ ] **Add filtering helper** - Standardize filtering across repositories
-- [ ] **Add scope methods** - Common query scopes (active, verified, etc.)
+- [x] **Add scope methods** ✅ - Added `scopeActive`, `scopeSuspended`, `scopeVerified`, `scopeUnverified` to User model (Session 16)
 - [ ] **Add repository caching documentation** - Document how to use caching effectively
 
 ### Frontend ✅ 7 COMPLETED
@@ -606,29 +941,29 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 ### User Management
 
 - [ ] **User profile pictures** - Add avatar upload functionality
-- [ ] **User activity log** - Track user actions (login, profile changes, etc.)
-- [ ] **User export** - Export user list to CSV/Excel
+- [x] **User activity log** ✅ - Activity log page at `/settings/activity` with paginated audit trail, event icons, human-readable descriptions (Session 15)
+- [x] **User export** ✅ - Export user list to CSV with roles, dates, verification status (Session 13)
 - [ ] **User import** - Bulk import users from CSV
-- [ ] **User suspension** - Temporarily disable user accounts
+- [x] **User suspension** ✅ - Suspend/unsuspend user accounts with reason, middleware auto-logout, audit logging (Session 14)
 - [ ] **User notes** - Admin notes on user accounts
-- [ ] **User sessions management** - View and revoke active sessions
+- [x] **User sessions management** ✅ - View and revoke active sessions at `/settings/sessions` with UA parsing, password confirmation (Session 15)
 - [ ] **Password expiry** - Force password changes after X days
 - [ ] **User groups** - Group users beyond roles
 
 ### Admin Panel
 
 - [ ] **Activity dashboard** - System activity overview on admin dashboard
-- [ ] **System health checks** - Database, cache, queue status
-- [ ] **Failed jobs viewer** - View and retry failed queue jobs
+- [x] **System health checks** ✅ - Created `/admin/health` with database, cache, storage, queue, scheduler checks (Session 12)
+- [x] **Failed jobs viewer** ✅ - Created `/admin/failed-jobs` with search, filter, retry, delete (Session 12)
 - [ ] **Email logs viewer** - View sent emails (requires mail logger)
-- [ ] **Cache management UI** - Clear specific cache keys
-- [ ] **Maintenance mode toggle** - Enable/disable maintenance mode from UI
+- [x] **Cache management UI** ✅ - Created `/admin/cache` with cache stats, clear actions, item browser (Session 12)
+- [x] **Maintenance mode toggle** ✅ - Integrated into `/admin/cache` with secret bypass support (Session 12)
 - [ ] **Backup management** - Create and restore database backups
-- [ ] **System logs viewer** - View Laravel logs from UI (integrate with Pail)
+- [x] **System logs viewer** ✅ - Created `/admin/logs` with search, filtering, daily file support (Session 11)
 
 ### Roles & Permissions
 
-- [ ] **Permission categories** - Group permissions by module
+- [x] **Permission categories** ✅ - Group filter on Permissions Index, group_name in Create/Edit (Session 13)
 - [ ] **Role templates** - Pre-defined role configurations
 - [ ] **Permission inheritance** - Roles can inherit from other roles
 - [ ] **Permission testing tool** - Test if user has permission
@@ -646,8 +981,8 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 
 ### Database Browser
 
-- [ ] **Query execution** - Allow admins to run read-only SQL queries
-- [ ] **Table export** - Export table data to CSV/Excel
+- [x] **Query execution** ✅ - Read-only SQL query execution with whitelist, dangerous pattern blocking, audit logging (Session 16)
+- [x] **Table export** ✅ - Streamed CSV export with chunked processing, sensitive column masking, audit logging (Session 16)
 - [ ] **Record editing** - Edit individual records from browser
 - [ ] **Table search** - Search within table data
 - [ ] **Relationship viewer** - Visualize table relationships
@@ -737,11 +1072,12 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 
 ### Unit Tests Needed
 
-- [ ] **SettingRepository tests** - Test settings CRUD operations
-- [ ] **SettingService tests** - Once service is created
-- [ ] **RoleService tests** - Once service is created
-- [ ] **PermissionService tests** - Once service is created
-- [ ] **ImpersonationService tests** - Once service is created
+- [ ] **SettingRepository tests** - Test settings CRUD operations (lives in global-settings package)
+- [ ] **SettingService tests** - Lives in global-settings package
+- [x] **RoleService tests** ✅ - 15 tests covering CRUD, super-admin protection, permissions (Session 14)
+- [x] **PermissionService tests** ✅ - 10 tests covering CRUD, grouping, search, edit (Session 14)
+- [x] **ImpersonationService tests** ✅ - 18 tests covering start/stop, audit, session, search (Session 14)
+- [x] **AuditLogService tests** ✅ - 5 tests covering filtered pagination, event types, recent (Session 14)
 - [ ] **CookieConsent helper tests** - Test consent checking logic
 
 ### Feature Tests Needed
@@ -749,22 +1085,23 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 - [x] **Admin/SettingsController** ✅ - 29 tests (Full CRUD and bulk update)
 - [x] **Admin/UsersController** ✅ - 33 tests (Full CRUD and authorization)
 - [x] **Admin/RolesController** ✅ - Tests added for CRUD operations
-- [ ] **Admin/PermissionsController** - CRUD operations
-- [ ] **Admin/DatabaseController** - All views and actions
-- [ ] **CookieConsentController** - All consent scenarios
-- [ ] **Settings/AppearanceController** - Theme switching
-- [ ] **AboutController** - Page rendering
-- [ ] **Quick login flow** - Development feature
+- [x] **Admin/PermissionsController** ✅ - 24 tests (137 assertions) - Full CRUD + authorization (Session 12)
+- [x] **Admin/DatabaseController** ✅ - 48 tests (652 assertions) - All views, actions, data masking (Session 12)
+- [x] **CookieConsentController** ✅ - 52 tests (147 assertions) - All consent scenarios (Session 12)
+- [x] **Admin/CacheController** ✅ - 18 tests (97 assertions) - Cache management + maintenance (Session 12)
+- [x] **Settings/AppearanceController** ✅ - 7 tests (17 assertions) - Theme switching (Session 13)
+- [x] **AboutController** ✅ - 7 tests (45 assertions) - Page rendering (Session 13)
+- [x] **Quick login flow** ✅ - 7 tests (12 assertions) - Route availability validation (Session 13)
 - [x] **Impersonation flow** ✅ - 8 tests (Start, use, stop impersonation)
 
 ### Integration Tests Needed
 
-- [ ] **Role and permission assignment** - Test full flow
-- [ ] **User creation with roles** - Test admin user creation
-- [ ] **Settings persistence** - Test setting changes persist
-- [ ] **Cookie consent flow** - Guest and authenticated
-- [ ] **2FA full flow** - Setup, use, recovery
-- [ ] **Email verification flow** - Complete flow test
+- [x] **Role and permission assignment** ✅ - Covered by RolePermissionsTest (17 tests) and UserPermissionsTest (15 tests)
+- [x] **User creation with roles** ✅ - Covered by UsersControllerTest (33 tests)
+- [x] **Settings persistence** ✅ - Covered by SettingsControllerTest (29 tests)
+- [x] **Cookie consent flow** ✅ - Covered by CookieConsentControllerTest (52 tests)
+- [x] **2FA full flow** ✅ - 21 tests covering setup, TOTP login, recovery codes, disable (Session 14)
+- [x] **Email verification flow** ✅ - Covered by EmailVerificationTest and VerificationNotificationTest
 
 ### Browser Tests (Dusk)
 
@@ -822,8 +1159,8 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 
 ### Backend
 
-- [ ] **Add database indexes** - Audit queries and add missing indexes
-- [ ] **Optimize N+1 queries** - Audit for N+1 and add eager loading
+- [x] **Add database indexes** ✅ - Added indexes on audit_logs.event, users.suspended_at, users.created_at, notifications.read_at, notifications.created_at (Session 16)
+- [x] **Optimize N+1 queries** ✅ - Added withCount('users') to RoleRepository, fixed PermissionService to use loaded collection (Session 16)
 - [ ] **Add query caching** - Cache expensive queries
 - [ ] **Optimize settings queries** - Cache settings in memory
 - [ ] **Add response caching** - Cache public pages
@@ -875,15 +1212,15 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 - [ ] **Add encryption for sensitive settings** - Encrypt sensitive values
 - [ ] **Add database encryption** - Encrypt sensitive columns
 - [ ] **Add secure file uploads** - Validate and sanitize uploads
-- [ ] **Add XSS protection** - Content Security Policy headers
+- [x] **Add XSS protection** ✅ - CSP headers with Vite nonce, report-only mode, disabled by default (Session 16)
 - [ ] **Add SQL injection protection audit** - Review all raw queries
 - [ ] **Add CSRF token refresh** - Refresh tokens periodically
 
 ### Auditing
 
-- [ ] **Add comprehensive audit logging** - Log all sensitive operations
-- [ ] **Add admin action logging** - Track all admin actions
-- [ ] **Add login history** - Store login attempts and locations
+- [x] **Add comprehensive audit logging** ✅ - Auth events, profile changes, password changes, account deletion, impersonation all logged via AuditLog (Session 15)
+- [x] **Add admin action logging** ✅ - Added audit logging to CacheController (6 actions) and FailedJobsController (4 actions) (Session 16)
+- [x] **Add login history** ✅ - Auth event logging captures login, logout, failed login with IP and user agent (Session 15)
 - [ ] **Add data access logging** - GDPR compliance logging
 - [ ] **Add security event alerting** - Alert admins on security events
 
@@ -896,7 +1233,7 @@ These are easy-to-implement items that provide immediate value. Great for gettin
 - [ ] **Add Laravel Telescope** - Debugging and insights (dev only)
 - [ ] **Add Laravel IDE Helper** - Better IDE autocomplete
 - [ ] **Add pre-commit hooks** - Run Pint and tests before commit
-- [ ] **Add GitHub Actions CI/CD** - Automated testing and deployment
+- [x] **Add GitHub Actions CI/CD** ✅ - Already has ci.yml, tests.yml, and lint.yml workflows
 - [ ] **Add Docker support** - Docker Compose for local development
 - [ ] **Add database seeders for testing** - Rich test data
 - [ ] **Add factory states** - More factory variations
@@ -995,7 +1332,7 @@ When working on items from this TODO:
 
 ---
 
-**Document Version**: 1.3.0
-**Last Reviewed**: 2026-01-27
-**Sessions Completed**: 10 (53+ items resolved)
-**Test Coverage**: 248 tests passing (900+ assertions)
+**Document Version**: 1.8.0
+**Last Reviewed**: 2026-02-14
+**Sessions Completed**: 16 (100+ items resolved)
+**Test Coverage**: 828 tests passing (3987 assertions)

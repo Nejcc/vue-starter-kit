@@ -151,7 +151,11 @@ watch(
                 class="relative flex w-auto flex-col items-center justify-center space-y-5"
             >
                 <template v-if="!showVerificationStep">
-                    <AlertMessage v-if="errors?.length" :messages="errors" title="Something went wrong." />
+                    <AlertMessage
+                        v-if="errors?.length"
+                        :messages="errors"
+                        title="Something went wrong."
+                    />
                     <template v-else>
                         <div
                             class="relative mx-auto flex max-w-md items-center overflow-hidden"

@@ -21,12 +21,32 @@ export function usePaymentNav(): ModuleNav {
         title: 'Payments',
         icon: CreditCard,
         items: [
-            { title: 'Dashboard', href: '/admin/payments', icon: LayoutDashboard },
-            { title: 'Transactions', href: '/admin/payments/transactions', icon: ArrowLeftRight },
-            { title: 'Subscriptions', href: '/admin/payments/subscriptions', icon: RefreshCw },
-            { title: 'Customers', href: '/admin/payments/customers', icon: Users },
+            {
+                title: 'Dashboard',
+                href: '/admin/payments',
+                icon: LayoutDashboard,
+            },
+            {
+                title: 'Transactions',
+                href: '/admin/payments/transactions',
+                icon: ArrowLeftRight,
+            },
+            {
+                title: 'Subscriptions',
+                href: '/admin/payments/subscriptions',
+                icon: RefreshCw,
+            },
+            {
+                title: 'Customers',
+                href: '/admin/payments/customers',
+                icon: Users,
+            },
             { title: 'Plans', href: '/admin/payments/plans', icon: ListChecks },
-            { title: 'Invoices', href: '/admin/payments/invoices', icon: FileText },
+            {
+                title: 'Invoices',
+                href: '/admin/payments/invoices',
+                icon: FileText,
+            },
         ],
     };
 }

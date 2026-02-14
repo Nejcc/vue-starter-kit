@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Contracts\Services\RoleServiceInterface;
+use App\Exceptions\RoleException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRoleRequest;
 use App\Http\Requests\Admin\SyncRolePermissionsRequest;
@@ -14,7 +15,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use InvalidArgumentException;
 
 final class RolesController extends Controller
 {
@@ -53,7 +53,7 @@ final class RolesController extends Controller
     {
         try {
             $this->roleService->create($request->validated());
-        } catch (InvalidArgumentException $e) {
+        } catch (RoleException $e) {
             return redirect()->route('admin.roles.create')
                 ->withErrors(['name' => $e->getMessage()]);
         }
@@ -79,7 +79,7 @@ final class RolesController extends Controller
     {
         try {
             $this->roleService->update($role, $request->validated());
-        } catch (InvalidArgumentException $e) {
+        } catch (RoleException $e) {
             return redirect()->route('admin.roles.edit', $role)
                 ->withErrors(['name' => $e->getMessage()]);
         }
@@ -94,7 +94,7 @@ final class RolesController extends Controller
     {
         try {
             $this->roleService->delete($role);
-        } catch (InvalidArgumentException $e) {
+        } catch (RoleException $e) {
             if (str_contains($e->getMessage(), 'assigned to')) {
                 return redirect()->route('admin.roles.index')
                     ->withErrors(['role_deletion' => $e->getMessage()]);
@@ -119,7 +119,7 @@ final class RolesController extends Controller
     {
         try {
             $this->roleService->syncPermissions($role, $request->validated());
-        } catch (InvalidArgumentException $e) {
+        } catch (RoleException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
 

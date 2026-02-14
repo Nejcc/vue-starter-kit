@@ -80,15 +80,50 @@ const breadcrumbItems: BreadcrumbItem[] = [
     { title: 'Application Logs', href: '#' },
 ];
 
-const levelConfig: Record<string, { icon: Component; color: string; bg: string }> = {
-    EMERGENCY: { icon: OctagonAlert, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-950' },
-    ALERT: { icon: OctagonAlert, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-950' },
-    CRITICAL: { icon: XCircle, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-950' },
-    ERROR: { icon: XCircle, color: 'text-red-500 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-950/50' },
-    WARNING: { icon: AlertTriangle, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-950/50' },
-    NOTICE: { icon: Info, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/50' },
-    INFO: { icon: Info, color: 'text-blue-500 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/50' },
-    DEBUG: { icon: ScrollText, color: 'text-gray-500 dark:text-gray-400', bg: 'bg-gray-50 dark:bg-gray-900' },
+const levelConfig: Record<
+    string,
+    { icon: Component; color: string; bg: string }
+> = {
+    EMERGENCY: {
+        icon: OctagonAlert,
+        color: 'text-red-600 dark:text-red-400',
+        bg: 'bg-red-100 dark:bg-red-950',
+    },
+    ALERT: {
+        icon: OctagonAlert,
+        color: 'text-red-600 dark:text-red-400',
+        bg: 'bg-red-100 dark:bg-red-950',
+    },
+    CRITICAL: {
+        icon: XCircle,
+        color: 'text-red-600 dark:text-red-400',
+        bg: 'bg-red-100 dark:bg-red-950',
+    },
+    ERROR: {
+        icon: XCircle,
+        color: 'text-red-500 dark:text-red-400',
+        bg: 'bg-red-50 dark:bg-red-950/50',
+    },
+    WARNING: {
+        icon: AlertTriangle,
+        color: 'text-yellow-600 dark:text-yellow-400',
+        bg: 'bg-yellow-50 dark:bg-yellow-950/50',
+    },
+    NOTICE: {
+        icon: Info,
+        color: 'text-blue-600 dark:text-blue-400',
+        bg: 'bg-blue-50 dark:bg-blue-950/50',
+    },
+    INFO: {
+        icon: Info,
+        color: 'text-blue-500 dark:text-blue-400',
+        bg: 'bg-blue-50 dark:bg-blue-950/50',
+    },
+    DEBUG: {
+        icon: ScrollText,
+        color: 'text-gray-500 dark:text-gray-400',
+        bg: 'bg-gray-50 dark:bg-gray-900',
+    },
 };
 
 function getLevelConfig(level: string) {
@@ -106,8 +141,18 @@ function applyFilter(type: 'level' | 'file', value: string): void {
         routeUrl,
         {
             search: searchQuery.value || null,
-            level: type === 'level' ? (value === 'all' ? null : value) : selectedLevel.value || null,
-            file: type === 'file' ? (value === 'all' ? null : value) : selectedFile.value || null,
+            level:
+                type === 'level'
+                    ? value === 'all'
+                        ? null
+                        : value
+                    : selectedLevel.value || null,
+            file:
+                type === 'file'
+                    ? value === 'all'
+                        ? null
+                        : value
+                    : selectedFile.value || null,
         },
         { preserveState: true, preserveScroll: true },
     );
@@ -136,7 +181,8 @@ function formatBytes(bytes: number): string {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
-const hasFilters = props.filters.search || props.filters.level || props.filters.file;
+const hasFilters =
+    props.filters.search || props.filters.level || props.filters.file;
 </script>
 
 <template>
@@ -164,7 +210,12 @@ const hasFilters = props.filters.search || props.filters.level || props.filters.
                     <select
                         :value="selectedFile || 'all'"
                         class="h-9 w-[220px] rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
-                        @change="applyFilter('file', ($event.target as HTMLSelectElement).value)"
+                        @change="
+                            applyFilter(
+                                'file',
+                                ($event.target as HTMLSelectElement).value,
+                            )
+                        "
                     >
                         <option value="all">All log files</option>
                         <option
@@ -178,7 +229,12 @@ const hasFilters = props.filters.search || props.filters.level || props.filters.
                     <select
                         :value="selectedLevel || 'all'"
                         class="h-9 w-[160px] rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
-                        @change="applyFilter('level', ($event.target as HTMLSelectElement).value)"
+                        @change="
+                            applyFilter(
+                                'level',
+                                ($event.target as HTMLSelectElement).value,
+                            )
+                        "
                     >
                         <option value="all">All levels</option>
                         <option
@@ -200,23 +256,40 @@ const hasFilters = props.filters.search || props.filters.level || props.filters.
 
                 <!-- Results count -->
                 <p v-if="logs.total > 0" class="text-sm text-muted-foreground">
-                    Showing {{ logs.from }}&ndash;{{ logs.to }} of {{ logs.total }} entries
+                    Showing {{ logs.from }}&ndash;{{ logs.to }} of
+                    {{ logs.total }} entries
                 </p>
 
                 <!-- Log entries -->
-                <div v-if="logs.data.length > 0" class="overflow-hidden rounded-lg border">
+                <div
+                    v-if="logs.data.length > 0"
+                    class="overflow-hidden rounded-lg border"
+                >
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b bg-muted/50">
                                 <th class="w-8 px-3 py-3"></th>
-                                <th class="px-4 py-3 text-left font-medium">Level</th>
-                                <th class="px-4 py-3 text-left font-medium">Message</th>
-                                <th class="hidden px-4 py-3 text-left font-medium md:table-cell">Environment</th>
-                                <th class="px-4 py-3 text-left font-medium">Date</th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Level
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Message
+                                </th>
+                                <th
+                                    class="hidden px-4 py-3 text-left font-medium md:table-cell"
+                                >
+                                    Environment
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Date
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y">
-                            <template v-for="entry in logs.data" :key="entry.id">
+                            <template
+                                v-for="entry in logs.data"
+                                :key="entry.id"
+                            >
                                 <tr
                                     class="cursor-pointer hover:bg-muted/30"
                                     :class="getLevelConfig(entry.level).bg"
@@ -224,42 +297,74 @@ const hasFilters = props.filters.search || props.filters.level || props.filters.
                                 >
                                     <td class="px-3 py-3">
                                         <ChevronRight
-                                            v-if="entry.context && !expandedRows.has(entry.id)"
+                                            v-if="
+                                                entry.context &&
+                                                !expandedRows.has(entry.id)
+                                            "
                                             class="h-4 w-4 text-muted-foreground"
                                         />
                                         <ChevronDown
-                                            v-else-if="entry.context && expandedRows.has(entry.id)"
+                                            v-else-if="
+                                                entry.context &&
+                                                expandedRows.has(entry.id)
+                                            "
                                             class="h-4 w-4 text-muted-foreground"
                                         />
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="flex items-center gap-2">
                                             <component
-                                                :is="getLevelConfig(entry.level).icon"
+                                                :is="
+                                                    getLevelConfig(entry.level)
+                                                        .icon
+                                                "
                                                 class="h-4 w-4 shrink-0"
-                                                :class="getLevelConfig(entry.level).color"
+                                                :class="
+                                                    getLevelConfig(entry.level)
+                                                        .color
+                                                "
                                             />
                                             <span
                                                 class="text-xs font-semibold uppercase"
-                                                :class="getLevelConfig(entry.level).color"
+                                                :class="
+                                                    getLevelConfig(entry.level)
+                                                        .color
+                                                "
                                             >
                                                 {{ entry.level }}
                                             </span>
                                         </div>
                                     </td>
-                                    <td class="max-w-md truncate px-4 py-3 font-mono text-xs">
+                                    <td
+                                        class="max-w-md truncate px-4 py-3 font-mono text-xs"
+                                    >
                                         {{ entry.message }}
                                     </td>
                                     <td class="hidden px-4 py-3 md:table-cell">
-                                        <code class="text-xs">{{ entry.environment }}</code>
+                                        <code class="text-xs">{{
+                                            entry.environment
+                                        }}</code>
                                     </td>
-                                    <td class="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                                    <td
+                                        class="px-4 py-3 whitespace-nowrap text-muted-foreground"
+                                    >
                                         {{ formatDateTime(entry.timestamp) }}
                                     </td>
                                 </tr>
-                                <tr v-if="entry.context && expandedRows.has(entry.id)">
-                                    <td colspan="5" class="bg-muted/20 px-4 py-4">
-                                        <pre class="max-h-96 overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted p-4 font-mono text-xs">{{ entry.context }}</pre>
+                                <tr
+                                    v-if="
+                                        entry.context &&
+                                        expandedRows.has(entry.id)
+                                    "
+                                >
+                                    <td
+                                        colspan="5"
+                                        class="bg-muted/20 px-4 py-4"
+                                    >
+                                        <pre
+                                            class="max-h-96 overflow-auto rounded-md bg-muted p-4 font-mono text-xs break-all whitespace-pre-wrap"
+                                            >{{ entry.context }}</pre
+                                        >
                                     </td>
                                 </tr>
                             </template>
@@ -269,14 +374,20 @@ const hasFilters = props.filters.search || props.filters.level || props.filters.
 
                 <!-- Empty state -->
                 <div v-else class="rounded-lg border p-12 text-center">
-                    <FileText class="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                    <FileText
+                        class="mx-auto mb-3 h-8 w-8 text-muted-foreground"
+                    />
                     <p class="text-muted-foreground">
-                        {{ hasFilters ? 'No log entries matching your filters.' : 'No log entries found.' }}
+                        {{
+                            hasFilters
+                                ? 'No log entries matching your filters.'
+                                : 'No log entries found.'
+                        }}
                     </p>
                 </div>
 
                 <!-- Pagination -->
-                <Pagination :pagination="(logs as any)" />
+                <Pagination :pagination="logs as any" />
             </div>
         </div>
     </AdminLayout>

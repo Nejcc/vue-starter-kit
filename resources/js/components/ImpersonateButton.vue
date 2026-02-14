@@ -36,7 +36,9 @@ interface User {
 
 const { isSuperAdmin, hasPermission } = useUserPermissions();
 
-const canImpersonate = computed(() => isSuperAdmin.value || hasPermission('impersonate'));
+const canImpersonate = computed(
+    () => isSuperAdmin.value || hasPermission('impersonate'),
+);
 
 const isModalOpen = ref(false);
 const users = ref<User[]>([]);

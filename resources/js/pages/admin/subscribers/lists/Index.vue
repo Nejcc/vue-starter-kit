@@ -3,7 +3,6 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import {
     ChevronLeft,
     ChevronRight,
-    Edit,
     Eye,
     ListIcon,
     Plus,
@@ -31,7 +30,11 @@ import { useSubscriberNav } from '@/composables/useSubscriberNav';
 import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useSubscriberNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useSubscriberNav();
 
 interface SubscriptionList {
     id: number;
@@ -58,7 +61,7 @@ interface Props {
     lists: PaginatedLists;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 const createDialogOpen = ref(false);
 const deleteDialogOpen = ref(false);
@@ -110,7 +113,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Subscription Lists" />
 
         <div class="container mx-auto py-8">

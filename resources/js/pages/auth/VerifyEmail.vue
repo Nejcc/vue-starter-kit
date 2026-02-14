@@ -62,12 +62,7 @@ withDefaults(defineProps<Props>(), {
             </Form>
 
             <template #footer>
-                <TextLink
-                    :href="logout()"
-                    as="button"
-                    class="text-sm"
-                    prefetch
-                >
+                <TextLink :href="logout()" as="button" class="text-sm" prefetch>
                     Log out
                 </TextLink>
             </template>

@@ -34,7 +34,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
-                    <FormField label="Name" id="name" :error="errors.name" required>
+                    <FormField
+                        label="Name"
+                        id="name"
+                        :error="errors.name"
+                        required
+                    >
                         <Input
                             id="name"
                             name="name"
@@ -44,7 +49,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         />
                     </FormField>
 
-                    <FormField label="Slug" id="slug" :error="errors.slug" description="Leave blank to auto-generate from name.">
+                    <FormField
+                        label="Slug"
+                        id="slug"
+                        :error="errors.slug"
+                        description="Leave blank to auto-generate from name."
+                    >
                         <Input
                             id="slug"
                             name="slug"
@@ -53,7 +63,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         />
                     </FormField>
 
-                    <FormField label="Description" id="description" :error="errors.description">
+                    <FormField
+                        label="Description"
+                        id="description"
+                        :error="errors.description"
+                    >
                         <Textarea
                             id="description"
                             name="description"

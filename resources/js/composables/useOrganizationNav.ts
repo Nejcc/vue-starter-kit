@@ -13,9 +13,21 @@ export function useOrganizationNav(): ModuleNav {
         title: 'Organizations',
         icon: Building2,
         items: [
-            { title: 'All Organizations', href: '/admin/organizations', icon: LayoutDashboard },
-            { title: 'Create', href: '/admin/organizations/create', icon: Plus },
-            { title: 'Settings', href: '/admin/organizations/settings', icon: Settings },
+            {
+                title: 'All Organizations',
+                href: '/admin/organizations',
+                icon: LayoutDashboard,
+            },
+            {
+                title: 'Create',
+                href: '/admin/organizations/create',
+                icon: Plus,
+            },
+            {
+                title: 'Settings',
+                href: '/admin/organizations/settings',
+                icon: Settings,
+            },
         ],
     };
 }

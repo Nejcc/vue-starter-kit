@@ -10,6 +10,7 @@ use App\Contracts\Services\NotificationServiceInterface;
 use App\Contracts\Services\PermissionServiceInterface;
 use App\Contracts\Services\RoleServiceInterface;
 use App\Contracts\Services\UserServiceInterface;
+use App\Listeners\LogAuthenticationEvent;
 use App\Listeners\UpdateLastLoginAt;
 use App\Services\AuditLogService;
 use App\Services\ImpersonationService;
@@ -19,7 +20,12 @@ use App\Services\RoleService;
 use App\Services\UserService;
 use App\Support\AdminNavigation;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -50,6 +56,15 @@ final class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Event::listen(Login::class, UpdateLastLoginAt::class);
+
+        // Authentication audit logging
+        $authListener = LogAuthenticationEvent::class;
+        Event::listen(Login::class, [$authListener, 'handleLogin']);
+        Event::listen(Logout::class, [$authListener, 'handleLogout']);
+        Event::listen(Registered::class, [$authListener, 'handleRegistered']);
+        Event::listen(PasswordReset::class, [$authListener, 'handlePasswordReset']);
+        Event::listen(Verified::class, [$authListener, 'handleVerified']);
+        Event::listen(Failed::class, [$authListener, 'handleFailed']);
 
         $this->configureDefaults();
     }

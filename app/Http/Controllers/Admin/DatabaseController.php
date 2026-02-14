@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Constants\AuditEvent;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use Exception;
@@ -399,7 +400,7 @@ final class DatabaseController extends Controller
             $view = null;
         }
 
-        AuditLog::log('database.viewed', null, null, [
+        AuditLog::log(AuditEvent::DATABASE_VIEWED, null, null, [
             'connection' => $connection,
             'table' => $table,
             'view' => $view ?? 'structure',
@@ -411,6 +412,151 @@ final class DatabaseController extends Controller
             'currentConnection' => $connection,
             'driver' => $driver,
             'view' => $view,
+        ]);
+    }
+
+    /**
+     * Execute a read-only SQL query.
+     */
+    public function query(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'query' => ['required', 'string', 'max:5000'],
+            'connection' => ['nullable', 'string'],
+        ]);
+
+        $sql = mb_trim($request->input('query'));
+        $connection = $request->input('connection', config('database.default'));
+
+        // Only allow read-only queries
+        $allowedPrefixes = ['select', 'show', 'explain', 'describe', 'desc', 'pragma'];
+        $sqlLower = mb_strtolower($sql);
+
+        $isAllowed = false;
+        foreach ($allowedPrefixes as $prefix) {
+            if (str_starts_with($sqlLower, $prefix)) {
+                $isAllowed = true;
+
+                break;
+            }
+        }
+
+        if (!$isAllowed) {
+            return response()->json([
+                'error' => 'Only read-only queries are allowed (SELECT, SHOW, EXPLAIN, DESCRIBE).',
+            ], 422);
+        }
+
+        // Block dangerous patterns even in SELECT
+        $dangerousPatterns = [
+            '/\binto\s+outfile\b/i',
+            '/\binto\s+dumpfile\b/i',
+            '/\bload_file\b/i',
+        ];
+
+        foreach ($dangerousPatterns as $pattern) {
+            if (preg_match($pattern, $sql)) {
+                return response()->json([
+                    'error' => 'Query contains disallowed operations.',
+                ], 422);
+            }
+        }
+
+        try {
+            $db = DB::connection($connection);
+            $startTime = microtime(true);
+            $results = $db->select($sql);
+            $duration = round((microtime(true) - $startTime) * 1000, 2);
+
+            $columns = [];
+            $rows = [];
+
+            if (count($results) > 0) {
+                $columns = array_keys((array) $results[0]);
+                $rows = array_map(fn ($row) => (array) $row, array_slice($results, 0, 1000));
+            }
+
+            AuditLog::log(AuditEvent::DATABASE_VIEWED, null, null, [
+                'connection' => $connection,
+                'query' => mb_substr($sql, 0, 500),
+                'rows_returned' => count($results),
+            ]);
+
+            return response()->json([
+                'columns' => $columns,
+                'rows' => $rows,
+                'total' => count($results),
+                'truncated' => count($results) > 1000,
+                'duration_ms' => $duration,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Query failed: ' . $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Export table data as CSV.
+     *
+     * @param  string  $connection  The database connection name
+     * @param  string  $table  The table name
+     */
+    public function export(string $connection, string $table): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $connections = array_keys(config('database.connections'));
+
+        if (!in_array($connection, $connections, true)) {
+            $connection = config('database.default');
+        }
+
+        $db = DB::connection($connection);
+
+        // Verify the table exists
+        $columnListing = $db->getSchemaBuilder()->getColumnListing($table);
+        if (empty($columnListing)) {
+            abort(404, "Table '{$table}' not found.");
+        }
+
+        $maskedColumns = config('security.database_browser.masked_columns', []);
+
+        AuditLog::log(AuditEvent::DATABASE_VIEWED, null, null, [
+            'connection' => $connection,
+            'table' => $table,
+            'action' => 'export',
+        ]);
+
+        $filename = $connection . '_' . $table . '_' . date('Y-m-d_His') . '.csv';
+
+        return response()->streamDownload(function () use ($db, $table, $maskedColumns): void {
+            $handle = fopen('php://output', 'w');
+
+            $first = true;
+            $db->table($table)->orderBy(
+                $db->getSchemaBuilder()->getColumnListing($table)[0] ?? 'id'
+            )->chunk(1000, function ($rows) use ($handle, &$first, $maskedColumns): void {
+                foreach ($rows as $row) {
+                    $rowArray = (array) $row;
+
+                    if ($first) {
+                        fputcsv($handle, array_keys($rowArray));
+                        $first = false;
+                    }
+
+                    // Mask sensitive columns
+                    foreach ($rowArray as $column => $value) {
+                        if ($value !== null && in_array($column, $maskedColumns, true)) {
+                            $rowArray[$column] = '********';
+                        }
+                    }
+
+                    fputcsv($handle, $rowArray);
+                }
+            });
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv',
         ]);
     }
 

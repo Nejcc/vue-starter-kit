@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Contracts\Services\PermissionServiceInterface;
+use App\Exceptions\PermissionException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePermissionRequest;
 use App\Http\Requests\Admin\UpdatePermissionRequest;
@@ -24,12 +25,15 @@ final class PermissionsController extends Controller
     public function index(Request $request): Response
     {
         $search = $request->filled('search') ? $request->get('search') : null;
+        $group = $request->filled('group') ? $request->get('group') : null;
 
         return Inertia::render('admin/Permissions/Index', [
-            'permissions' => $this->permissionService->getPaginated($search),
+            'permissions' => $this->permissionService->getPaginated($search, 15, $group),
+            'groups' => $this->permissionService->getGroupNames(),
             'status' => $request->session()->get('status'),
             'filters' => [
                 'search' => $request->get('search', ''),
+                'group' => $request->get('group', ''),
             ],
         ]);
     }
@@ -70,5 +74,19 @@ final class PermissionsController extends Controller
         $this->permissionService->update($permission, $request->validated());
 
         return redirect()->route('admin.permissions.index')->with('status', 'Permission updated successfully.');
+    }
+
+    /**
+     * Delete the specified permission.
+     */
+    public function destroy(Permission $permission): RedirectResponse
+    {
+        try {
+            $this->permissionService->delete($permission);
+
+            return redirect()->route('admin.permissions.index')->with('status', 'Permission deleted successfully.');
+        } catch (PermissionException $e) {
+            return back()->withErrors(['permission_deletion' => $e->getMessage()]);
+        }
     }
 }

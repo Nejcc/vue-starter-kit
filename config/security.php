@@ -24,6 +24,10 @@ return [
             'max_age' => env('SECURITY_HSTS_MAX_AGE', 31536000),
             'include_subdomains' => env('SECURITY_HSTS_SUBDOMAINS', true),
         ],
+        'content_security_policy' => [
+            'enabled' => env('SECURITY_CSP_ENABLED', false),
+            'report_only' => env('SECURITY_CSP_REPORT_ONLY', false),
+        ],
     ],
 
     /*

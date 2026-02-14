@@ -18,5 +18,12 @@ interface PermissionRepositoryInterface extends RepositoryInterface
 
     public function getAllWithRoles(?string $search = null): Collection;
 
-    public function paginateWithRoles(?string $search = null, int $perPage = 15): LengthAwarePaginator;
+    public function paginateWithRoles(?string $search = null, int $perPage = 15, ?string $group = null): LengthAwarePaginator;
+
+    /**
+     * Get all distinct group names.
+     *
+     * @return Collection<int, string>
+     */
+    public function getGroupNames(): Collection;
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Middleware\EnsureCookieConsent;
 use App\Http\Middleware\EnsureUserExists;
 use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\EnsureUserIsNotSuspended;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SecurityHeaders;
@@ -12,6 +13,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -25,13 +27,14 @@ return Application::configure(basePath: dirname(__DIR__))
             SecurityHeaders::class,
             EnsureCookieConsent::class,
             EnsureUserExists::class,
+            EnsureUserIsNotSuspended::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ];
 
-        if (class_exists(\LaravelPlus\Localization\Middleware\SetLocale::class)) {
-            array_splice($webMiddleware, 3, 0, [\LaravelPlus\Localization\Middleware\SetLocale::class]);
+        if (class_exists(LaravelPlus\Localization\Middleware\SetLocale::class)) {
+            array_splice($webMiddleware, 3, 0, [LaravelPlus\Localization\Middleware\SetLocale::class]);
         }
 
         $middleware->web(append: $webMiddleware);

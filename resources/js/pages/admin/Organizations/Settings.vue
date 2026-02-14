@@ -30,7 +30,11 @@ interface SettingsPageProps {
 }
 
 const props = defineProps<SettingsPageProps>();
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = useOrganizationNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = useOrganizationNav();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     { title: 'Admin', href: '#' },
@@ -63,12 +67,21 @@ watch(memberRolesInput, (value) => {
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Organization Settings" />
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col space-y-6">
-                <Heading variant="small" title="Organization Settings" description="Configure tenant and organization behavior" />
+                <Heading
+                    variant="small"
+                    title="Organization Settings"
+                    description="Configure tenant and organization behavior"
+                />
 
                 <Form
                     action="/admin/organizations/settings"
@@ -92,14 +105,18 @@ watch(memberRolesInput, (value) => {
                                 <InputError :message="errors.entity_name" />
                             </div>
                             <div class="grid gap-2">
-                                <Label for="entity_name_plural">Plural Name</Label>
+                                <Label for="entity_name_plural"
+                                    >Plural Name</Label
+                                >
                                 <Input
                                     id="entity_name_plural"
                                     v-model="formData.entity_name_plural"
                                     type="text"
                                     placeholder="Organizations"
                                 />
-                                <InputError :message="errors.entity_name_plural" />
+                                <InputError
+                                    :message="errors.entity_name_plural"
+                                />
                             </div>
                         </div>
                     </div>
@@ -115,8 +132,13 @@ watch(memberRolesInput, (value) => {
                                     class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                                 />
                                 <div>
-                                    <span class="text-sm font-medium">Multi-Organization Mode</span>
-                                    <p class="text-xs text-muted-foreground">Allow users to belong to multiple organizations</p>
+                                    <span class="text-sm font-medium"
+                                        >Multi-Organization Mode</span
+                                    >
+                                    <p class="text-xs text-muted-foreground">
+                                        Allow users to belong to multiple
+                                        organizations
+                                    </p>
                                 </div>
                             </label>
                             <InputError :message="errors.multi_org" />
@@ -128,8 +150,13 @@ watch(memberRolesInput, (value) => {
                                     class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                                 />
                                 <div>
-                                    <span class="text-sm font-medium">Personal Organization</span>
-                                    <p class="text-xs text-muted-foreground">Auto-create a personal organization on user registration</p>
+                                    <span class="text-sm font-medium"
+                                        >Personal Organization</span
+                                    >
+                                    <p class="text-xs text-muted-foreground">
+                                        Auto-create a personal organization on
+                                        user registration
+                                    </p>
                                 </div>
                             </label>
                             <InputError :message="errors.personal_org" />
@@ -152,7 +179,10 @@ watch(memberRolesInput, (value) => {
                                 </select>
                                 <InputError :message="errors.routing_mode" />
                             </div>
-                            <div v-if="formData.routing_mode === 'url'" class="grid gap-2">
+                            <div
+                                v-if="formData.routing_mode === 'url'"
+                                class="grid gap-2"
+                            >
                                 <Label for="url_prefix">URL Prefix</Label>
                                 <Input
                                     id="url_prefix"
@@ -169,16 +199,25 @@ watch(memberRolesInput, (value) => {
                     <div class="space-y-4 rounded-lg border p-4">
                         <h3 class="text-sm font-medium">Invitations</h3>
                         <div class="grid gap-2 sm:max-w-xs">
-                            <Label for="invitation_expiry_hours">Invitation Expiry (hours)</Label>
+                            <Label for="invitation_expiry_hours"
+                                >Invitation Expiry (hours)</Label
+                            >
                             <Input
                                 id="invitation_expiry_hours"
-                                v-model.number="formData.invitation_expiry_hours"
+                                v-model.number="
+                                    formData.invitation_expiry_hours
+                                "
                                 type="number"
                                 min="1"
                                 max="720"
                             />
-                            <p class="text-xs text-muted-foreground">How long an invitation link remains valid (1–720 hours)</p>
-                            <InputError :message="errors.invitation_expiry_hours" />
+                            <p class="text-xs text-muted-foreground">
+                                How long an invitation link remains valid (1–720
+                                hours)
+                            </p>
+                            <InputError
+                                :message="errors.invitation_expiry_hours"
+                            />
                         </div>
                     </div>
 
@@ -187,26 +226,44 @@ watch(memberRolesInput, (value) => {
                         <h3 class="text-sm font-medium">Limits</h3>
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="grid gap-2">
-                                <Label for="max_organizations_per_user">Max Organizations per User</Label>
+                                <Label for="max_organizations_per_user"
+                                    >Max Organizations per User</Label
+                                >
                                 <Input
                                     id="max_organizations_per_user"
-                                    v-model.number="formData.max_organizations_per_user"
+                                    v-model.number="
+                                        formData.max_organizations_per_user
+                                    "
                                     type="number"
                                     min="0"
                                 />
-                                <p class="text-xs text-muted-foreground">Set to 0 for unlimited</p>
-                                <InputError :message="errors.max_organizations_per_user" />
+                                <p class="text-xs text-muted-foreground">
+                                    Set to 0 for unlimited
+                                </p>
+                                <InputError
+                                    :message="errors.max_organizations_per_user"
+                                />
                             </div>
                             <div class="grid gap-2">
-                                <Label for="max_members_per_organization">Max Members per Organization</Label>
+                                <Label for="max_members_per_organization"
+                                    >Max Members per Organization</Label
+                                >
                                 <Input
                                     id="max_members_per_organization"
-                                    v-model.number="formData.max_members_per_organization"
+                                    v-model.number="
+                                        formData.max_members_per_organization
+                                    "
                                     type="number"
                                     min="0"
                                 />
-                                <p class="text-xs text-muted-foreground">Set to 0 for unlimited</p>
-                                <InputError :message="errors.max_members_per_organization" />
+                                <p class="text-xs text-muted-foreground">
+                                    Set to 0 for unlimited
+                                </p>
+                                <InputError
+                                    :message="
+                                        errors.max_members_per_organization
+                                    "
+                                />
                             </div>
                         </div>
                     </div>
@@ -216,20 +273,30 @@ watch(memberRolesInput, (value) => {
                         <h3 class="text-sm font-medium">Member Roles</h3>
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="grid gap-2">
-                                <Label for="default_member_role">Default Member Role</Label>
+                                <Label for="default_member_role"
+                                    >Default Member Role</Label
+                                >
                                 <select
                                     id="default_member_role"
                                     v-model="formData.default_member_role"
                                     class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                                 >
-                                    <option v-for="role in formData.member_roles" :key="role" :value="role">
+                                    <option
+                                        v-for="role in formData.member_roles"
+                                        :key="role"
+                                        :value="role"
+                                    >
                                         {{ role }}
                                     </option>
                                 </select>
-                                <InputError :message="errors.default_member_role" />
+                                <InputError
+                                    :message="errors.default_member_role"
+                                />
                             </div>
                             <div class="grid gap-2">
-                                <Label for="member_roles">Member Roles (comma-separated)</Label>
+                                <Label for="member_roles"
+                                    >Member Roles (comma-separated)</Label
+                                >
                                 <Input
                                     id="member_roles"
                                     v-model="memberRolesInput"
@@ -237,7 +304,8 @@ watch(memberRolesInput, (value) => {
                                     placeholder="owner, admin, member"
                                 />
                                 <p class="text-xs text-muted-foreground">
-                                    Current roles: {{ formData.member_roles.join(', ') }}
+                                    Current roles:
+                                    {{ formData.member_roles.join(', ') }}
                                 </p>
                                 <InputError :message="errors.member_roles" />
                             </div>

@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { Cookie } from 'lucide-vue-next';
+import { Activity, Cookie, Monitor } from 'lucide-vue-next';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
+import { index as activityIndex } from '@/routes/activity';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editCookiePreferences } from '@/routes/cookie-preferences';
 import { edit as editProfile } from '@/routes/profile';
+import { index as sessionsIndex } from '@/routes/sessions';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
 import { type NavItem } from '@/types';
@@ -29,6 +31,16 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Appearance',
         href: editAppearance(),
+    },
+    {
+        title: 'Sessions',
+        href: sessionsIndex(),
+        icon: Monitor,
+    },
+    {
+        title: 'Activity',
+        href: activityIndex(),
+        icon: Activity,
     },
     {
         title: 'Cookie Preferences',

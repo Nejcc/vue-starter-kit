@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use App\Constants\RoleNames;
+use App\Exceptions\RoleException;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use InvalidArgumentException;
 use Tests\TestCase;
 
 final class RoleServiceTest extends TestCase
@@ -85,7 +85,7 @@ final class RoleServiceTest extends TestCase
 
     public function test_create_super_admin_role_throws_exception(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(RoleException::class);
         $this->expectExceptionMessage('super-admin role cannot be created');
 
         $this->service->create(['name' => RoleNames::SUPER_ADMIN]);
@@ -109,7 +109,7 @@ final class RoleServiceTest extends TestCase
     {
         $role = Role::create(['name' => RoleNames::SUPER_ADMIN]);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(RoleException::class);
         $this->expectExceptionMessage('super-admin role name cannot be changed');
 
         $this->service->update($role, ['name' => 'renamed']);
@@ -119,7 +119,7 @@ final class RoleServiceTest extends TestCase
     {
         $role = Role::create(['name' => 'editor']);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(RoleException::class);
         $this->expectExceptionMessage('super-admin role name cannot be used');
 
         $this->service->update($role, ['name' => RoleNames::SUPER_ADMIN]);
@@ -139,7 +139,7 @@ final class RoleServiceTest extends TestCase
     {
         $role = Role::create(['name' => RoleNames::SUPER_ADMIN]);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(RoleException::class);
         $this->expectExceptionMessage('super-admin role cannot be deleted');
 
         $this->service->delete($role);
@@ -151,7 +151,7 @@ final class RoleServiceTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole($role);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(RoleException::class);
         $this->expectExceptionMessage('assigned to 1 user(s)');
 
         $this->service->delete($role);

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Contracts\Services;
 
+use App\Exceptions\RoleException;
 use App\Models\Role;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use InvalidArgumentException;
 
 interface RoleServiceInterface
 {
@@ -76,7 +76,7 @@ interface RoleServiceInterface
      *
      * @param  array<string, mixed>  $data
      *
-     * @throws InvalidArgumentException If trying to modify super-admin permissions
+     * @throws RoleException If trying to modify super-admin permissions
      */
     public function syncPermissions(Role $role, array $data): Role;
 }

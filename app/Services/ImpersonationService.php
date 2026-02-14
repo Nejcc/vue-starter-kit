@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Constants\AuditEvent;
 use App\Contracts\Services\ImpersonationServiceInterface;
 use App\Contracts\Services\UserServiceInterface;
 use App\Models\AuditLog;
@@ -70,7 +71,7 @@ final class ImpersonationService implements ImpersonationServiceInterface
 
         // Log the impersonation start
         AuditLog::log(
-            event: 'impersonation.started',
+            event: AuditEvent::IMPERSONATION_STARTED,
             auditable: $targetUser,
             newValues: [
                 'impersonated_user_id' => $targetUser->id,
@@ -125,7 +126,7 @@ final class ImpersonationService implements ImpersonationServiceInterface
         // Log the impersonation end (only if current user still exists)
         if (Auth::check()) {
             AuditLog::log(
-                event: 'impersonation.stopped',
+                event: AuditEvent::IMPERSONATION_STOPPED,
                 newValues: [
                     'impersonated_user_id' => $impersonatedUserId,
                     'returned_to_user_id' => $impersonator->id,

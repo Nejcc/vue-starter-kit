@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import type { LucideIcon } from 'lucide-vue-next';
-import { Building2, CreditCard, ExternalLink, Languages, Mail, Package, Settings } from 'lucide-vue-next';
+import {
+    Building2,
+    CreditCard,
+    ExternalLink,
+    Languages,
+    Mail,
+    Package,
+    Settings,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 import Heading from '@/components/Heading.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
@@ -23,7 +31,7 @@ interface PackageItem {
     required: boolean;
 }
 
-const props = defineProps<{
+defineProps<{
     packages: PackageItem[];
 }>();
 
@@ -63,7 +71,11 @@ function togglePackage(pkg: PackageItem): void {
 
         <div class="container mx-auto py-8">
             <div class="flex flex-col gap-8">
-                <Heading title="Packages" description="Enable or disable installed packages" variant="small" />
+                <Heading
+                    title="Packages"
+                    description="Enable or disable installed packages"
+                    variant="small"
+                />
 
                 <div
                     v-if="status"
@@ -95,11 +107,18 @@ function togglePackage(pkg: PackageItem): void {
                                         'rounded-lg p-2.5',
                                     ]"
                                 >
-                                    <component :is="getIcon(pkg.icon)" class="h-5 w-5" />
+                                    <component
+                                        :is="getIcon(pkg.icon)"
+                                        class="h-5 w-5"
+                                    />
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold">{{ pkg.name }}</h3>
-                                    <p class="text-xs text-muted-foreground">{{ pkg.package }}</p>
+                                    <h3 class="font-semibold">
+                                        {{ pkg.name }}
+                                    </h3>
+                                    <p class="text-xs text-muted-foreground">
+                                        {{ pkg.package }}
+                                    </p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -110,13 +129,19 @@ function togglePackage(pkg: PackageItem): void {
                                 />
                                 <StatusBadge
                                     v-else
-                                    :label="pkg.enabled ? 'Enabled' : 'Disabled'"
-                                    :variant="pkg.enabled ? 'success' : 'default'"
+                                    :label="
+                                        pkg.enabled ? 'Enabled' : 'Disabled'
+                                    "
+                                    :variant="
+                                        pkg.enabled ? 'success' : 'default'
+                                    "
                                 />
                             </div>
                         </div>
 
-                        <p class="text-sm text-muted-foreground">{{ pkg.description }}</p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ pkg.description }}
+                        </p>
 
                         <div class="mt-auto flex items-center justify-between">
                             <div class="flex items-center gap-2">
@@ -126,7 +151,13 @@ function togglePackage(pkg: PackageItem): void {
                                     @update:model-value="togglePackage(pkg)"
                                 />
                                 <span class="text-sm text-muted-foreground">
-                                    {{ pkg.required ? 'Always on' : (pkg.enabled ? 'On' : 'Off') }}
+                                    {{
+                                        pkg.required
+                                            ? 'Always on'
+                                            : pkg.enabled
+                                              ? 'On'
+                                              : 'Off'
+                                    }}
                                 </span>
                             </div>
                             <Link

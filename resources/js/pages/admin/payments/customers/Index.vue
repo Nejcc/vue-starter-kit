@@ -15,7 +15,11 @@ import ModuleLayout from '@/layouts/admin/ModuleLayout.vue';
 import { decodePaginationLabel } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 
-const { title: moduleTitle, icon: moduleIcon, items: moduleItems } = usePaymentNav();
+const {
+    title: moduleTitle,
+    icon: moduleIcon,
+    items: moduleItems,
+} = usePaymentNav();
 
 interface User {
     id: number;
@@ -89,7 +93,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <ModuleLayout :breadcrumbs="breadcrumbItems" :module-title="moduleTitle" :module-icon="moduleIcon" :module-items="moduleItems">
+    <ModuleLayout
+        :breadcrumbs="breadcrumbItems"
+        :module-title="moduleTitle"
+        :module-icon="moduleIcon"
+        :module-items="moduleItems"
+    >
         <Head title="Customers" />
 
         <div class="container mx-auto py-8">
@@ -178,15 +187,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                 </div>
                                 <div class="flex items-center gap-4 text-sm">
                                     <span>
-                                        {{
-                                            customer.transactions_count
-                                        }}
+                                        {{ customer.transactions_count }}
                                         transactions
                                     </span>
                                     <span>
-                                        {{
-                                            customer.subscriptions_count
-                                        }}
+                                        {{ customer.subscriptions_count }}
                                         subscriptions
                                     </span>
                                 </div>
