@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
-import {
-    Globe,
-    Laptop,
-    Monitor,
-    Smartphone,
-    Trash2,
-} from 'lucide-vue-next';
+import { Globe, Laptop, Monitor, Smartphone, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -187,9 +181,7 @@ function getDeviceIcon(device: SessionDevice) {
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        @click="
-                                            revokeSessionId = session.id
-                                        "
+                                        @click="revokeSessionId = session.id"
                                     >
                                         <Trash2 class="h-4 w-4" />
                                     </Button>
@@ -201,8 +193,8 @@ function getDeviceIcon(device: SessionDevice) {
                                         >
                                         <DialogDescription>
                                             Please enter your password to
-                                            confirm you would like to log out
-                                            of this session.
+                                            confirm you would like to log out of
+                                            this session.
                                         </DialogDescription>
                                     </DialogHeader>
 
@@ -260,10 +252,7 @@ function getDeviceIcon(device: SessionDevice) {
                     </div>
                 </div>
 
-                <div
-                    v-if="sessions.length > 1"
-                    class="border-t pt-6"
-                >
+                <div v-if="sessions.length > 1" class="border-t pt-6">
                     <Dialog
                         :open="showRevokeAllDialog"
                         @update:open="
@@ -303,9 +292,7 @@ function getDeviceIcon(device: SessionDevice) {
                                         autocomplete="current-password"
                                     />
                                     <InputError
-                                        :message="
-                                            revokeAllForm.errors.password
-                                        "
+                                        :message="revokeAllForm.errors.password"
                                     />
                                 </div>
 

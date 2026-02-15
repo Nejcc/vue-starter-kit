@@ -55,6 +55,12 @@ export interface InstalledModules {
     localizations: boolean;
 }
 
+export interface SeoSharedProps {
+    gtmId: string;
+    defaultDescription: string;
+    siteName: string;
+}
+
 export interface AppPageProps {
     name: string;
     auth: Auth;
@@ -65,4 +71,5 @@ export interface AppPageProps {
     notifications: {
         unreadCount: number;
     };
+    seo: SeoSharedProps;
 }

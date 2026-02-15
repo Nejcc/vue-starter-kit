@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
+import SeoHead from '@/components/SeoHead.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 </script>
 
 <template>
-    <Head title="Cookie Policy" />
+    <SeoHead
+        title="Cookie Policy"
+        description="Learn about how we use cookies and how you can manage your cookie preferences."
+    />
 
     <PublicLayout :centered="true">
         <main

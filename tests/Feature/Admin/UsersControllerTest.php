@@ -101,12 +101,12 @@ final class UsersControllerTest extends TestCase
      */
     public function test_can_search_users_by_name(): void
     {
-        $admin = User::factory()->create(['name' => 'Admin User']);
+        $admin = User::factory()->create(['name' => 'Admin User', 'email' => 'admin@example.com']);
         $superAdminRole = Role::create(['name' => RoleNames::SUPER_ADMIN]);
         $admin->assignRole($superAdminRole);
 
-        $user1 = User::factory()->create(['name' => 'John Doe']);
-        $user2 = User::factory()->create(['name' => 'Jane Smith']);
+        $user1 = User::factory()->create(['name' => 'John Doe', 'email' => 'doe@example.com']);
+        $user2 = User::factory()->create(['name' => 'Jane Smith', 'email' => 'smith@example.com']);
 
         $response = $this->actingAs($admin)->get(route('admin.users.index', ['search' => 'John']));
 

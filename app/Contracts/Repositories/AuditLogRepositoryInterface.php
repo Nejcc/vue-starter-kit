@@ -19,4 +19,6 @@ interface AuditLogRepositoryInterface extends RepositoryInterface
     public function getDistinctEventTypes(): Collection;
 
     public function getRecentWithUser(int $limit = 10): Collection;
+
+    public function getUserActivityPaginated(int $userId, int $perPage = 20): LengthAwarePaginator;
 }

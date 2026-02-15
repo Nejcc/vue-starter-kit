@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
 import { usePage, Link } from '@inertiajs/vue3';
 import {
     ArrowRight,
@@ -22,6 +21,7 @@ import { computed, onMounted, ref } from 'vue';
 import CookieConsentBanner from '@/components/CookieConsentBanner.vue';
 import PublicFooter from '@/components/PublicFooter.vue';
 import PublicHeader from '@/components/PublicHeader.vue';
+import SeoHead from '@/components/SeoHead.vue';
 import { register, dashboard } from '@/routes';
 import type { WelcomePageProps } from '@/types';
 
@@ -57,10 +57,13 @@ function copyCommand() {
 </script>
 
 <template>
-    <Head title="Welcome">
+    <SeoHead
+        title="Welcome"
+        description="Laravel 12 + Vue 3 + Inertia.js v2 starter kit. Auth, payments, admin panel, notifications, RBAC, audit logs, dark mode, and GDPR — all wired up with TypeScript and Tailwind CSS."
+    >
         <link rel="preconnect" href="https://rsms.me/" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-    </Head>
+    </SeoHead>
     <div
         class="relative flex min-h-screen flex-col items-center overflow-hidden bg-[#FDFDFC] text-[#1b1b18] dark:bg-[#0a0a0a] dark:text-[#EDEDEC]"
         style="font-family: 'Inter', sans-serif"

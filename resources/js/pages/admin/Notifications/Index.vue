@@ -86,7 +86,9 @@ interface Props {
 const props = defineProps<Props>();
 const page = usePage();
 const { formatDateTime } = useDateFormat();
-const successMessage = computed(() => page.props.flash?.success as string | undefined);
+const successMessage = computed(
+    () => page.props.flash?.success as string | undefined,
+);
 
 const selectedFilter = ref(props.filters.filter);
 const selectedUserId = ref(props.filters.user_id);
@@ -172,9 +174,7 @@ function handleUserFilter(value: string): void {
         {
             search: searchQuery.value || null,
             filter:
-                selectedFilter.value !== 'all'
-                    ? selectedFilter.value
-                    : null,
+                selectedFilter.value !== 'all' ? selectedFilter.value : null,
             user_id: value || null,
         },
         { preserveState: true, preserveScroll: true },
@@ -192,11 +192,7 @@ function handleDelete(id: string): void {
 }
 
 function handleDeleteAll(): void {
-    if (
-        confirm(
-            'Delete all read notifications? This cannot be undone.',
-        )
-    ) {
+    if (confirm('Delete all read notifications? This cannot be undone.')) {
         router.delete(destroyAll({ mergeQuery: { filter: 'read' } }).url, {
             preserveScroll: true,
         });
@@ -335,7 +331,7 @@ function clearFilters(): void {
                 <DataTable
                     v-if="notifications.data.length > 0"
                     :columns="columns"
-                    :rows="(notifications.data as Record<string, unknown>[])"
+                    :rows="notifications.data as Record<string, unknown>[]"
                     row-key="id"
                 >
                     <template #cell-status="{ row }">
@@ -391,9 +387,7 @@ function clearFilters(): void {
                     </template>
                     <template #cell-type="{ row }">
                         <Badge variant="outline">
-                            {{
-                                (row as unknown as AdminNotification).type
-                            }}
+                            {{ (row as unknown as AdminNotification).type }}
                         </Badge>
                     </template>
                     <template #cell-created_at="{ row }">
@@ -446,9 +440,7 @@ function clearFilters(): void {
 
                 <!-- Empty state -->
                 <div v-else class="rounded-lg border p-12 text-center">
-                    <Bell
-                        class="mx-auto mb-3 h-8 w-8 text-muted-foreground"
-                    />
+                    <Bell class="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
                     <p class="text-muted-foreground">
                         {{
                             filters.search ||

@@ -89,6 +89,29 @@ final class HandleInertiaRequests extends Middleware
                 ? $user->organizations()->select('organizations.id', 'organizations.name', 'organizations.slug', 'organizations.is_personal')->get()
                 : [],
             'localization' => fn () => $this->getLocalizationData(),
+            'seo' => fn () => $this->getSeoData(),
+        ];
+    }
+
+    /**
+     * Get SEO-related data for the frontend.
+     *
+     * @return array<string, mixed>
+     */
+    private function getSeoData(): array
+    {
+        $gtmId = '';
+        $defaultDescription = '';
+
+        if (class_exists(\LaravelPlus\GlobalSettings\Models\Setting::class)) {
+            $gtmId = \LaravelPlus\GlobalSettings\Models\Setting::get('google_tag_manager_id', '');
+            $defaultDescription = \LaravelPlus\GlobalSettings\Models\Setting::get('site_description', '');
+        }
+
+        return [
+            'gtmId' => $gtmId ?: (string) config('seo.gtm_id', ''),
+            'defaultDescription' => $defaultDescription ?: (string) config('seo.default_meta_description', ''),
+            'siteName' => (string) config('app.name', 'Laravel'),
         ];
     }
 

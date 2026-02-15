@@ -149,9 +149,7 @@ function deleteOrganization(slug: string) {
                                     >
                                         <span class="flex items-center gap-1">
                                             <Users class="h-4 w-4" />
-                                            {{
-                                                org.members_count ?? 0
-                                            }}
+                                            {{ org.members_count ?? 0 }}
                                             member(s)
                                         </span>
                                         <span

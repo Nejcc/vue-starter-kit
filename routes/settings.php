@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Settings\ActivityController;
+use App\Http\Controllers\Settings\DataExportController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SessionsController;
@@ -38,4 +39,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('settings/sessions', [SessionsController::class, 'index'])->name('sessions.index');
     Route::delete('settings/sessions/{session}', [SessionsController::class, 'destroy'])->name('sessions.destroy');
     Route::delete('settings/sessions', [SessionsController::class, 'destroyAll'])->name('sessions.destroyAll');
+
+    Route::get('settings/data-export', [DataExportController::class, 'show'])->name('data-export.show');
+    Route::get('settings/data-export/download', [DataExportController::class, 'download'])
+        ->middleware('throttle:3,60')
+        ->name('data-export.download');
 });

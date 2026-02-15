@@ -39,6 +39,9 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
+        <meta name="description" content="{{ config('seo.default_meta_description', '') }}" inertia>
+        <meta name="robots" content="{{ config('seo.default_robots', 'index, follow') }}" inertia>
+
         @vite(['resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         @inertiaHead
     </head>

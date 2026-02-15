@@ -108,11 +108,7 @@ function formatBytes(bytes: number): string {
                         description="Manage application caches and maintenance mode"
                         variant="small"
                     />
-                    <Button
-                        variant="destructive"
-                        size="sm"
-                        @click="clearAll"
-                    >
+                    <Button variant="destructive" size="sm" @click="clearAll">
                         <Trash2 class="mr-2 h-4 w-4" />
                         Clear All Caches
                     </Button>
@@ -229,9 +225,7 @@ function formatBytes(bytes: number): string {
                                 />
                             </div>
                             <div>
-                                <p class="text-sm font-medium">
-                                    Config Cache
-                                </p>
+                                <p class="text-sm font-medium">Config Cache</p>
                                 <p class="text-xs text-muted-foreground">
                                     config:clear
                                 </p>
@@ -258,19 +252,16 @@ function formatBytes(bytes: number): string {
                                 "
                             >
                                 {{
-                                    maintenance.is_down
-                                        ? 'Maintenance'
-                                        : 'Live'
+                                    maintenance.is_down ? 'Maintenance' : 'Live'
                                 }}
                             </Badge>
                         </div>
                     </div>
                     <div class="p-6">
-                        <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
-                            <div
-                                v-if="!maintenance.is_down"
-                                class="flex-1"
-                            >
+                        <div
+                            class="flex flex-col gap-4 sm:flex-row sm:items-end"
+                        >
+                            <div v-if="!maintenance.is_down" class="flex-1">
                                 <label
                                     for="secret"
                                     class="mb-1 block text-sm font-medium"
@@ -285,11 +276,13 @@ function formatBytes(bytes: number): string {
                                     v-model="maintenanceSecret"
                                     type="text"
                                     placeholder="Enter a secret to bypass maintenance mode..."
-                                    class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                    class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
                                 />
                                 <p class="mt-1 text-xs text-muted-foreground">
                                     If set, users can bypass maintenance mode by
-                                    visiting /{{ maintenanceSecret || 'secret' }}
+                                    visiting /{{
+                                        maintenanceSecret || 'secret'
+                                    }}
                                 </p>
                             </div>
                             <Button
@@ -323,30 +316,19 @@ function formatBytes(bytes: number): string {
                         </p>
                     </div>
                     <div class="overflow-x-auto">
-                        <table
-                            v-if="items.length > 0"
-                            class="w-full text-sm"
-                        >
+                        <table v-if="items.length > 0" class="w-full text-sm">
                             <thead>
                                 <tr class="border-b bg-muted/50">
-                                    <th
-                                        class="px-4 py-3 text-left font-medium"
-                                    >
+                                    <th class="px-4 py-3 text-left font-medium">
                                         Key
                                     </th>
-                                    <th
-                                        class="px-4 py-3 text-left font-medium"
-                                    >
+                                    <th class="px-4 py-3 text-left font-medium">
                                         Size
                                     </th>
-                                    <th
-                                        class="px-4 py-3 text-left font-medium"
-                                    >
+                                    <th class="px-4 py-3 text-left font-medium">
                                         Expires At
                                     </th>
-                                    <th
-                                        class="px-4 py-3 text-left font-medium"
-                                    >
+                                    <th class="px-4 py-3 text-left font-medium">
                                         Status
                                     </th>
                                 </tr>
@@ -365,12 +347,12 @@ function formatBytes(bytes: number): string {
                                         </p>
                                     </td>
                                     <td
-                                        class="whitespace-nowrap px-4 py-3 text-xs text-muted-foreground"
+                                        class="px-4 py-3 text-xs whitespace-nowrap text-muted-foreground"
                                     >
                                         {{ formatBytes(item.size) }}
                                     </td>
                                     <td
-                                        class="whitespace-nowrap px-4 py-3 text-xs text-muted-foreground"
+                                        class="px-4 py-3 text-xs whitespace-nowrap text-muted-foreground"
                                     >
                                         {{ item.expires_at }}
                                     </td>
@@ -414,10 +396,7 @@ function formatBytes(bytes: number): string {
                 </div>
 
                 <!-- Driver info for non-database drivers -->
-                <div
-                    v-else
-                    class="rounded-lg border"
-                >
+                <div v-else class="rounded-lg border">
                     <div class="border-b px-6 py-4">
                         <h3 class="font-semibold">Cache Driver Info</h3>
                     </div>
@@ -455,8 +434,8 @@ function formatBytes(bytes: number): string {
                             </div>
                         </div>
                         <p class="mt-4 text-sm text-muted-foreground">
-                            Cache item browsing is only available when using
-                            the database driver. Current driver:
+                            Cache item browsing is only available when using the
+                            database driver. Current driver:
                             <span class="font-medium">{{
                                 driver.default
                             }}</span>

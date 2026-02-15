@@ -61,4 +61,12 @@ final class AuditLogRepository extends BaseRepository implements AuditLogReposit
             ->limit($limit)
             ->get(['id', 'user_id', 'event', 'auditable_type', 'auditable_id', 'created_at']);
     }
+
+    public function getUserActivityPaginated(int $userId, int $perPage = 20): LengthAwarePaginator
+    {
+        return $this->query()
+            ->where('user_id', $userId)
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
+    }
 }

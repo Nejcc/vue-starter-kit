@@ -108,11 +108,7 @@ function retryAll(): void {
         )
     )
         return;
-    router.post(
-        `/admin/failed-jobs/retry-all`,
-        {},
-        { preserveScroll: true },
-    );
+    router.post(`/admin/failed-jobs/retry-all`, {}, { preserveScroll: true });
 }
 
 function deleteAll(): void {
@@ -138,10 +134,7 @@ function deleteAll(): void {
                         description="View and manage failed queue jobs"
                         variant="small"
                     />
-                    <div
-                        v-if="stats.total > 0"
-                        class="flex items-center gap-2"
-                    >
+                    <div v-if="stats.total > 0" class="flex items-center gap-2">
                         <Button variant="outline" size="sm" @click="retryAll">
                             <RotateCcw class="mr-2 h-4 w-4" />
                             Retry All
@@ -186,7 +179,7 @@ function deleteAll(): void {
                     </div>
                     <select
                         :value="selectedQueue"
-                        class="h-9 w-48 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        class="h-9 w-48 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
                         @change="
                             filterByQueue(
                                 ($event.target as HTMLSelectElement).value,
@@ -194,11 +187,7 @@ function deleteAll(): void {
                         "
                     >
                         <option value="all">All Queues</option>
-                        <option
-                            v-for="q in queues"
-                            :key="q"
-                            :value="q"
-                        >
+                        <option v-for="q in queues" :key="q" :value="q">
                             {{ q }}
                         </option>
                     </select>
@@ -213,24 +202,16 @@ function deleteAll(): void {
                         >
                             <thead>
                                 <tr class="border-b bg-muted/50">
-                                    <th
-                                        class="px-4 py-3 text-left font-medium"
-                                    >
+                                    <th class="px-4 py-3 text-left font-medium">
                                         Job
                                     </th>
-                                    <th
-                                        class="px-4 py-3 text-left font-medium"
-                                    >
+                                    <th class="px-4 py-3 text-left font-medium">
                                         Queue
                                     </th>
-                                    <th
-                                        class="px-4 py-3 text-left font-medium"
-                                    >
+                                    <th class="px-4 py-3 text-left font-medium">
                                         Error
                                     </th>
-                                    <th
-                                        class="px-4 py-3 text-left font-medium"
-                                    >
+                                    <th class="px-4 py-3 text-left font-medium">
                                         Failed At
                                     </th>
                                     <th
@@ -269,7 +250,7 @@ function deleteAll(): void {
                                         </p>
                                     </td>
                                     <td
-                                        class="whitespace-nowrap px-4 py-3 text-xs text-muted-foreground"
+                                        class="px-4 py-3 text-xs whitespace-nowrap text-muted-foreground"
                                     >
                                         {{ formatShortDate(job.failed_at) }}
                                     </td>

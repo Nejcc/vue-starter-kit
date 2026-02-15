@@ -129,9 +129,7 @@ function getEventColor(event: string): string {
                         v-if="logs.data.length === 0"
                         class="rounded-lg border border-dashed p-8 text-center"
                     >
-                        <Globe
-                            class="mx-auto h-8 w-8 text-muted-foreground"
-                        />
+                        <Globe class="mx-auto h-8 w-8 text-muted-foreground" />
                         <p class="mt-2 text-sm text-muted-foreground">
                             No activity recorded yet.
                         </p>

@@ -32,6 +32,8 @@ final class AuditEvent
 
     public const USER_ACCOUNT_DELETED = 'user.account_deleted';
 
+    public const USER_DATA_EXPORTED = 'user.data_exported';
+
     // Admin user management events
     public const USER_CREATED = 'user.created';
 

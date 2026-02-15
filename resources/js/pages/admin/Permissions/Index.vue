@@ -100,7 +100,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     <select
                         v-if="groups.length > 0"
                         :value="filters?.group ?? ''"
-                        class="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        class="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
                         @change="
                             filterByGroup(
                                 ($event.target as HTMLSelectElement).value,

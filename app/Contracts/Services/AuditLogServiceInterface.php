@@ -15,4 +15,8 @@ interface AuditLogServiceInterface
     public function getDistinctEventTypes(): SupportCollection;
 
     public function getRecentWithUser(int $limit = 10): Collection;
+
+    public function getUserActivityPaginated(int $userId, int $perPage = 20): LengthAwarePaginator;
+
+    public function describeEvent(string $event): string;
 }

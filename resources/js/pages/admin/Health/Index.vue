@@ -163,9 +163,7 @@ function statusLabel(status: string): string {
                             {{ check.message }}
                         </p>
                         <div
-                            v-if="
-                                Object.keys(check.details).length > 0
-                            "
+                            v-if="Object.keys(check.details).length > 0"
                             class="mt-3 space-y-1"
                         >
                             <div

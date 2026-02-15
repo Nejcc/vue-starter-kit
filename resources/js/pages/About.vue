@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
+import SeoHead from '@/components/SeoHead.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 </script>
 
 <template>
-    <Head title="About" />
+    <SeoHead
+        title="About"
+        description="Learn more about our platform built with Laravel 12, Vue 3, and Inertia.js."
+    />
 
     <PublicLayout :centered="true">
         <main

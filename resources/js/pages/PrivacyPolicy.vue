@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
+import SeoHead from '@/components/SeoHead.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 </script>
 
 <template>
-    <Head title="Privacy Policy" />
+    <SeoHead
+        title="Privacy Policy"
+        description="Our privacy policy explains how we collect, use, and protect your personal information."
+    />
 
     <PublicLayout :centered="true">
         <main
