@@ -872,7 +872,7 @@ final class DatabaseControllerTest extends TestCase
         $content = $response->streamedContent();
 
         // Password column should be masked, not contain the actual hash
-        $this->assertStringContainsString('********', $content);
+        $this->assertStringContainsString(str_repeat("\u{2022}", 8), $content);
         $this->assertStringNotContainsString('$2y$', $content);
     }
 
