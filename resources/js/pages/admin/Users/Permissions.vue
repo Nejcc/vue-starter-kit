@@ -5,7 +5,6 @@ import { ref } from 'vue';
 
 import CheckboxGroup from '@/components/CheckboxGroup.vue';
 import Heading from '@/components/Heading.vue';
-import StatusBadge from '@/components/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
 import { edit, index } from '@/routes/admin/users';
@@ -71,35 +70,15 @@ const selectedPermissions = ref<string[]>(props.user.direct_permissions);
                     :description="`Direct permissions for ${user.name}`"
                 />
 
-                <div
+                <p
                     v-if="user.role_permissions.length > 0"
-                    class="rounded-lg border border-muted bg-muted/50 p-4"
+                    class="text-sm text-muted-foreground"
                 >
-                    <h4 class="text-sm font-medium">
-                        Permissions inherited via roles ({{
-                            user.roles.join(', ')
-                        }})
-                    </h4>
-                    <div class="mt-2 flex flex-wrap gap-2">
-                        <StatusBadge
-                            v-for="perm in user.role_permissions"
-                            :key="perm"
-                            :label="perm"
-                            variant="info"
-                        />
-                    </div>
-                    <p class="mt-2 text-xs text-muted-foreground">
-                        These permissions are granted through role assignments
-                        and cannot be changed here.
-                    </p>
-                </div>
-
-                <div
-                    v-else
-                    class="rounded-md border p-4 text-sm text-muted-foreground"
-                >
-                    No permissions inherited via roles.
-                </div>
+                    Permissions marked
+                    <span class="font-medium">(via role)</span> are inherited
+                    from role assignments ({{ user.roles.join(', ') }}) and
+                    cannot be changed here.
+                </p>
 
                 <Form
                     :action="update(user.slug).url"
@@ -112,8 +91,9 @@ const selectedPermissions = ref<string[]>(props.user.direct_permissions);
                         v-if="allPermissions.length > 0"
                         v-model="selectedPermissions"
                         :options="allPermissions"
+                        :disabled-options="user.role_permissions"
                         name="permissions"
-                        label="Direct Permissions"
+                        label="Permissions"
                         :error="errors.permissions"
                     />
 

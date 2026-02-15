@@ -10,34 +10,54 @@ interface Props {
     label?: string;
     error?: string;
     columns?: number;
+    disabledOptions?: string[];
+    disabledLabel?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     label: undefined,
     error: undefined,
     columns: 1,
+    disabledOptions: () => [],
+    disabledLabel: '(via role)',
 });
 
 const emit = defineEmits<{
     'update:modelValue': [value: string[]];
 }>();
 
+const toggleableOptions = computed(() =>
+    props.options.filter((o) => !props.disabledOptions.includes(o)),
+);
+
 const allSelected = computed(() => {
     return (
-        props.options.length > 0 &&
-        props.modelValue.length === props.options.length
+        toggleableOptions.value.length > 0 &&
+        toggleableOptions.value.every((o) => props.modelValue.includes(o))
     );
 });
 
 function toggleAll(): void {
     if (allSelected.value) {
-        emit('update:modelValue', []);
+        emit(
+            'update:modelValue',
+            props.modelValue.filter(
+                (v) => !toggleableOptions.value.includes(v),
+            ),
+        );
     } else {
-        emit('update:modelValue', [...props.options]);
+        const merged = new Set([
+            ...props.modelValue,
+            ...toggleableOptions.value,
+        ]);
+        emit('update:modelValue', [...merged]);
     }
 }
 
 function toggleOption(option: string): void {
+    if (props.disabledOptions.includes(option)) {
+        return;
+    }
     const current = [...props.modelValue];
     const idx = current.indexOf(option);
     if (idx >= 0) {
@@ -75,18 +95,38 @@ const gridClass = computed(() => {
                 v-for="option in options"
                 :key="option"
                 class="flex items-center space-x-2"
+                :class="{ 'opacity-50': disabledOptions.includes(option) }"
             >
                 <input
                     :id="`${name}-${option}`"
                     type="checkbox"
                     :value="option"
                     :name="`${name}[]`"
-                    :checked="modelValue.includes(option)"
+                    :checked="
+                        modelValue.includes(option) ||
+                        disabledOptions.includes(option)
+                    "
+                    :disabled="disabledOptions.includes(option)"
                     class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    :class="{
+                        'cursor-not-allowed': disabledOptions.includes(option),
+                    }"
                     @change="toggleOption(option)"
                 />
-                <Label :for="`${name}-${option}`" class="text-sm font-medium">
+                <Label
+                    :for="`${name}-${option}`"
+                    class="text-sm font-medium"
+                    :class="{
+                        'cursor-not-allowed': disabledOptions.includes(option),
+                    }"
+                >
                     {{ option }}
+                    <span
+                        v-if="disabledOptions.includes(option)"
+                        class="ml-1 text-xs text-muted-foreground"
+                    >
+                        {{ disabledLabel }}
+                    </span>
                 </Label>
             </div>
         </div>

@@ -7,7 +7,13 @@ import StatusBadge from '@/components/StatusBadge.vue';
 import { useDateFormat } from '@/composables/useDateFormat';
 import { useSearch } from '@/composables/useSearch';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
-import { create, edit, exportMethod, index } from '@/routes/admin/users';
+import {
+    create,
+    edit,
+    exportMethod,
+    index,
+    permissions,
+} from '@/routes/admin/users';
 import { type BreadcrumbItem, type PaginatedResponse } from '@/types';
 
 interface User {
@@ -185,12 +191,24 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     {{ formatDate(user.created_at) }}
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <Link
-                                        :href="edit(user.slug).url"
-                                        class="text-sm text-primary hover:underline"
+                                    <div
+                                        class="flex items-center justify-end gap-3"
                                     >
-                                        Edit
-                                    </Link>
+                                        <Link
+                                            :href="
+                                                permissions(user.slug).url
+                                            "
+                                            class="text-sm text-primary hover:underline"
+                                        >
+                                            Permissions
+                                        </Link>
+                                        <Link
+                                            :href="edit(user.slug).url"
+                                            class="text-sm text-primary hover:underline"
+                                        >
+                                            Edit
+                                        </Link>
+                                    </div>
                                 </td>
                             </tr>
                             <tr v-if="users.data.length === 0">

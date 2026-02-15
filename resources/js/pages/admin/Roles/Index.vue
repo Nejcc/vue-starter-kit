@@ -18,7 +18,13 @@ import {
 import { useDateFormat } from '@/composables/useDateFormat';
 import { useSearch } from '@/composables/useSearch';
 import AdminLayout from '@/layouts/admin/AdminLayout.vue';
-import { create, destroy, edit, index } from '@/routes/admin/roles';
+import {
+    create,
+    destroy,
+    edit,
+    index,
+    permissions,
+} from '@/routes/admin/roles';
 import { type BreadcrumbItem, type PaginatedResponse } from '@/types';
 
 const page = usePage();
@@ -207,6 +213,22 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     <div
                                         class="flex items-center justify-end gap-3"
                                     >
+                                        <Link
+                                            v-if="!role.is_super_admin"
+                                            :href="
+                                                permissions(role.name).url
+                                            "
+                                            class="text-sm text-primary hover:underline"
+                                        >
+                                            Permissions
+                                        </Link>
+                                        <span
+                                            v-else
+                                            class="text-sm text-muted-foreground"
+                                            title="Super-admin has all permissions"
+                                        >
+                                            Permissions
+                                        </span>
                                         <Link
                                             v-if="!role.is_super_admin"
                                             :href="edit(role.name).url"
