@@ -28,6 +28,10 @@
         {
             "type": "path",
             "url": "packages/laravelplus/tenants"
+        },
+        {
+            "type": "path",
+            "url": "packages/laravelplus/ecommerce"
         }
     ],
     "require": {
@@ -42,6 +46,7 @@
         "laravelplus/localization": "@dev",
         "laravelplus/payment-gateway": "@dev",
         "laravelplus/subscribe": "@dev",
+        "laravelplus/ecommerce": "@dev",
         "laravelplus/tenants": "@dev",
         "spatie/laravel-permission": "^6.24"
     },

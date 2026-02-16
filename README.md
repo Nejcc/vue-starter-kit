@@ -120,6 +120,32 @@ Controllers -> Services -> Repositories -> Models
 - **Wayfinder** (`resources/js/actions/`) — Auto-generated TypeScript route functions
 - **Types** (`resources/js/types/`) — TypeScript interfaces for page props, models, forms
 
+### Package Page Resolution
+
+Inertia pages can live inside packages instead of the main app. A multi-path page resolver in `app.ts` automatically discovers Vue pages from all packages under `packages/laravelplus/*/resources/js/pages/`.
+
+**How it works:**
+
+1. Vite globs pages from both `resources/js/pages/` (main app) and `packages/laravelplus/*/resources/js/pages/` (all packages)
+2. `resolvePackagePages.ts` remaps package paths to match the standard `./pages/{name}.vue` format
+3. App pages are merged last, so they **always override** package pages with the same path
+
+**Adding pages to a package:**
+
+Place Vue files inside `packages/laravelplus/{name}/resources/js/pages/` using the same directory structure as `resources/js/pages/`. They are picked up automatically — no Vite or app config changes needed.
+
+**Overriding a package page:**
+
+Create the same file path in the main app's `resources/js/pages/` and it takes priority:
+
+```
+# Package provides:
+packages/laravelplus/ecommerce/resources/js/pages/admin/ecommerce/Dashboard.vue
+
+# Override in main app:
+resources/js/pages/admin/ecommerce/Dashboard.vue
+```
+
 ## Prerequisites
 
 - **PHP 8.4+** with required extensions
@@ -206,9 +232,13 @@ app/
 ├── Repositories/     # Data access layer (Repository Pattern)
 └── Services/         # Business logic layer (Service Pattern)
 
-packages/
-├── laravelplus/payment-gateway/   # Multi-provider payment processing
-└── laravelplus/subscribe/         # Email subscription management
+packages/laravelplus/
+├── global-settings/     # Key-value global settings with admin UI
+├── localization/        # Multi-language translation management
+├── tenants/             # Multi-tenant organization management
+├── payment-gateway/     # Multi-provider payment processing
+├── subscribe/           # Email subscription management
+└── ecommerce/           # Product catalog, categories, variants
 
 resources/js/
 ├── components/       # Vue components (shadcn-vue in ui/)
@@ -227,8 +257,11 @@ routes/
 | Package | Description |
 |---------|-------------|
 | `laravelplus/global-settings` | Key-value settings with admin panel and role-based access |
+| `laravelplus/localization` | Multi-language translation management and locale detection |
+| `laravelplus/tenants` | Multi-tenant organization management with team memberships |
 | `laravelplus/payment-gateway` | Multi-provider payments, subscriptions, invoices, refunds, webhooks |
 | `laravelplus/subscribe` | Email subscriptions with Brevo, Mailchimp, HubSpot, ConvertKit support |
+| `laravelplus/ecommerce` | Product catalog, categories, variants, and shop management |
 
 ## Tech Stack
 

@@ -18,6 +18,7 @@ import {
     ScrollText,
     Settings,
     ShieldCheck,
+    ShoppingCart,
     Users,
     Wrench,
 } from 'lucide-vue-next';
@@ -213,6 +214,22 @@ const navGroups = computed<NavGroup[]>(() => {
             title: 'Organizations',
             href: '#',
             icon: Building2,
+            disabled: true,
+        });
+    }
+
+    // Ecommerce
+    if (modules.value?.ecommerce) {
+        moduleItems.push({
+            title: 'Ecommerce',
+            href: moduleHref('ecommerce', '/admin/ecommerce/products'),
+            icon: ShoppingCart,
+        });
+    } else {
+        moduleItems.push({
+            title: 'Ecommerce',
+            href: '#',
+            icon: ShoppingCart,
             disabled: true,
         });
     }

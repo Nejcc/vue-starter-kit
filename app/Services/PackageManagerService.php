@@ -71,6 +71,17 @@ final class PackageManagerService
             'adminRouteName' => 'admin.localizations.languages.index',
             'required' => false,
         ],
+        'ecommerce' => [
+            'name' => 'Ecommerce',
+            'description' => 'Product catalog, categories, variants, and shop management.',
+            'icon' => 'ShoppingCart',
+            'package' => 'laravelplus/ecommerce',
+            'configKey' => 'ecommerce.admin.enabled',
+            'settingsUrl' => '/admin/ecommerce',
+            'adminUrl' => '/admin/ecommerce',
+            'adminRouteName' => 'admin.ecommerce.dashboard',
+            'required' => false,
+        ],
     ];
 
     /**

@@ -215,9 +215,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                     >
                                         <Link
                                             v-if="!role.is_super_admin"
-                                            :href="
-                                                permissions(role.name).url
-                                            "
+                                            :href="permissions(role.name).url"
                                             class="text-sm text-primary hover:underline"
                                         >
                                             Permissions

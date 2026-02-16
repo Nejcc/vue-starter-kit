@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a3e847055155cc413ea0da8f8df3dd9f",
+    "content-hash": "1ada041df2a59189ca724407538473c7",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1841,12 +1841,12 @@
             "time": "2026-01-12T19:57:57+00:00"
         },
         {
-            "name": "laravelplus/global-settings",
+            "name": "laravelplus/ecommerce",
             "version": "dev-master",
             "dist": {
                 "type": "path",
-                "url": "packages/laravelplus/global-settings",
-                "reference": "203eb2947271c274b42d5afd09425fc7c5fc6e59"
+                "url": "packages/laravelplus/ecommerce",
+                "reference": "314705a7a5db23e86e5c13ddd37f77cf983bb841"
             },
             "require": {
                 "illuminate/database": "^12.0",
@@ -1855,8 +1855,73 @@
                 "php": "^8.4"
             },
             "require-dev": {
-                "orchestra/testbench": "^9.0",
-                "phpunit/phpunit": "^11.0"
+                "inertiajs/inertia-laravel": "^2.0",
+                "orchestra/testbench": "^10.0",
+                "phpunit/phpunit": "^11.0",
+                "spatie/laravel-permission": "^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelPlus\\Ecommerce\\EcommerceServiceProvider"
+                    ],
+                    "aliases": {
+                        "Ecommerce": "LaravelPlus\\Ecommerce\\Facades\\Ecommerce"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelPlus\\Ecommerce\\": "src/",
+                    "LaravelPlus\\Ecommerce\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LaravelPlus\\Ecommerce\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "LaravelPlus",
+                    "email": "info@laravelplus.com"
+                }
+            ],
+            "description": "An ecommerce package for Laravel with products, categories, variants, and admin panel support.",
+            "keywords": [
+                "categories",
+                "ecommerce",
+                "laravel",
+                "products",
+                "shop"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "laravelplus/global-settings",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "packages/laravelplus/global-settings",
+                "reference": "efc98501226d2c0dc14967bfd0dd9e2e2d88b684"
+            },
+            "require": {
+                "illuminate/database": "^12.0",
+                "illuminate/http": "^12.0",
+                "illuminate/support": "^12.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "inertiajs/inertia-laravel": "^2.0",
+                "orchestra/testbench": "^10.0",
+                "phpunit/phpunit": "^11.0",
+                "spatie/laravel-permission": "^6.0"
             },
             "type": "library",
             "extra": {
@@ -1904,7 +1969,7 @@
         },
         {
             "name": "laravelplus/localization",
-            "version": "dev-a7c5cfd00b42cba99bca5a44bb739c74d1c8c0e2",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/laravelplus/localization",
@@ -1969,7 +2034,7 @@
         },
         {
             "name": "laravelplus/payment-gateway",
-            "version": "dev-afb40cb9181c79b8d07e19be76f31916f476e719",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "packages/laravelplus/payment-gateway",
@@ -2036,7 +2101,7 @@
         },
         {
             "name": "laravelplus/subscribe",
-            "version": "dev-cdddc9e908ee894339901954b1846badb664c9ab",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "packages/laravelplus/subscribe",
@@ -2091,7 +2156,7 @@
         },
         {
             "name": "laravelplus/tenants",
-            "version": "dev-1b0235a16cd4959d5b1d063d14b9a544136cacd5",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/laravelplus/tenants",
@@ -9752,6 +9817,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "laravelplus/ecommerce": 20,
         "laravelplus/global-settings": 20,
         "laravelplus/localization": 20,
         "laravelplus/payment-gateway": 20,

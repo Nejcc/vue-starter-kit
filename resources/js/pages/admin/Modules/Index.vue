@@ -10,6 +10,7 @@ import {
     Mail,
     Package,
     Settings,
+    ShoppingCart,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import Heading from '@/components/Heading.vue';
@@ -42,6 +43,7 @@ const iconMap: Record<string, LucideIcon> = {
     CreditCard,
     Mail,
     Settings,
+    ShoppingCart,
 };
 
 function getIcon(name: string): LucideIcon {

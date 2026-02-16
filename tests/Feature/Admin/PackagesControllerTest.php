@@ -65,7 +65,7 @@ final class PackagesControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->has('packages', 5)
+            ->has('packages', 6)
         );
     }
 

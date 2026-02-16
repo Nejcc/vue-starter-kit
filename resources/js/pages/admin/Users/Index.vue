@@ -195,9 +195,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                                         class="flex items-center justify-end gap-3"
                                     >
                                         <Link
-                                            :href="
-                                                permissions(user.slug).url
-                                            "
+                                            :href="permissions(user.slug).url"
                                             class="text-sm text-primary hover:underline"
                                         >
                                             Permissions

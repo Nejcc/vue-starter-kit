@@ -150,6 +150,7 @@ final class HandleInertiaRequests extends Middleware
             'horizon' => Route::has('horizon.index'),
             'organizations' => Route::has('admin.organizations.index'),
             'localizations' => Route::has('admin.localizations.languages.index'),
+            'ecommerce' => Route::has('admin.ecommerce.dashboard'),
         ];
     }
 }

@@ -53,6 +53,7 @@ export interface InstalledModules {
     horizon: boolean;
     organizations: boolean;
     localizations: boolean;
+    ecommerce: boolean;
 }
 
 export interface SeoSharedProps {
